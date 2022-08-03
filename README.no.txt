@@ -1,1 +1,2 @@
-Værvarsel fra YR
+Værvarsel fra Yr.no
+

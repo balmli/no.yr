@@ -1,1 +1,1 @@
-Weather forecast served by YR
+Weather forecast served by Yr.no
