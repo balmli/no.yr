@@ -1,0 +1,21 @@
+{
+    "type": "number",
+    "title": {
+        "en": "Wind strength",
+        "no": "Vindstyrke"
+    },
+    "units": {
+        "en": "m/s"
+    },
+    "desc": {
+        "en": "Wind Strength in meters per second (m/s)",
+        "no": "Vindstyrke i meter pr. sekund (m/s)"
+    },
+    "insights": true,
+    "chartType": "spline",
+    "decimals": 2,
+    "getable": true,
+    "setable": false,
+    "uiComponent": "sensor",
+    "icon": "/assets/icon-wind.svg"
+}

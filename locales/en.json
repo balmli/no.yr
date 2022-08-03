@@ -1,0 +1,10 @@
+{
+  "device": {
+    "name": "Weather"
+  },
+  "time": {
+    "now": "now",
+    "hour": "in 1 hour",
+    "hours": "in __hour__ hours"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "title": {
+    "en": "Is the probability for rain !{{|not}} above X % starting Y to Z hours later",
+    "no": "Er sannsynligheten for regn !{{|ikke}} over X % fra Y til Z timer senere"
+  },
+  "titleFormatted": {
+    "en": "Is the probability for rain !{{|not}} above [[value]] % starting [[start]] to [[hours]] hours later",
+    "no": "Er sannsynligheten for regn !{{|ikke}} over [[value]] % fra [[start]] til [[hours]] timer senere"
+  },
+  "hint": {
+    "en": "Condition to check if the probability for rain is above a specific value for at least one of the hours in a period",
+    "no": "For å sjekke om sannsynligheten for regn er over en spesifikk verdi for minst en av timene i en periode"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=myr"
+    },
+    {
+      "type": "number",
+      "name": "value",
+      "title": {
+        "en": "Probability",
+        "no": "Sannsynlighet"
+      },
+      "placeholder": {
+        "en": "Probability...",
+        "no": "Sannsynlighet..."
+      },
+      "min": 0,
+      "max": 100,
+      "step": 1
+    },
+    {
+      "name": "start",
+      "title": {
+        "en": "Start",
+        "no": "Start"
+      },
+      "type": "autocomplete",
+      "placeholder": {
+        "en": "Start...",
+        "no": "Start..."
+      }
+    },
+    {
+      "type": "number",
+      "name": "hours",
+      "title": {
+        "en": "Hours",
+        "no": "Timer"
+      },
+      "placeholder": {
+        "en": "2",
+        "no": "2"
+      },
+      "min": 1,
+      "max": 24,
+      "step": 1
+    }
+  ]
+}

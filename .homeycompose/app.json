@@ -1,0 +1,69 @@
+{
+  "id": "no.yr",
+  "version": "0.0.1",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "brandColor": "#53b7ee",
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "Weather Forecast",
+    "no": "Værvarsel"
+  },
+  "description": {
+    "en": "Weather information and prognoses from Yr.no",
+    "no": "Værinformasjon og prognoser fra Yr.no"
+  },
+  "category": [
+    "climate"
+  ],
+  "tags": {
+    "en": [
+      "yr",
+      "weather",
+      "forecast",
+      "climate",
+      "rain",
+      "wind",
+      "precipitation"
+    ],
+    "no": [
+      "yr",
+      "weather",
+      "vær",
+      "varsel",
+      "værvarsel",
+      "klima",
+      "regn",
+      "vind"
+    ]
+  },
+  "images": {
+    "large": "/assets/images/large.png",
+    "small": "/assets/images/small.png"
+  },
+  "permissions": [
+    "homey:manager:geolocation"
+  ],
+  "author": {
+    "name": "Bjørnar Almli",
+    "email": "bjornar.almli@gmail.com"
+  },
+  "contributors": {
+    "developers": [
+      {
+        "name": "Bjørnar Almli",
+        "email": "bjornar.almli@gmail.com"
+      }
+    ]
+  },
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": "bjornaralmli"
+      }
+    }
+  },
+  "homeyCommunityTopicId": 0
+}

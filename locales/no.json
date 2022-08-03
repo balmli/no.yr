@@ -1,0 +1,10 @@
+{
+  "device": {
+    "name": "Værvarsel"
+  },
+  "time": {
+    "now": "nå",
+    "hour": "om 1 time",
+    "hours": "om __hour__ timer"
+  }
+}

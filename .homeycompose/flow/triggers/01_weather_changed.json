@@ -1,0 +1,45 @@
+{
+  "id": "01_weather_changed",
+  "highlight": true,
+  "title": {
+    "en": "Weather changes",
+    "no": "Værendring"
+  },
+  "hint": {
+    "en": "Triggers on weather updates, every hour.",
+    "no": "Dette kortet trigges når været oppdateres hver time."
+  },
+  "tokens": [
+    {
+      "name": "code",
+      "type": "string",
+      "title": {
+        "en": "Weather code",
+        "no": "Kode for vær"
+      }
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "title": {
+        "en": "Weather",
+        "no": "Vær"
+      }
+    },
+    {
+      "name": "all_data",
+      "type": "string",
+      "title": {
+        "en": "Weather data (JSON)",
+        "no": "Værdata (JSON)"
+      }
+    }
+  ],
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=myr"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "title": {
+    "en": "Weather situation !{{is|isn't}}",
+    "no": "Været er !{{|ikke}}"
+  },
+  "highlight": true,
+  "titleFormatted": {
+    "en": "Weather situation !{{is|isn't}} [[code]]",
+    "no": "Været er !{{|ikke}} [[code]]"
+  },
+  "hint": {
+    "en": "Condition to check the weather situation",
+    "no": "For å sjekke værsituasjonen"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=myr"
+    },
+    {
+      "name": "code",
+      "label": {
+        "en": "Weather",
+        "no": "Vær"
+      },
+      "type": "autocomplete",
+      "placeholder": {
+        "en": "Weather...",
+        "no": "Vær..."
+      }
+    }
+  ]
+}

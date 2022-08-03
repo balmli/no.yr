@@ -1,0 +1,246 @@
+{
+  "id": "period",
+  "type": "dropdown",
+  "label": {
+    "en": "Select period",
+    "no": "Velg periode"
+  },
+  "hint": {
+    "en": "Select period for the weather forecast. ",
+    "no": "Velg periode for værvarsel. "
+  },
+  "value": "0",
+  "values": [
+    {
+      "id": "0",
+      "label": {
+        "en": "Now",
+        "no": "Nå"
+      }
+    },
+    {
+      "id": "1",
+      "label": {
+        "en": "+1 hour",
+        "no": "+1 time"
+      }
+    },
+    {
+      "id": "2",
+      "label": {
+        "en": "+2 hours",
+        "no": "+2 timer"
+      }
+    },
+    {
+      "id": "3",
+      "label": {
+        "en": "+3 hours",
+        "no": "+3 timer"
+      }
+    },
+    {
+      "id": "4",
+      "label": {
+        "en": "+4 hours",
+        "no": "+4 timer"
+      }
+    },
+    {
+      "id": "5",
+      "label": {
+        "en": "+5 hours",
+        "no": "+5 timer"
+      }
+    },
+    {
+      "id": "6",
+      "label": {
+        "en": "+6 hours",
+        "no": "+6 timer"
+      }
+    },
+    {
+      "id": "8",
+      "label": {
+        "en": "+8 hours",
+        "no": "+8 timer"
+      }
+    },
+    {
+      "id": "12",
+      "label": {
+        "en": "+12 hours",
+        "no": "+12 timer"
+      }
+    },
+    {
+      "id": "18",
+      "label": {
+        "en": "+18 hours",
+        "no": "+18 timer"
+      }
+    },
+    {
+      "id": "24",
+      "label": {
+        "en": "+24 hours",
+        "no": "+24 timer"
+      }
+    },
+    {
+      "id": "30",
+      "label": {
+        "en": "+30 hours",
+        "no": "+30 timer"
+      }
+    },
+    {
+      "id": "36",
+      "label": {
+        "en": "+36 hours",
+        "no": "+36 timer"
+      }
+    },
+    {
+      "id": "1:0",
+      "label": {
+        "en": "+1 day, 00:00 UTC",
+        "no": "+1 dag, 00:00 UTC"
+      }
+    },
+    {
+      "id": "1:6",
+      "label": {
+        "en": "+1 day, 06:00 UTC",
+        "no": "+1 dag, 06:00 UTC"
+      }
+    },
+    {
+      "id": "1:12",
+      "label": {
+        "en": "+1 day, 12:00 UTC",
+        "no": "+1 dag, 12:00 UTC"
+      }
+    },
+    {
+      "id": "1:18",
+      "label": {
+        "en": "+1 day, 18:00 UTC",
+        "no": "+1 dag, 18:00 UTC"
+      }
+    },
+    {
+      "id": "2:0",
+      "label": {
+        "en": "+2 days, 00:00 UTC",
+        "no": "+2 dager, 00:00 UTC"
+      }
+    },
+    {
+      "id": "2:6",
+      "label": {
+        "en": "+2 days, 06:00 UTC",
+        "no": "+2 dager, 06:00 UTC"
+      }
+    },
+    {
+      "id": "2:12",
+      "label": {
+        "en": "+2 days, 12:00 UTC",
+        "no": "+2 dager, 12:00 UTC"
+      }
+    },
+    {
+      "id": "2:18",
+      "label": {
+        "en": "+2 days, 18:00 UTC",
+        "no": "+2 dager, 18:00 UTC"
+      }
+    },
+    {
+      "id": "3:0",
+      "label": {
+        "en": "+3 days, 00:00 UTC",
+        "no": "+3 dager, 00:00 UTC"
+      }
+    },
+    {
+      "id": "3:6",
+      "label": {
+        "en": "+3 days, 06:00 UTC",
+        "no": "+3 dager, 06:00 UTC"
+      }
+    },
+    {
+      "id": "3:12",
+      "label": {
+        "en": "+3 days, 12:00 UTC",
+        "no": "+3 dager, 12:00 UTC"
+      }
+    },
+    {
+      "id": "3:18",
+      "label": {
+        "en": "+3 days, 18:00 UTC",
+        "no": "+3 dager, 18:00 UTC"
+      }
+    },
+    {
+      "id": "4:0",
+      "label": {
+        "en": "+4 days, 00:00 UTC",
+        "no": "+4 dager, 00:00 UTC"
+      }
+    },
+    {
+      "id": "4:6",
+      "label": {
+        "en": "+4 days, 06:00 UTC",
+        "no": "+4 dager, 06:00 UTC"
+      }
+    },
+    {
+      "id": "4:12",
+      "label": {
+        "en": "+4 days, 12:00 UTC",
+        "no": "+4 dager, 12:00 UTC"
+      }
+    },
+    {
+      "id": "4:18",
+      "label": {
+        "en": "+4 days, 18:00 UTC",
+        "no": "+4 dager, 18:00 UTC"
+      }
+    },
+    {
+      "id": "5:0",
+      "label": {
+        "en": "+5 days, 00:00 UTC",
+        "no": "+5 dager, 00:00 UTC"
+      }
+    },
+    {
+      "id": "5:6",
+      "label": {
+        "en": "+5 days, 06:00 UTC",
+        "no": "+5 dager, 06:00 UTC"
+      }
+    },
+    {
+      "id": "5:12",
+      "label": {
+        "en": "+5 days, 12:00 UTC",
+        "no": "+5 dager, 12:00 UTC"
+      }
+    },
+    {
+      "id": "5:18",
+      "label": {
+        "en": "+5 days, 18:00 UTC",
+        "no": "+5 dager, 18:00 UTC"
+      }
+    }
+  ]
+}

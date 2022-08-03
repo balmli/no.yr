@@ -1,0 +1,16 @@
+{
+  "id": "altitude",
+  "type": "number",
+  "label": {
+    "en": "Altitude",
+    "no": "Høyde over havet"
+  },
+  "hint": {
+    "en": "Height above (or sometimes below) sea level in whole meters. Optional but recommended for precise temperature values. ",
+    "no": "Høyde over (eller noen ganger under) havnivå i hele meter. Valgfritt, men anbefalt for nøyaktige temperaturverdier. "
+  },
+  "value": -1,
+  "units": {
+    "en": "m"
+  }
+}

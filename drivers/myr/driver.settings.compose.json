@@ -1,0 +1,36 @@
+[
+  {
+    "type": "group",
+    "label": {
+      "en": "Forecast period",
+      "no": "Periode for varsel"
+    },
+    "children": [
+      {
+        "id": "period",
+        "$extends": "period"
+      }
+    ]
+  },
+  {
+    "type": "group",
+    "label": {
+      "en": "Location",
+      "no": "Lokasjon"
+    },
+    "children": [
+      {
+        "id": "lat",
+        "$extends": "lat"
+      },
+      {
+        "id": "lon",
+        "$extends": "lon"
+      },
+      {
+        "id": "altitude",
+        "$extends": "altitude"
+      }
+    ]
+  }
+]

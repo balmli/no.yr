@@ -1,0 +1,13 @@
+{
+  "id": "lon",
+  "type": "number",
+  "label": {
+    "en": "Longitude",
+    "no": "Lengdegrad"
+  },
+  "hint": {
+    "en": "Longitude",
+    "no": "Lengdegrad"
+  },
+  "value": 0
+}

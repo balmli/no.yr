@@ -1,0 +1,28 @@
+{
+  "id": "measure_fog_area_fraction_changed",
+  "title": {
+    "en": "Fog changed",
+    "no": "Tåke ble endret"
+  },
+  "hint": {
+    "en": "Triggers when the fog (%) changes.",
+    "no": "Dette kortet trigges når tåke (%) endres."
+  },
+  "tokens": [
+    {
+      "name": "measure_fog_area_fraction",
+      "type": "number",
+      "title": {
+        "en": "Fog",
+        "no": "Tåke"
+      }
+    }
+  ],
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=myr"
+    }
+  ]
+}

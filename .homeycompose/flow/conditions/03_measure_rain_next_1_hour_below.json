@@ -1,0 +1,24 @@
+{
+    "title": {
+        "en": "Is the probability for rain next hour !{{below|above}}",
+        "no": "Er sannsynligheten for regn neste time !{{under|over}}"
+    },
+    "titleFormatted": {
+        "en": "Is the probability for rain next hour !{{below|above}} [[value]] %",
+        "no": "Er sannsynligheten for regn neste time !{{under|over}} [[value]] %"
+    },
+    "hint": {
+        "en": "Condition to check if the probability for rain next hour is below or above a specific value",
+        "no": "For å sjekke om sannsynligheten for regn den neste timen er under eller over en spesifikk verdi"
+    },
+    "args": [{
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+        },
+        {
+            "name": "value",
+            "type": "number"
+        }
+    ]
+}

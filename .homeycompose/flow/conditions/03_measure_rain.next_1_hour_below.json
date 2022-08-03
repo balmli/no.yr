@@ -1,0 +1,24 @@
+{
+    "title": {
+        "en": "Is rain next hour !{{below|above}}",
+        "no": "Er regn neste time !{{under|over}}"
+    },
+    "titleFormatted": {
+        "en": "Is rain next hour !{{below|above}} [[value]] mm",
+        "no": "Er regn neste time !{{under|over}} [[value]] mm"
+    },
+    "hint": {
+        "en": "Condition to check if the current value for rain next hour is below or above a specific value",
+        "no": "For å sjekke om verdi for regn neste time er under eller over en spesifikk verdi"
+    },
+    "args": [{
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+        },
+        {
+            "name": "value",
+            "type": "number"
+        }
+    ]
+}

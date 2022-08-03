@@ -1,0 +1,63 @@
+{
+  "title": {
+    "en": "Is wind strength !{{|not}} above X m/s starting Y to Z hours later",
+    "no": "Er vindstyrke !{{|ikke}} over X m/s fra Y til Z timer senere"
+  },
+  "titleFormatted": {
+    "en": "Is wind strength !{{|not}} above [[value]] m/s starting [[start]] to [[hours]] hours later",
+    "no": "Er vindstyrke !{{|ikke}} over [[value]] m/s fra [[start]] til [[hours]] timer senere"
+  },
+  "hint": {
+    "en": "Condition to check if wind strength is above a specific value for at least one of the hours in a period",
+    "no": "For å sjekke om vindstyrke er over en spesifikk verdi for minst en av timene i en periode"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=myr"
+    },
+    {
+      "type": "number",
+      "name": "value",
+      "title": {
+        "en": "Wind strength",
+        "no": "Vindstyrke"
+      },
+      "placeholder": {
+        "en": "Wind strength...",
+        "no": "Vindstyrke..."
+      },
+      "min": 0,
+      "max": 100,
+      "step": 0.1
+    },
+    {
+      "name": "start",
+      "title": {
+        "en": "Start",
+        "no": "Start"
+      },
+      "type": "autocomplete",
+      "placeholder": {
+        "en": "Start...",
+        "no": "Start..."
+      }
+    },
+    {
+      "type": "number",
+      "name": "hours",
+      "title": {
+        "en": "Hours",
+        "no": "Timer"
+      },
+      "placeholder": {
+        "en": "2",
+        "no": "2"
+      },
+      "min": 1,
+      "max": 24,
+      "step": 1
+    }
+  ]
+}

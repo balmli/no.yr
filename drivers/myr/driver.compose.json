@@ -1,0 +1,73 @@
+{
+  "id": "myr",
+  "name": {
+    "en": "Yr"
+  },
+  "$extends": [
+    "defaults"
+  ],
+  "class": "sensor",
+  "connectivity": [
+    "cloud"
+  ],
+  "capabilities": [
+    "forecast_time",
+    "weather_description",
+    "measure_temperature",
+    "measure_temperature.feels_like",
+    "measure_rain.next_1_hour",
+    "measure_rain_next_1_hour",
+    "measure_rain.next_6_hours",
+    "measure_rain_next_6_hours",
+    "measure_temperature.min_next_6_hours",
+    "measure_temperature.max_next_6_hours",
+    "measure_pressure",
+    "measure_humidity",
+    "measure_cloud_area_fraction",
+    "measure_fog_area_fraction",
+    "measure_wind_strength",
+    "measure_wind_direction",
+    "measure_gust_strength",
+    "measure_wind_angle",
+    "measure_thunder_next_1_hour",
+    "measure_ultraviolet"
+  ],
+  "capabilitiesOptions": {
+    "measure_temperature.feels_like": {
+      "title": {
+        "en": "Feels like",
+        "no": "Føles som"
+      }
+    },
+    "measure_temperature.min_next_6_hours": {
+      "title": {
+        "en": "Min. temperature",
+        "no": "Min. temperatur"
+      }
+    },
+    "measure_temperature.max_next_6_hours": {
+      "title": {
+        "en": "Max. temperature",
+        "no": "Maks. temperatur"
+      }
+    },
+    "measure_pressure": {
+      "title": {
+        "en": "Air pressure at sea level",
+        "no": "Lufttrykk ved havnivå"
+      }
+    },
+    "measure_rain.next_1_hour": {
+      "title": {
+        "en": "Rain next hour",
+        "no": "Regn neste time"
+      }
+    },
+    "measure_rain.next_6_hours": {
+      "title": {
+        "en": "Rain next 6 hours",
+        "no": "Regn neste 6 timer"
+      }
+    }
+  }
+}

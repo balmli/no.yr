@@ -1,0 +1,63 @@
+{
+  "title": {
+    "en": "Is the sum of rain !{{|not}} above X mm starting Y to Z hours later",
+    "no": "Er sum av regn !{{|ikke}} over X mm fra Y til Z timer senere"
+  },
+  "titleFormatted": {
+    "en": "Is the sum of rain !{{|not}} above [[value]] mm starting [[start]] to [[hours]] hours later",
+    "no": "Er sum av regn !{{|ikke}} over [[value]] mm fra [[start]] til [[hours]] timer senere"
+  },
+  "hint": {
+    "en": "Condition to check if the sum of rain in mm is above a specific value in a period",
+    "no": "For å sjekke om sum av regn i mm er over en spesifikk verdi i en periode"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=myr"
+    },
+    {
+      "type": "number",
+      "name": "value",
+      "title": {
+        "en": "Sum of rain (mm)",
+        "no": "Sum av regn (mm)"
+      },
+      "placeholder": {
+        "en": "Sum of rain (mm)...",
+        "no": "Sum av regn (mm)..."
+      },
+      "min": 0,
+      "max": 100,
+      "step": 1
+    },
+    {
+      "name": "start",
+      "title": {
+        "en": "Start",
+        "no": "Start"
+      },
+      "type": "autocomplete",
+      "placeholder": {
+        "en": "Start...",
+        "no": "Start..."
+      }
+    },
+    {
+      "type": "number",
+      "name": "hours",
+      "title": {
+        "en": "Hours",
+        "no": "Timer"
+      },
+      "placeholder": {
+        "en": "2",
+        "no": "2"
+      },
+      "min": 1,
+      "max": 24,
+      "step": 1
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "measure_wind_direction_changed",
+  "title": {
+    "en": "Wind direction changed",
+    "no": "Vindretning ble endret"
+  },
+  "hint": {
+    "en": "Triggers when the wind direction (text) changes.",
+    "no": "Dette kortet trigges når vindretning (tekst) endres."
+  },
+  "tokens": [
+    {
+      "name": "measure_wind_direction",
+      "type": "string",
+      "title": {
+        "en": "Wind direction",
+        "no": "Vindretning"
+      }
+    }
+  ],
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=myr"
+    }
+  ]
+}

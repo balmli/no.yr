@@ -1,0 +1,24 @@
+{
+    "title": {
+        "en": "Is wind angle !{{below|above}}",
+        "no": "Er vindvinkel !{{under|over}}"
+    },
+    "titleFormatted": {
+        "en": "Is wind angle !{{below|above}} [[value]] °",
+        "no": "Er vindvinkel !{{under|over}} [[value]] °"
+    },
+    "hint": {
+        "en": "Condition to check if the current value for wind angle is below or above a specific value",
+        "no": "For å sjekke om verdi for vindvinkel er under eller over en spesifikk verdi"
+    },
+    "args": [{
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+        },
+        {
+            "name": "value",
+            "type": "number"
+        }
+    ]
+}

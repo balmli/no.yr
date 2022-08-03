@@ -1,0 +1,15 @@
+{
+    "type": "number",
+    "title": {
+        "en": "Rain next 6 hours",
+        "no": "Regn neste 6 timer"
+    },
+    "uiComponent": "sensor",
+    "getable": true,
+    "setable": false,
+    "insights": false,
+    "units": {
+        "en": "%"
+    },
+    "icon": "/assets/icon-drop-percent.svg"
+}

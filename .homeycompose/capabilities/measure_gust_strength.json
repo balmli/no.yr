@@ -1,0 +1,21 @@
+{
+    "type": "number",
+    "title": {
+        "en": "Gust strength",
+        "no": "Vindkast"
+    },
+    "units": {
+        "en": "m/s"
+    },
+    "desc": {
+        "en": "Gust Strength in meters per second (m/s)",
+        "no": "Vindkast i meter pr. sekund (m/s)"
+    },
+    "insights": true,
+    "chartType": "spline",
+    "decimals": 2,
+    "getable": true,
+    "setable": false,
+    "uiComponent": "sensor",
+    "icon": "/assets/icon-wind.svg"
+}

@@ -1,0 +1,28 @@
+{
+  "id": "measure_rain_next_1_hour_changed",
+  "title": {
+    "en": "Rain next hour changed",
+    "no": "Regn neste time ble endret"
+  },
+  "hint": {
+    "en": "Triggers when the probability for rain next hour (%) changes.",
+    "no": "Dette kortet trigges når sannsynligheten for regn neste time (%) endres."
+  },
+  "tokens": [
+    {
+      "name": "measure_rain_next_1_hour",
+      "type": "number",
+      "title": {
+        "en": "Rain next hour",
+        "no": "Regn neste time"
+      }
+    }
+  ],
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=myr"
+    }
+  ]
+}

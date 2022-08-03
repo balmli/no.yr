@@ -1,0 +1,15 @@
+{
+    "type": "number",
+    "title": {
+        "en": "Cloudiness",
+        "no": "Skydekke"
+    },
+    "uiComponent": "sensor",
+    "getable": true,
+    "setable": false,
+    "insights": false,
+    "units": {
+        "en": "%"
+    },
+    "icon": "/assets/icon-partly-cloudy.svg"
+}

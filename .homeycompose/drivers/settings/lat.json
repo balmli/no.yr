@@ -1,0 +1,13 @@
+{
+  "id": "lat",
+  "type": "number",
+  "label": {
+    "en": "Latitude",
+    "no": "Breddegrad"
+  },
+  "hint": {
+    "en": "Latitude",
+    "no": "Breddegrad"
+  },
+  "value": 0
+}

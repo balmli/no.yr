@@ -1,0 +1,12 @@
+{
+    "type": "string",
+    "title": {
+        "en": "Forecast time",
+        "no": "Værvarsel for"
+    },
+    "uiComponent": "sensor",
+    "getable": true,
+    "setable": false,
+    "insights": false,
+    "icon": "/assets/icon-calendar.svg"
+}

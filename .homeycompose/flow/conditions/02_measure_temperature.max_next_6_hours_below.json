@@ -1,0 +1,24 @@
+{
+    "title": {
+        "en": "Is max. temperature !{{below|above}}",
+        "no": "Er maks. temperatur !{{under|over}}"
+    },
+    "titleFormatted": {
+        "en": "Is max. temperature !{{below|above}} [[value]] °C",
+        "no": "Er maks. temperatur !{{under|over}} [[value]] °C"
+    },
+    "hint": {
+        "en": "Condition to check if the current value for maximum temperature next 6 hours is below or above a specific value",
+        "no": "For å sjekke om verdi for maksimum temperatur neste 6 timer er under eller over en spesifikk verdi"
+    },
+    "args": [{
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+        },
+        {
+            "name": "value",
+            "type": "number"
+        }
+    ]
+}

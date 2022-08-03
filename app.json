@@ -1,0 +1,2495 @@
+{
+  "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
+  "id": "no.yr",
+  "version": "0.0.1",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "brandColor": "#53b7ee",
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "Weather Forecast",
+    "no": "Værvarsel"
+  },
+  "description": {
+    "en": "Weather information and prognoses from Yr.no",
+    "no": "Værinformasjon og prognoser fra Yr.no"
+  },
+  "category": [
+    "climate"
+  ],
+  "tags": {
+    "en": [
+      "yr",
+      "weather",
+      "forecast",
+      "climate",
+      "rain",
+      "wind",
+      "precipitation"
+    ],
+    "no": [
+      "yr",
+      "weather",
+      "vær",
+      "varsel",
+      "værvarsel",
+      "klima",
+      "regn",
+      "vind"
+    ]
+  },
+  "images": {
+    "large": "/assets/images/large.png",
+    "small": "/assets/images/small.png"
+  },
+  "permissions": [
+    "homey:manager:geolocation"
+  ],
+  "author": {
+    "name": "Bjørnar Almli",
+    "email": "bjornar.almli@gmail.com"
+  },
+  "contributors": {
+    "developers": [
+      {
+        "name": "Bjørnar Almli",
+        "email": "bjornar.almli@gmail.com"
+      }
+    ]
+  },
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": "bjornaralmli"
+      }
+    }
+  },
+  "homeyCommunityTopicId": 0,
+  "flow": {
+    "triggers": [
+      {
+        "id": "01_weather_changed",
+        "highlight": true,
+        "title": {
+          "en": "Weather changes",
+          "no": "Værendring"
+        },
+        "hint": {
+          "en": "Triggers on weather updates.",
+          "no": "Dette kortet trigges når været oppdateres."
+        },
+        "tokens": [
+          {
+            "name": "code",
+            "type": "string",
+            "title": {
+              "en": "Weather code",
+              "no": "Kode for vær"
+            }
+          },
+          {
+            "name": "description",
+            "type": "string",
+            "title": {
+              "en": "Weather",
+              "no": "Vær"
+            }
+          },
+          {
+            "name": "all_data",
+            "type": "string",
+            "title": {
+              "en": "Weather data (JSON)",
+              "no": "Værdata (JSON)"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          }
+        ]
+      },
+      {
+        "id": "measure_cloud_area_fraction_changed",
+        "title": {
+          "en": "Cloudiness changed",
+          "no": "Skydekke ble endret"
+        },
+        "hint": {
+          "en": "Triggers when the cloudiness (%) changes.",
+          "no": "Dette kortet trigges når skydekke (%) endres."
+        },
+        "tokens": [
+          {
+            "name": "measure_cloud_area_fraction",
+            "type": "number",
+            "title": {
+              "en": "Cloudiness",
+              "no": "Skydekke"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          }
+        ]
+      },
+      {
+        "id": "measure_fog_area_fraction_changed",
+        "title": {
+          "en": "Fog changed",
+          "no": "Tåke ble endret"
+        },
+        "hint": {
+          "en": "Triggers when the fog (%) changes.",
+          "no": "Dette kortet trigges når tåke (%) endres."
+        },
+        "tokens": [
+          {
+            "name": "measure_fog_area_fraction",
+            "type": "number",
+            "title": {
+              "en": "Fog",
+              "no": "Tåke"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          }
+        ]
+      },
+      {
+        "id": "measure_rain_next_1_hour_changed",
+        "title": {
+          "en": "Rain next hour changed",
+          "no": "Regn neste time ble endret"
+        },
+        "hint": {
+          "en": "Triggers when the probability for rain next hour (%) changes.",
+          "no": "Dette kortet trigges når sannsynligheten for regn neste time (%) endres."
+        },
+        "tokens": [
+          {
+            "name": "measure_rain_next_1_hour",
+            "type": "number",
+            "title": {
+              "en": "Rain next hour",
+              "no": "Regn neste time"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          }
+        ]
+      },
+      {
+        "id": "measure_rain_next_6_hours_changed",
+        "title": {
+          "en": "Rain next 6 hours changed",
+          "no": "Regn neste 6 timer ble endret"
+        },
+        "hint": {
+          "en": "Triggers when the probability for rain next 6 hours (%) changes.",
+          "no": "Dette kortet trigges når sannsynligheten for regn neste 6 timer (%) endres."
+        },
+        "tokens": [
+          {
+            "name": "measure_rain_next_6_hours",
+            "type": "number",
+            "title": {
+              "en": "Rain next 6 hours",
+              "no": "Regn neste 6 timer"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          }
+        ]
+      },
+      {
+        "id": "measure_thunder_next_1_hour_changed",
+        "title": {
+          "en": "Thunder next hour changed",
+          "no": "Torden neste time ble endret"
+        },
+        "hint": {
+          "en": "Triggers when the probability for thunder next hour (%) changes.",
+          "no": "Dette kortet trigges når sannsynligheten for torden neste time (%) endres."
+        },
+        "tokens": [
+          {
+            "name": "measure_thunder_next_1_hour",
+            "type": "number",
+            "title": {
+              "en": "Thunder next hour",
+              "no": "Torden neste time"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          }
+        ]
+      },
+      {
+        "id": "measure_wind_direction_changed",
+        "title": {
+          "en": "Wind direction changed",
+          "no": "Vindretning ble endret"
+        },
+        "hint": {
+          "en": "Triggers when the wind direction (text) changes.",
+          "no": "Dette kortet trigges når vindretning (tekst) endres."
+        },
+        "tokens": [
+          {
+            "name": "measure_wind_direction",
+            "type": "string",
+            "title": {
+              "en": "Wind direction",
+              "no": "Vindretning"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          }
+        ]
+      }
+    ],
+    "conditions": [
+      {
+        "title": {
+          "en": "Weather situation !{{is|isn't}}",
+          "no": "Været er !{{|ikke}}"
+        },
+        "highlight": true,
+        "titleFormatted": {
+          "en": "Weather situation !{{is|isn't}} [[code]]",
+          "no": "Været er !{{|ikke}} [[code]]"
+        },
+        "hint": {
+          "en": "Condition to check the weather situation",
+          "no": "For å sjekke værsituasjonen"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "code",
+            "label": {
+              "en": "Weather",
+              "no": "Vær"
+            },
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Weather...",
+              "no": "Vær..."
+            }
+          }
+        ],
+        "id": "01_is_weather"
+      },
+      {
+        "title": {
+          "en": "Is temperature !{{below|above}}",
+          "no": "Er temperatur !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is temperature !{{below|above}} [[value]] °C",
+          "no": "Er temperatur !{{under|over}} [[value]] °C"
+        },
+        "hint": {
+          "en": "Condition to check if the current value for temperature is below or above a specific value",
+          "no": "For å sjekke om verdi for temperatur er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "02_measure_temperature_below"
+      },
+      {
+        "title": {
+          "en": "Is feels like temperature !{{below|above}}",
+          "no": "Er føles som temperatur !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is feels like temperature !{{below|above}} [[value]] °C",
+          "no": "Er føles som temperatur !{{under|over}} [[value]] °C"
+        },
+        "hint": {
+          "en": "Condition to check if the current value for feels like temperature is below or above a specific value",
+          "no": "For å sjekke om verdi for føles som temperatur er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "02_measure_temperature.feels_like_below"
+      },
+      {
+        "title": {
+          "en": "Is max. temperature !{{below|above}}",
+          "no": "Er maks. temperatur !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is max. temperature !{{below|above}} [[value]] °C",
+          "no": "Er maks. temperatur !{{under|over}} [[value]] °C"
+        },
+        "hint": {
+          "en": "Condition to check if the current value for maximum temperature next 6 hours is below or above a specific value",
+          "no": "For å sjekke om verdi for maksimum temperatur neste 6 timer er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "02_measure_temperature.max_next_6_hours_below"
+      },
+      {
+        "title": {
+          "en": "Is min. temperature !{{below|above}}",
+          "no": "Er min. temperatur !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is min. temperature !{{below|above}} [[value]] °C",
+          "no": "Er min. temperatur !{{under|over}} [[value]] °C"
+        },
+        "hint": {
+          "en": "Condition to check if the current value for minimum temperature next 6 hours is below or above a specific value",
+          "no": "For å sjekke om verdi for minimum temperatur neste 6 timer er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "02_measure_temperature.min_next_6_hours_below"
+      },
+      {
+        "title": {
+          "en": "Is the temperature !{{|not}} above X °C starting Y to Z hours later",
+          "no": "Er temperaturen !{{|ikke}} over X °C fra Y til Z timer senere"
+        },
+        "titleFormatted": {
+          "en": "Is the temperature !{{|not}} above [[value]] °C starting [[start]] to [[hours]] hours later",
+          "no": "Er temperaturen !{{|ikke}} over [[value]] °C fra [[start]] til [[hours]] timer senere"
+        },
+        "hint": {
+          "en": "Condition to check if the temperature is above a specific value for at least one of the hours in a period",
+          "no": "For å sjekke om temperaturen er over en spesifikk verdi for minst en av timene i en periode"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Temperature",
+              "no": "Temperatur"
+            },
+            "placeholder": {
+              "en": "Temperature...",
+              "no": "Temperatur..."
+            },
+            "min": -100,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "name": "start",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Start...",
+              "no": "Start..."
+            }
+          },
+          {
+            "type": "number",
+            "name": "hours",
+            "title": {
+              "en": "Hours",
+              "no": "Timer"
+            },
+            "placeholder": {
+              "en": "2",
+              "no": "2"
+            },
+            "min": 1,
+            "max": 24,
+            "step": 1
+          }
+        ],
+        "id": "02_temperature_next_hours_above"
+      },
+      {
+        "title": {
+          "en": "Is the temperature !{{|not}} below X °C starting Y to Z hours later",
+          "no": "Er temperaturen !{{|ikke}} under X °C fra Y til Z timer senere"
+        },
+        "titleFormatted": {
+          "en": "Is the temperature !{{|not}} below [[value]] °C starting [[start]] to [[hours]] hours later",
+          "no": "Er temperaturen !{{|ikke}} under [[value]] °C fra [[start]] til [[hours]] timer senere"
+        },
+        "hint": {
+          "en": "Condition to check if the temperature is below a specific value for at least one of the hours in a period",
+          "no": "For å sjekke om temperaturen er under en spesifikk verdi for minst en av timene i en periode"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Temperature",
+              "no": "Temperatur"
+            },
+            "placeholder": {
+              "en": "Temperature...",
+              "no": "Temperatur..."
+            },
+            "min": -100,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "name": "start",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Start...",
+              "no": "Start..."
+            }
+          },
+          {
+            "type": "number",
+            "name": "hours",
+            "title": {
+              "en": "Hours",
+              "no": "Timer"
+            },
+            "placeholder": {
+              "en": "2",
+              "no": "2"
+            },
+            "min": 1,
+            "max": 24,
+            "step": 1
+          }
+        ],
+        "id": "02_temperature_next_hours_below"
+      },
+      {
+        "title": {
+          "en": "Is the temperature above X °C between HH:mm and HH:mm today/tomorrow",
+          "no": "Er temperaturen over X °C fra HH:mm til HH:mm i dag/i morgen"
+        },
+        "titleFormatted": {
+          "en": "Is the temperature above [[value]] °C between [[start]] and [[end]] [[day]]",
+          "no": "Er temperaturen over [[value]] °C fra [[start]] til [[end]] [[day]]"
+        },
+        "hint": {
+          "en": "Condition to check if the temperature is above a specific value for at least one of the hours in a period today or tomorrow",
+          "no": "For å sjekke om temperaturen er over en spesifikk verdi for minst en av timene i en periode i dag eller i morgen"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Temperature",
+              "no": "Temperatur"
+            },
+            "placeholder": {
+              "en": "Temperature...",
+              "no": "Temperatur..."
+            },
+            "min": -100,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "name": "start",
+            "type": "time",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "placeholder": {
+              "en": "08:00"
+            }
+          },
+          {
+            "name": "end",
+            "type": "time",
+            "title": {
+              "en": "End",
+              "no": "Slutt"
+            },
+            "placeholder": {
+              "en": "14:00"
+            }
+          },
+          {
+            "name": "day",
+            "type": "dropdown",
+            "title": {
+              "en": "Day",
+              "no": "Dag"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "today",
+                  "no": "i dag"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "tomorrow",
+                  "no": "i morgen"
+                }
+              }
+            ]
+          }
+        ],
+        "id": "02_temperature_period_above"
+      },
+      {
+        "title": {
+          "en": "Is the temperature !{{|not}} below X °C between HH:mm and HH:mm today/tomorrow",
+          "no": "Er temperaturen !{{|ikke}} under X °C fra HH:mm til HH:mm i dag/i morgen"
+        },
+        "titleFormatted": {
+          "en": "Is the temperature !{{|not}} below [[value]] °C between [[start]] and [[end]] [[day]]",
+          "no": "Er temperaturen !{{|ikke}} under [[value]] °C fra [[start]] til [[end]] [[day]]"
+        },
+        "hint": {
+          "en": "Condition to check if the temperature is below a specific value for at least one of the hours in a period today or tomorrow",
+          "no": "For å sjekke om temperaturen er under en spesifikk verdi for minst en av timene i en periode i dag eller i morgen"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Temperature",
+              "no": "Temperatur"
+            },
+            "placeholder": {
+              "en": "Temperature...",
+              "no": "Temperatur..."
+            },
+            "min": -100,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "name": "start",
+            "type": "time",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "placeholder": {
+              "en": "08:00"
+            }
+          },
+          {
+            "name": "end",
+            "type": "time",
+            "title": {
+              "en": "End",
+              "no": "Slutt"
+            },
+            "placeholder": {
+              "en": "14:00"
+            }
+          },
+          {
+            "name": "day",
+            "type": "dropdown",
+            "title": {
+              "en": "Day",
+              "no": "Dag"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "today",
+                  "no": "i dag"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "tomorrow",
+                  "no": "i morgen"
+                }
+              }
+            ]
+          }
+        ],
+        "id": "02_temperature_period_below"
+      },
+      {
+        "title": {
+          "en": "Is the probability for rain next hour !{{below|above}}",
+          "no": "Er sannsynligheten for regn neste time !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is the probability for rain next hour !{{below|above}} [[value]] %",
+          "no": "Er sannsynligheten for regn neste time !{{under|over}} [[value]] %"
+        },
+        "hint": {
+          "en": "Condition to check if the probability for rain next hour is below or above a specific value",
+          "no": "For å sjekke om sannsynligheten for regn den neste timen er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "03_measure_rain_next_1_hour_below"
+      },
+      {
+        "title": {
+          "en": "Is the probability for rain next 6 hours !{{below|above}}",
+          "no": "Er sannsynligheten for regn neste 6 timer !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is the probability for rain next 6 hours !{{below|above}} [[value]] %",
+          "no": "Er sannsynligheten for regn neste 6 timer !{{under|over}} [[value]] %"
+        },
+        "hint": {
+          "en": "Condition to check if the probability for rain next 6 hours is below or above a specific value",
+          "no": "For å sjekke om sannsynligheten for regn neste 6 timer er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "03_measure_rain_next_6_hours_below"
+      },
+      {
+        "title": {
+          "en": "Is rain next hour !{{below|above}}",
+          "no": "Er regn neste time !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is rain next hour !{{below|above}} [[value]] mm",
+          "no": "Er regn neste time !{{under|over}} [[value]] mm"
+        },
+        "hint": {
+          "en": "Condition to check if the current value for rain next hour is below or above a specific value",
+          "no": "For å sjekke om verdi for regn neste time er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "03_measure_rain.next_1_hour_below"
+      },
+      {
+        "title": {
+          "en": "Is rain next 6 hours !{{below|above}}",
+          "no": "Er regn neste 6 timer !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is rain next 6 hours !{{below|above}} [[value]] mm",
+          "no": "Er regn neste 6 timer !{{under|over}} [[value]] mm"
+        },
+        "hint": {
+          "en": "Condition to check if the current value for rain next 6 hours is below or above a specific value",
+          "no": "For å sjekke om verdi for regn neste 6 timer er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "03_measure_rain.next_6_hours_below"
+      },
+      {
+        "title": {
+          "en": "Is the probability for rain !{{|not}} above X % starting Y to Z hours later",
+          "no": "Er sannsynligheten for regn !{{|ikke}} over X % fra Y til Z timer senere"
+        },
+        "titleFormatted": {
+          "en": "Is the probability for rain !{{|not}} above [[value]] % starting [[start]] to [[hours]] hours later",
+          "no": "Er sannsynligheten for regn !{{|ikke}} over [[value]] % fra [[start]] til [[hours]] timer senere"
+        },
+        "hint": {
+          "en": "Condition to check if the probability for rain is above a specific value for at least one of the hours in a period",
+          "no": "For å sjekke om sannsynligheten for regn er over en spesifikk verdi for minst en av timene i en periode"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Probability",
+              "no": "Sannsynlighet"
+            },
+            "placeholder": {
+              "en": "Probability...",
+              "no": "Sannsynlighet..."
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "name": "start",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Start...",
+              "no": "Start..."
+            }
+          },
+          {
+            "type": "number",
+            "name": "hours",
+            "title": {
+              "en": "Hours",
+              "no": "Timer"
+            },
+            "placeholder": {
+              "en": "2",
+              "no": "2"
+            },
+            "min": 1,
+            "max": 24,
+            "step": 1
+          }
+        ],
+        "id": "03_rain_probability_next_hours_above"
+      },
+      {
+        "title": {
+          "en": "Is the probability for rain !{{|not}} above X % between HH:mm and HH:mm today/tomorrow",
+          "no": "Er sannsynligheten for regn !{{|ikke}} over X % fra HH:mm til HH:mm i dag/i morgen"
+        },
+        "titleFormatted": {
+          "en": "Is the probability for rain !{{|not}} above [[value]] % between [[start]] and [[end]] [[day]]",
+          "no": "Er sannsynligheten for regn !{{|ikke}} over [[value]] % fra [[start]] til [[end]] [[day]]"
+        },
+        "hint": {
+          "en": "Condition to check if the probability for rain is above a specific value for at least one of the hours in a period today or tomorrow",
+          "no": "For å sjekke om sannsynligheten for regn er over en spesifikk verdi for minst en av timene i en periode i dag eller i morgen"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Probability",
+              "no": "Sannsynlighet"
+            },
+            "placeholder": {
+              "en": "Probability...",
+              "no": "Sannsynlighet..."
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "name": "start",
+            "type": "time",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "placeholder": {
+              "en": "08:00"
+            }
+          },
+          {
+            "name": "end",
+            "type": "time",
+            "title": {
+              "en": "End",
+              "no": "Slutt"
+            },
+            "placeholder": {
+              "en": "14:00"
+            }
+          },
+          {
+            "name": "day",
+            "type": "dropdown",
+            "title": {
+              "en": "Day",
+              "no": "Dag"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "today",
+                  "no": "i dag"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "tomorrow",
+                  "no": "i morgen"
+                }
+              }
+            ]
+          }
+        ],
+        "id": "03_rain_probability_period_above"
+      },
+      {
+        "title": {
+          "en": "Is the sum of rain !{{|not}} above X mm starting Y to Z hours later",
+          "no": "Er sum av regn !{{|ikke}} over X mm fra Y til Z timer senere"
+        },
+        "titleFormatted": {
+          "en": "Is the sum of rain !{{|not}} above [[value]] mm starting [[start]] to [[hours]] hours later",
+          "no": "Er sum av regn !{{|ikke}} over [[value]] mm fra [[start]] til [[hours]] timer senere"
+        },
+        "hint": {
+          "en": "Condition to check if the sum of rain in mm is above a specific value in a period",
+          "no": "For å sjekke om sum av regn i mm er over en spesifikk verdi i en periode"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Sum of rain (mm)",
+              "no": "Sum av regn (mm)"
+            },
+            "placeholder": {
+              "en": "Sum of rain (mm)...",
+              "no": "Sum av regn (mm)..."
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "name": "start",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Start...",
+              "no": "Start..."
+            }
+          },
+          {
+            "type": "number",
+            "name": "hours",
+            "title": {
+              "en": "Hours",
+              "no": "Timer"
+            },
+            "placeholder": {
+              "en": "2",
+              "no": "2"
+            },
+            "min": 1,
+            "max": 24,
+            "step": 1
+          }
+        ],
+        "id": "03_rain_sum_next_hours_above"
+      },
+      {
+        "title": {
+          "en": "Is the sum of rain rain !{{|not}} above X mm between HH:mm and HH:mm today/tomorrow",
+          "no": "Er sum av regn !{{|ikke}} over X mm fra HH:mm til HH:mm i dag/i morgen"
+        },
+        "titleFormatted": {
+          "en": "Is the sum of rain !{{|not}} above [[value]] mm between [[start]] and [[end]] [[day]]",
+          "no": "Er sum av regn !{{|ikke}} over [[value]] mm fra [[start]] til [[end]] [[day]]"
+        },
+        "hint": {
+          "en": "Condition to check if the sum of rain in mm is above a specific value in a period today or tomorrow",
+          "no": "For å sjekke om sum av regn i mm er over en spesifikk verdi i en periode i dag eller i morgen"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Sum of rain (mm)",
+              "no": "Sum av regn (mm)"
+            },
+            "placeholder": {
+              "en": "Sum of rain (mm)...",
+              "no": "Sum av regn (mm)..."
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "name": "start",
+            "type": "time",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "placeholder": {
+              "en": "08:00"
+            }
+          },
+          {
+            "name": "end",
+            "type": "time",
+            "title": {
+              "en": "End",
+              "no": "Slutt"
+            },
+            "placeholder": {
+              "en": "14:00"
+            }
+          },
+          {
+            "name": "day",
+            "type": "dropdown",
+            "title": {
+              "en": "Day",
+              "no": "Dag"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "today",
+                  "no": "i dag"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "tomorrow",
+                  "no": "i morgen"
+                }
+              }
+            ]
+          }
+        ],
+        "id": "03_rain_sum_period_above"
+      },
+      {
+        "title": {
+          "en": "Is wind strength !{{below|above}}",
+          "no": "Er vindstyrke !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is wind strength !{{below|above}} [[value]] m/s",
+          "no": "Er vindstyrke !{{under|over}} [[value]] m/s"
+        },
+        "hint": {
+          "en": "Condition to check if the current value for wind strength is below or above a specific value",
+          "no": "For å sjekke om verdi for vindstyrke er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "10_measure_wind_strength_below"
+      },
+      {
+        "title": {
+          "en": "Is wind strength !{{|not}} above X m/s starting Y to Z hours later",
+          "no": "Er vindstyrke !{{|ikke}} over X m/s fra Y til Z timer senere"
+        },
+        "titleFormatted": {
+          "en": "Is wind strength !{{|not}} above [[value]] m/s starting [[start]] to [[hours]] hours later",
+          "no": "Er vindstyrke !{{|ikke}} over [[value]] m/s fra [[start]] til [[hours]] timer senere"
+        },
+        "hint": {
+          "en": "Condition to check if wind strength is above a specific value for at least one of the hours in a period",
+          "no": "For å sjekke om vindstyrke er over en spesifikk verdi for minst en av timene i en periode"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Wind strength",
+              "no": "Vindstyrke"
+            },
+            "placeholder": {
+              "en": "Wind strength...",
+              "no": "Vindstyrke..."
+            },
+            "min": 0,
+            "max": 100,
+            "step": 0.1
+          },
+          {
+            "name": "start",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Start...",
+              "no": "Start..."
+            }
+          },
+          {
+            "type": "number",
+            "name": "hours",
+            "title": {
+              "en": "Hours",
+              "no": "Timer"
+            },
+            "placeholder": {
+              "en": "2",
+              "no": "2"
+            },
+            "min": 1,
+            "max": 24,
+            "step": 1
+          }
+        ],
+        "id": "10_wind_strength_next_hours_above"
+      },
+      {
+        "title": {
+          "en": "Is wind strength !{{|not}} above X m/s between HH:mm and HH:mm today/tomorrow",
+          "no": "Er vindstyrke !{{|ikke}} over X m/s fra HH:mm til HH:mm i dag/i morgen"
+        },
+        "titleFormatted": {
+          "en": "Is wind strength !{{|not}} above [[value]] m/s between [[start]] and [[end]] [[day]]",
+          "no": "Er vindstyrke !{{|ikke}} over [[value]] m/s fra [[start]] til [[end]] [[day]]"
+        },
+        "hint": {
+          "en": "Condition to check if wind strength is above a specific value for at least one of the hours in a period today or tomorrow",
+          "no": "For å sjekke om vindstyrke er over en spesifikk verdi for minst en av timene i en periode i dag eller i morgen"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Wind strength",
+              "no": "Vindstyrke"
+            },
+            "placeholder": {
+              "en": "Wind strength...",
+              "no": "Vindstyrke..."
+            },
+            "min": 0,
+            "max": 100,
+            "step": 0.1
+          },
+          {
+            "name": "start",
+            "type": "time",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "placeholder": {
+              "en": "08:00"
+            }
+          },
+          {
+            "name": "end",
+            "type": "time",
+            "title": {
+              "en": "End",
+              "no": "Slutt"
+            },
+            "placeholder": {
+              "en": "14:00"
+            }
+          },
+          {
+            "name": "day",
+            "type": "dropdown",
+            "title": {
+              "en": "Day",
+              "no": "Dag"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "today",
+                  "no": "i dag"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "tomorrow",
+                  "no": "i morgen"
+                }
+              }
+            ]
+          }
+        ],
+        "id": "10_wind_strength_period_above"
+      },
+      {
+        "title": {
+          "en": "Is wind angle !{{below|above}}",
+          "no": "Er vindvinkel !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is wind angle !{{below|above}} [[value]] °",
+          "no": "Er vindvinkel !{{under|over}} [[value]] °"
+        },
+        "hint": {
+          "en": "Condition to check if the current value for wind angle is below or above a specific value",
+          "no": "For å sjekke om verdi for vindvinkel er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "11_measure_wind_angle_below"
+      },
+      {
+        "title": {
+          "en": "Is gust speed !{{below|above}}",
+          "no": "Er vindkast !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is gust speed !{{below|above}} [[value]] m/s",
+          "no": "Er vindkast !{{under|over}} [[value]] m/s"
+        },
+        "hint": {
+          "en": "Condition to check if the current value for gust speed is below or above a specific value",
+          "no": "For å sjekke om verdi for vindkast er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "15_measure_gust_strength_below"
+      },
+      {
+        "title": {
+          "en": "Is humidity !{{below|above}}",
+          "no": "Er luftfuktighet !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is humidity !{{below|above}} [[value]] %",
+          "no": "Er luftfuktighet !{{under|over}} [[value]] %"
+        },
+        "hint": {
+          "en": "Condition to check if the current value for humidity is below or above a specific value",
+          "no": "For å sjekke om verdi for luftfuktighet er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "20_measure_humidity_below"
+      },
+      {
+        "title": {
+          "en": "Is air pressure !{{below|above}}",
+          "no": "Er lufttrykk !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is air pressure !{{below|above}} [[value]] hPa",
+          "no": "Er lufttrykk !{{under|over}} [[value]] hPa"
+        },
+        "hint": {
+          "en": "Condition to check if the current value for air pressure is below or above a specific value",
+          "no": "For å sjekke om verdi for lufttrykk er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "30_measure_pressure_below"
+      },
+      {
+        "title": {
+          "en": "Is cloudiness !{{below|above}}",
+          "no": "Er skydekke !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is cloudiness !{{below|above}} [[value]] %",
+          "no": "Er skydekke !{{under|over}} [[value]] %"
+        },
+        "hint": {
+          "en": "Condition to check if the current value for cloudiness is below or above a specific value",
+          "no": "For å sjekke om verdi for skydekke er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "40_measure_cloud_area_fraction_below"
+      },
+      {
+        "title": {
+          "en": "Is cloudiness !{{|not}} above X % starting Y to Z hours later",
+          "no": "Er skydekke !{{|ikke}} over X % fra Y til Z timer senere"
+        },
+        "titleFormatted": {
+          "en": "Is cloudiness !{{|not}} above [[value]] % starting [[start]] to [[hours]] hours later",
+          "no": "Er skydekke !{{|ikke}} over [[value]] % fra [[start]] til [[hours]] timer senere"
+        },
+        "hint": {
+          "en": "Condition to check if cloudiness is above a specific value for at least one of the hours in a period",
+          "no": "For å sjekke om skydekke er over en spesifikk verdi for minst en av timene i en periode"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Cloudiness",
+              "no": "Skydekke"
+            },
+            "placeholder": {
+              "en": "Cloudiness...",
+              "no": "Skydekke..."
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "name": "start",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Start...",
+              "no": "Start..."
+            }
+          },
+          {
+            "type": "number",
+            "name": "hours",
+            "title": {
+              "en": "Hours",
+              "no": "Timer"
+            },
+            "placeholder": {
+              "en": "2",
+              "no": "2"
+            },
+            "min": 1,
+            "max": 24,
+            "step": 1
+          }
+        ],
+        "id": "41_cloud_next_hours_above"
+      },
+      {
+        "title": {
+          "en": "Is cloudiness !{{|not}} above X % between HH:mm and HH:mm today/tomorrow",
+          "no": "Er skydekke !{{|ikke}} over X % fra HH:mm til HH:mm i dag/i morgen"
+        },
+        "titleFormatted": {
+          "en": "Is cloudiness !{{|not}} above [[value]] % between [[start]] and [[end]] [[day]]",
+          "no": "Er skydekke !{{|ikke}} over [[value]] % fra [[start]] til [[end]] [[day]]"
+        },
+        "hint": {
+          "en": "Condition to check if cloudiness is above a specific value for at least one of the hours in a period today or tomorrow",
+          "no": "For å sjekke om skydekke er over en spesifikk verdi for minst en av timene i en periode i dag eller i morgen"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Cloudiness",
+              "no": "Skydekke"
+            },
+            "placeholder": {
+              "en": "Cloudiness...",
+              "no": "Skydekke..."
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "name": "start",
+            "type": "time",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "placeholder": {
+              "en": "08:00"
+            }
+          },
+          {
+            "name": "end",
+            "type": "time",
+            "title": {
+              "en": "End",
+              "no": "Slutt"
+            },
+            "placeholder": {
+              "en": "14:00"
+            }
+          },
+          {
+            "name": "day",
+            "type": "dropdown",
+            "title": {
+              "en": "Day",
+              "no": "Dag"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "today",
+                  "no": "i dag"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "tomorrow",
+                  "no": "i morgen"
+                }
+              }
+            ]
+          }
+        ],
+        "id": "41_cloud_period_above"
+      },
+      {
+        "title": {
+          "en": "Is fog !{{below|above}}",
+          "no": "Er tåke !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is fog !{{below|above}} [[value]] %",
+          "no": "Er tåke !{{under|over}} [[value]] %"
+        },
+        "hint": {
+          "en": "Condition to check if the current value for fog is below or above a specific value",
+          "no": "For å sjekke om verdi for tåke er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "50_measure_fog_area_fraction_below"
+      },
+      {
+        "title": {
+          "en": "Is fog !{{|not}} above X % starting Y to Z hours later",
+          "no": "Er tåke !{{|ikke}} over X % fra Y til Z timer senere"
+        },
+        "titleFormatted": {
+          "en": "Is fog !{{|not}} above [[value]] % starting [[start]] to [[hours]] hours later",
+          "no": "Er tåke !{{|ikke}} over [[value]] % fra [[start]] til [[hours]] timer senere"
+        },
+        "hint": {
+          "en": "Condition to check if fog is above a specific value for at least one of the hours in a period",
+          "no": "For å sjekke om tåke er over en spesifikk verdi for minst en av timene i en periode"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Fog",
+              "no": "Tåke"
+            },
+            "placeholder": {
+              "en": "Fog...",
+              "no": "Tåke..."
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "name": "start",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Start...",
+              "no": "Start..."
+            }
+          },
+          {
+            "type": "number",
+            "name": "hours",
+            "title": {
+              "en": "Hours",
+              "no": "Timer"
+            },
+            "placeholder": {
+              "en": "2",
+              "no": "2"
+            },
+            "min": 1,
+            "max": 24,
+            "step": 1
+          }
+        ],
+        "id": "51_fog_next_hours_above"
+      },
+      {
+        "title": {
+          "en": "Is fog !{{|not}} above X % between HH:mm and HH:mm today/tomorrow",
+          "no": "Er tåke !{{|ikke}} over X % fra HH:mm til HH:mm i dag/i morgen"
+        },
+        "titleFormatted": {
+          "en": "Is fog !{{|not}} above [[value]] % between [[start]] and [[end]] [[day]]",
+          "no": "Er tåke !{{|ikke}} over [[value]] % fra [[start]] til [[end]] [[day]]"
+        },
+        "hint": {
+          "en": "Condition to check if fog is above a specific value for at least one of the hours in a period today or tomorrow",
+          "no": "For å sjekke om tåke er over en spesifikk verdi for minst en av timene i en periode i dag eller i morgen"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Fog",
+              "no": "Tåke"
+            },
+            "placeholder": {
+              "en": "Fog...",
+              "no": "Tåke..."
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "name": "start",
+            "type": "time",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "placeholder": {
+              "en": "08:00"
+            }
+          },
+          {
+            "name": "end",
+            "type": "time",
+            "title": {
+              "en": "End",
+              "no": "Slutt"
+            },
+            "placeholder": {
+              "en": "14:00"
+            }
+          },
+          {
+            "name": "day",
+            "type": "dropdown",
+            "title": {
+              "en": "Day",
+              "no": "Dag"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "today",
+                  "no": "i dag"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "tomorrow",
+                  "no": "i morgen"
+                }
+              }
+            ]
+          }
+        ],
+        "id": "51_fog_period_above"
+      },
+      {
+        "title": {
+          "en": "Is the probability for thunder next hour !{{below|above}}",
+          "no": "Er sannsynligheten for torden neste time !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is the probability for thunder next hour !{{below|above}} [[value]] %",
+          "no": "Er sannsynligheten for torden neste time !{{under|over}} [[value]] %"
+        },
+        "hint": {
+          "en": "Condition to check if the probability for thunder next hour is below or above a specific value",
+          "no": "For å sjekke om sannsynligheten for torden den neste timen er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "60_measure_thunder_next_1_hour_below"
+      },
+      {
+        "title": {
+          "en": "Is the probability for thunder !{{|not}} above X % starting Y to Z hours later",
+          "no": "Er sannsynligheten for torden !{{|ikke}} over X % fra Y til Z timer senere"
+        },
+        "titleFormatted": {
+          "en": "Is the probability for thunder !{{|not}} above [[value]] % starting [[start]] to [[hours]] hours later",
+          "no": "Er sannsynligheten for torden !{{|ikke}} over [[value]] % fra [[start]] til [[hours]] timer senere"
+        },
+        "hint": {
+          "en": "Condition to check if the probability for thunder is above a specific value for at least one of the hours in a period",
+          "no": "For å sjekke om sannsynligheten for torden er over en spesifikk verdi for minst en av timene i en periode"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Probability",
+              "no": "Sannsynlighet"
+            },
+            "placeholder": {
+              "en": "Probability...",
+              "no": "Sannsynlighet..."
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "name": "start",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Start...",
+              "no": "Start..."
+            }
+          },
+          {
+            "type": "number",
+            "name": "hours",
+            "title": {
+              "en": "Hours",
+              "no": "Timer"
+            },
+            "placeholder": {
+              "en": "2",
+              "no": "2"
+            },
+            "min": 1,
+            "max": 24,
+            "step": 1
+          }
+        ],
+        "id": "60_thunder_next_hours_above"
+      },
+      {
+        "title": {
+          "en": "Is the probability for thunder !{{|not}} above X % between HH:mm and HH:mm today/tomorrow",
+          "no": "Er sannsynligheten for torden !{{|ikke}} over X % fra HH:mm til HH:mm i dag/i morgen"
+        },
+        "titleFormatted": {
+          "en": "Is the probability for thunder !{{|not}} above [[value]] % between [[start]] and [[end]] [[day]]",
+          "no": "Er sannsynligheten for torden !{{|ikke}} over [[value]] % fra [[start]] til [[end]] [[day]]"
+        },
+        "hint": {
+          "en": "Condition to check if the probability for thunder is above a specific value for at least one of the hours in a period today or tomorrow",
+          "no": "For å sjekke om sannsynligheten for torden er over en spesifikk verdi for minst en av timene i en periode i dag eller i morgen"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Probability",
+              "no": "Sannsynlighet"
+            },
+            "placeholder": {
+              "en": "Probability...",
+              "no": "Sannsynlighet..."
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "name": "start",
+            "type": "time",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "placeholder": {
+              "en": "08:00"
+            }
+          },
+          {
+            "name": "end",
+            "type": "time",
+            "title": {
+              "en": "End",
+              "no": "Slutt"
+            },
+            "placeholder": {
+              "en": "14:00"
+            }
+          },
+          {
+            "name": "day",
+            "type": "dropdown",
+            "title": {
+              "en": "Day",
+              "no": "Dag"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "today",
+                  "no": "i dag"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "tomorrow",
+                  "no": "i morgen"
+                }
+              }
+            ]
+          }
+        ],
+        "id": "60_thunder_period_above"
+      },
+      {
+        "title": {
+          "en": "Is ultraviolet !{{below|above}}",
+          "no": "Er ultrafiolett !{{under|over}}"
+        },
+        "titleFormatted": {
+          "en": "Is ultraviolet !{{below|above}} [[value]] UVI",
+          "no": "Er ultrafiolett !{{under|over}} [[value]] UVI"
+        },
+        "hint": {
+          "en": "Condition to check if the current value for ultraviolet is below or above a specific value",
+          "no": "For å sjekke om verdi for ultrafiolett er under eller over en spesifikk verdi"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "value",
+            "type": "number"
+          }
+        ],
+        "id": "70_measure_ultraviolet_below"
+      }
+    ]
+  },
+  "drivers": [
+    {
+      "icon": "/drivers/myr/assets/icon.svg",
+      "images": {
+        "large": "/drivers/myr/assets/images/large.png",
+        "small": "/drivers/myr/assets/images/small.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_my_devices"
+          }
+        },
+        {
+          "id": "add_my_devices",
+          "template": "add_devices"
+        }
+      ],
+      "id": "myr",
+      "name": {
+        "en": "Yr"
+      },
+      "class": "sensor",
+      "connectivity": [
+        "cloud"
+      ],
+      "capabilities": [
+        "forecast_time",
+        "weather_description",
+        "measure_temperature",
+        "measure_temperature.feels_like",
+        "measure_rain.next_1_hour",
+        "measure_rain_next_1_hour",
+        "measure_rain.next_6_hours",
+        "measure_rain_next_6_hours",
+        "measure_temperature.min_next_6_hours",
+        "measure_temperature.max_next_6_hours",
+        "measure_pressure",
+        "measure_humidity",
+        "measure_cloud_area_fraction",
+        "measure_fog_area_fraction",
+        "measure_wind_strength",
+        "measure_wind_direction",
+        "measure_gust_strength",
+        "measure_wind_angle",
+        "measure_thunder_next_1_hour",
+        "measure_ultraviolet"
+      ],
+      "capabilitiesOptions": {
+        "measure_temperature.feels_like": {
+          "title": {
+            "en": "Feels like",
+            "no": "Føles som"
+          }
+        },
+        "measure_temperature.min_next_6_hours": {
+          "title": {
+            "en": "Min. temperature",
+            "no": "Min. temperatur"
+          }
+        },
+        "measure_temperature.max_next_6_hours": {
+          "title": {
+            "en": "Max. temperature",
+            "no": "Maks. temperatur"
+          }
+        },
+        "measure_pressure": {
+          "title": {
+            "en": "Air pressure at sea level",
+            "no": "Lufttrykk ved havnivå"
+          }
+        },
+        "measure_rain.next_1_hour": {
+          "title": {
+            "en": "Rain next hour",
+            "no": "Regn neste time"
+          }
+        },
+        "measure_rain.next_6_hours": {
+          "title": {
+            "en": "Rain next 6 hours",
+            "no": "Regn neste 6 timer"
+          }
+        }
+      },
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Forecast period",
+            "no": "Periode for varsel"
+          },
+          "children": [
+            {
+              "id": "period",
+              "type": "dropdown",
+              "label": {
+                "en": "Select period",
+                "no": "Velg periode"
+              },
+              "hint": {
+                "en": "Select period for the weather forecast. ",
+                "no": "Velg periode for værvarsel. "
+              },
+              "value": "0",
+              "values": [
+                {
+                  "id": "0",
+                  "label": {
+                    "en": "Now",
+                    "no": "Nå"
+                  }
+                },
+                {
+                  "id": "1",
+                  "label": {
+                    "en": "+1 hour",
+                    "no": "+1 time"
+                  }
+                },
+                {
+                  "id": "2",
+                  "label": {
+                    "en": "+2 hours",
+                    "no": "+2 timer"
+                  }
+                },
+                {
+                  "id": "3",
+                  "label": {
+                    "en": "+3 hours",
+                    "no": "+3 timer"
+                  }
+                },
+                {
+                  "id": "4",
+                  "label": {
+                    "en": "+4 hours",
+                    "no": "+4 timer"
+                  }
+                },
+                {
+                  "id": "5",
+                  "label": {
+                    "en": "+5 hours",
+                    "no": "+5 timer"
+                  }
+                },
+                {
+                  "id": "6",
+                  "label": {
+                    "en": "+6 hours",
+                    "no": "+6 timer"
+                  }
+                },
+                {
+                  "id": "8",
+                  "label": {
+                    "en": "+8 hours",
+                    "no": "+8 timer"
+                  }
+                },
+                {
+                  "id": "12",
+                  "label": {
+                    "en": "+12 hours",
+                    "no": "+12 timer"
+                  }
+                },
+                {
+                  "id": "18",
+                  "label": {
+                    "en": "+18 hours",
+                    "no": "+18 timer"
+                  }
+                },
+                {
+                  "id": "24",
+                  "label": {
+                    "en": "+24 hours",
+                    "no": "+24 timer"
+                  }
+                },
+                {
+                  "id": "30",
+                  "label": {
+                    "en": "+30 hours",
+                    "no": "+30 timer"
+                  }
+                },
+                {
+                  "id": "36",
+                  "label": {
+                    "en": "+36 hours",
+                    "no": "+36 timer"
+                  }
+                },
+                {
+                  "id": "1:0",
+                  "label": {
+                    "en": "+1 day, 00:00 UTC",
+                    "no": "+1 dag, 00:00 UTC"
+                  }
+                },
+                {
+                  "id": "1:6",
+                  "label": {
+                    "en": "+1 day, 06:00 UTC",
+                    "no": "+1 dag, 06:00 UTC"
+                  }
+                },
+                {
+                  "id": "1:12",
+                  "label": {
+                    "en": "+1 day, 12:00 UTC",
+                    "no": "+1 dag, 12:00 UTC"
+                  }
+                },
+                {
+                  "id": "1:18",
+                  "label": {
+                    "en": "+1 day, 18:00 UTC",
+                    "no": "+1 dag, 18:00 UTC"
+                  }
+                },
+                {
+                  "id": "2:0",
+                  "label": {
+                    "en": "+2 days, 00:00 UTC",
+                    "no": "+2 dager, 00:00 UTC"
+                  }
+                },
+                {
+                  "id": "2:6",
+                  "label": {
+                    "en": "+2 days, 06:00 UTC",
+                    "no": "+2 dager, 06:00 UTC"
+                  }
+                },
+                {
+                  "id": "2:12",
+                  "label": {
+                    "en": "+2 days, 12:00 UTC",
+                    "no": "+2 dager, 12:00 UTC"
+                  }
+                },
+                {
+                  "id": "2:18",
+                  "label": {
+                    "en": "+2 days, 18:00 UTC",
+                    "no": "+2 dager, 18:00 UTC"
+                  }
+                },
+                {
+                  "id": "3:0",
+                  "label": {
+                    "en": "+3 days, 00:00 UTC",
+                    "no": "+3 dager, 00:00 UTC"
+                  }
+                },
+                {
+                  "id": "3:6",
+                  "label": {
+                    "en": "+3 days, 06:00 UTC",
+                    "no": "+3 dager, 06:00 UTC"
+                  }
+                },
+                {
+                  "id": "3:12",
+                  "label": {
+                    "en": "+3 days, 12:00 UTC",
+                    "no": "+3 dager, 12:00 UTC"
+                  }
+                },
+                {
+                  "id": "3:18",
+                  "label": {
+                    "en": "+3 days, 18:00 UTC",
+                    "no": "+3 dager, 18:00 UTC"
+                  }
+                },
+                {
+                  "id": "4:0",
+                  "label": {
+                    "en": "+4 days, 00:00 UTC",
+                    "no": "+4 dager, 00:00 UTC"
+                  }
+                },
+                {
+                  "id": "4:6",
+                  "label": {
+                    "en": "+4 days, 06:00 UTC",
+                    "no": "+4 dager, 06:00 UTC"
+                  }
+                },
+                {
+                  "id": "4:12",
+                  "label": {
+                    "en": "+4 days, 12:00 UTC",
+                    "no": "+4 dager, 12:00 UTC"
+                  }
+                },
+                {
+                  "id": "4:18",
+                  "label": {
+                    "en": "+4 days, 18:00 UTC",
+                    "no": "+4 dager, 18:00 UTC"
+                  }
+                },
+                {
+                  "id": "5:0",
+                  "label": {
+                    "en": "+5 days, 00:00 UTC",
+                    "no": "+5 dager, 00:00 UTC"
+                  }
+                },
+                {
+                  "id": "5:6",
+                  "label": {
+                    "en": "+5 days, 06:00 UTC",
+                    "no": "+5 dager, 06:00 UTC"
+                  }
+                },
+                {
+                  "id": "5:12",
+                  "label": {
+                    "en": "+5 days, 12:00 UTC",
+                    "no": "+5 dager, 12:00 UTC"
+                  }
+                },
+                {
+                  "id": "5:18",
+                  "label": {
+                    "en": "+5 days, 18:00 UTC",
+                    "no": "+5 dager, 18:00 UTC"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Location",
+            "no": "Lokasjon"
+          },
+          "children": [
+            {
+              "id": "lat",
+              "type": "number",
+              "label": {
+                "en": "Latitude",
+                "no": "Breddegrad"
+              },
+              "hint": {
+                "en": "Latitude",
+                "no": "Breddegrad"
+              },
+              "value": 0
+            },
+            {
+              "id": "lon",
+              "type": "number",
+              "label": {
+                "en": "Longitude",
+                "no": "Lengdegrad"
+              },
+              "hint": {
+                "en": "Longitude",
+                "no": "Lengdegrad"
+              },
+              "value": 0
+            },
+            {
+              "id": "altitude",
+              "type": "number",
+              "label": {
+                "en": "Altitude",
+                "no": "Høyde over havet"
+              },
+              "hint": {
+                "en": "Height above (or sometimes below) sea level in whole meters. Optional but recommended for precise temperature values. ",
+                "no": "Høyde over (eller noen ganger under) havnivå i hele meter. Valgfritt, men anbefalt for nøyaktige temperaturverdier. "
+              },
+              "value": -1,
+              "units": {
+                "en": "m"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "capabilities": {
+    "forecast_time": {
+      "type": "string",
+      "title": {
+        "en": "Forecast time",
+        "no": "Værvarsel for"
+      },
+      "uiComponent": "sensor",
+      "getable": true,
+      "setable": false,
+      "insights": false,
+      "icon": "/assets/icon-calendar.svg"
+    },
+    "measure_cloud_area_fraction": {
+      "type": "number",
+      "title": {
+        "en": "Cloudiness",
+        "no": "Skydekke"
+      },
+      "uiComponent": "sensor",
+      "getable": true,
+      "setable": false,
+      "insights": false,
+      "units": {
+        "en": "%"
+      },
+      "icon": "/assets/icon-partly-cloudy.svg"
+    },
+    "measure_fog_area_fraction": {
+      "type": "number",
+      "title": {
+        "en": "Fog",
+        "no": "Tåke"
+      },
+      "uiComponent": "sensor",
+      "getable": true,
+      "setable": false,
+      "insights": false,
+      "units": {
+        "en": "%"
+      },
+      "icon": "/assets/icon-partly-cloudy.svg"
+    },
+    "measure_gust_strength": {
+      "type": "number",
+      "title": {
+        "en": "Gust strength",
+        "no": "Vindkast"
+      },
+      "units": {
+        "en": "m/s"
+      },
+      "desc": {
+        "en": "Gust Strength in meters per second (m/s)",
+        "no": "Vindkast i meter pr. sekund (m/s)"
+      },
+      "insights": true,
+      "chartType": "spline",
+      "decimals": 2,
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/icon-wind.svg"
+    },
+    "measure_rain_next_1_hour": {
+      "type": "number",
+      "title": {
+        "en": "Rain next hour",
+        "no": "Regn neste time"
+      },
+      "uiComponent": "sensor",
+      "getable": true,
+      "setable": false,
+      "insights": false,
+      "units": {
+        "en": "%"
+      },
+      "icon": "/assets/icon-drop-percent.svg"
+    },
+    "measure_rain_next_6_hours": {
+      "type": "number",
+      "title": {
+        "en": "Rain next 6 hours",
+        "no": "Regn neste 6 timer"
+      },
+      "uiComponent": "sensor",
+      "getable": true,
+      "setable": false,
+      "insights": false,
+      "units": {
+        "en": "%"
+      },
+      "icon": "/assets/icon-drop-percent.svg"
+    },
+    "measure_thunder_next_1_hour": {
+      "type": "number",
+      "title": {
+        "en": "Thunder next hour",
+        "no": "Torden neste time"
+      },
+      "uiComponent": "sensor",
+      "getable": true,
+      "setable": false,
+      "insights": false,
+      "units": {
+        "en": "%"
+      },
+      "icon": "/assets/icon-thunder-probability.svg"
+    },
+    "measure_wind_direction": {
+      "type": "string",
+      "title": {
+        "en": "Wind direction",
+        "no": "Vindretning"
+      },
+      "uiComponent": "sensor",
+      "getable": true,
+      "setable": false,
+      "insights": false,
+      "icon": "/assets/icon-wind-direction.svg"
+    },
+    "measure_wind_strength": {
+      "type": "number",
+      "title": {
+        "en": "Wind strength",
+        "no": "Vindstyrke"
+      },
+      "units": {
+        "en": "m/s"
+      },
+      "desc": {
+        "en": "Wind Strength in meters per second (m/s)",
+        "no": "Vindstyrke i meter pr. sekund (m/s)"
+      },
+      "insights": true,
+      "chartType": "spline",
+      "decimals": 2,
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/icon-wind.svg"
+    },
+    "weather_description": {
+      "type": "string",
+      "title": {
+        "en": "Weather",
+        "no": "Vær"
+      },
+      "uiComponent": "sensor",
+      "getable": true,
+      "setable": false,
+      "insights": false,
+      "icon": "/assets/icon-i.svg"
+    }
+  }
+}

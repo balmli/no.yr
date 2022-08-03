@@ -1,0 +1,82 @@
+{
+  "title": {
+    "en": "Is fog !{{|not}} above X % between HH:mm and HH:mm today/tomorrow",
+    "no": "Er tåke !{{|ikke}} over X % fra HH:mm til HH:mm i dag/i morgen"
+  },
+  "titleFormatted": {
+    "en": "Is fog !{{|not}} above [[value]] % between [[start]] and [[end]] [[day]]",
+    "no": "Er tåke !{{|ikke}} over [[value]] % fra [[start]] til [[end]] [[day]]"
+  },
+  "hint": {
+    "en": "Condition to check if fog is above a specific value for at least one of the hours in a period today or tomorrow",
+    "no": "For å sjekke om tåke er over en spesifikk verdi for minst en av timene i en periode i dag eller i morgen"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=myr"
+    },
+    {
+      "type": "number",
+      "name": "value",
+      "title": {
+        "en": "Fog",
+        "no": "Tåke"
+      },
+      "placeholder": {
+        "en": "Fog...",
+        "no": "Tåke..."
+      },
+      "min": 0,
+      "max": 100,
+      "step": 1
+    },
+    {
+      "name": "start",
+      "type": "time",
+      "title": {
+        "en": "Start",
+        "no": "Start"
+      },
+      "placeholder": {
+        "en": "08:00"
+      }
+    },
+    {
+      "name": "end",
+      "type": "time",
+      "title": {
+        "en": "End",
+        "no": "Slutt"
+      },
+      "placeholder": {
+        "en": "14:00"
+      }
+    },
+    {
+      "name": "day",
+      "type": "dropdown",
+      "title": {
+        "en": "Day",
+        "no": "Dag"
+      },
+      "values": [
+        {
+          "id": "0",
+          "label": {
+            "en": "today",
+            "no": "i dag"
+          }
+        },
+        {
+          "id": "1",
+          "label": {
+            "en": "tomorrow",
+            "no": "i morgen"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "measure_cloud_area_fraction_changed",
+  "title": {
+    "en": "Cloudiness changed",
+    "no": "Skydekke ble endret"
+  },
+  "hint": {
+    "en": "Triggers when the cloudiness (%) changes.",
+    "no": "Dette kortet trigges når skydekke (%) endres."
+  },
+  "tokens": [
+    {
+      "name": "measure_cloud_area_fraction",
+      "type": "number",
+      "title": {
+        "en": "Cloudiness",
+        "no": "Skydekke"
+      }
+    }
+  ],
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=myr"
+    }
+  ]
+}
