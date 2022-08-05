@@ -1,6 +1,6 @@
 {
   "id": "no.yr",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "brandColor": "#53b7ee",
@@ -12,8 +12,8 @@
     "no": "Værvarsel"
   },
   "description": {
-    "en": "Weather information and prognoses from Yr.no",
-    "no": "Værinformasjon og prognoser fra Yr.no"
+    "en": "Always up to date on weather forecasts",
+    "no": "Alltid oppdatert på været"
   },
   "category": [
     "climate"
