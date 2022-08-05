@@ -1,6 +1,8 @@
-import {YrTimeserie, YrTimeseries} from "./types";
+import {InstantDetails, YrTimeserie, YrTimeseries} from "./types";
 import moment from "./moment-timezone-with-data";
-import {round2} from "./math";
+
+const math = require('./math');
+const Feels = require('feels');
 
 const getStartTimeNextHours = (forDate: any, args: any): any => {
     const {start} = args;
@@ -56,7 +58,7 @@ const xSum = (args: any,
               sumSelector: (ts: YrTimeserie) => number,
               compareFunc: (sum: number | undefined, value: number) => boolean
 ): boolean => {
-    return compareFunc(round2(tss
+    return compareFunc(math.round2(tss
         .map(ts => ({time: moment(ts.time), val: sumSelector(ts)}))
         .filter(t => t.time.isSameOrAfter(startTime) && t.time.isBefore(endTime))
         .map(ts => ts.val)
@@ -80,7 +82,6 @@ export const periodComparer = (forDate: any,
 }
 
 
-
 export const nextHoursSum = (forDate: any,
                              args: any,
                              tss: YrTimeseries,
@@ -97,4 +98,24 @@ export const periodSum = (forDate: any,
                           compareFunc: (sum: number | undefined, value: number) => boolean
 ): boolean => {
     return xSum(args, getStartTimePeriod(forDate, args), getEndTimePeriod(forDate, args), tss, sumSelector, compareFunc);
+}
+
+const degs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW", "N"];
+
+export const degreesToText = (num: number): string => {
+    const val = Math.abs(Math.round((num % 360) / 22.5));
+    return degs[val];
+}
+
+export const calculateFeelsLike = (instant: InstantDetails): number => {
+    const config = {
+        temp: instant.air_temperature,
+        humidity: instant.relative_humidity,
+        speed: instant.wind_speed,
+        units: {
+            temp: 'c',
+            speed: 'mps'
+        }
+    };
+    return math.round1(new Feels(config).like());
 }

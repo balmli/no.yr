@@ -16,6 +16,15 @@ The app is not created or endorsed in any way by Yr.no.
 
 ### Release Notes:
 
+#### 1.0.3
+
+- New conditions for the weather situation for next hours and a period
+- Fixed smaller issues
+
+#### 1.0.2
+
+- Adjustments for app store
+
 #### 1.0.1
 
 - Set the ID for Homey community

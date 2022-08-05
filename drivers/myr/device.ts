@@ -1,12 +1,19 @@
 import Homey from "homey";
 
-import {InstantDetails, YrComplete, YrTimeserie, YrTimeseries} from '../../lib/types';
+import {YrComplete, YrTimeserie, YrTimeseries} from '../../lib/types';
 import {WeatherLegends} from "../../lib/legends";
-import {nextHoursComparer, nextHoursSum, periodComparer, periodSum} from "../../lib/yr_lib";
+import {
+    calculateFeelsLike,
+    degreesToText,
+    nextHoursComparer,
+    nextHoursSum,
+    periodComparer,
+    periodSum
+} from "../../lib/yr_lib";
 
 const math = require('../../lib/math');
 const http = require('http.min');
-const Feels = require('feels');
+
 const moment = require('../../lib/moment-timezone-with-data');
 
 module.exports = class YrDevice extends Homey.Device {
@@ -75,6 +82,75 @@ module.exports = class YrDevice extends Homey.Device {
         }
     }
 
+    async updateCapabilities(): Promise<void> {
+        if (this._weatherData) {
+            const units = this._weatherData.properties.meta.units;
+            const removeCaps: string[] = [];
+            const addCaps: string[] = [];
+
+            if (!units.probability_of_precipitation) {
+                if (this.hasCapability('measure_rain_next_1_hour')) {
+                    removeCaps.push('measure_rain_next_1_hour');
+                }
+                if (this.hasCapability('measure_rain_next_6_hours')) {
+                    removeCaps.push('measure_rain_next_6_hours');
+                }
+            } else {
+                if (!this.hasCapability('measure_rain_next_1_hour')) {
+                    addCaps.push('measure_rain_next_1_hour');
+                }
+                if (!this.hasCapability('measure_rain_next_6_hours')) {
+                    addCaps.push('measure_rain_next_6_hours');
+                }
+            }
+            if (!units.wind_speed_of_gust) {
+                if (this.hasCapability('measure_gust_strength')) {
+                    removeCaps.push('measure_gust_strength');
+                }
+            } else {
+                if (!this.hasCapability('measure_gust_strength')) {
+                    addCaps.push('measure_gust_strength');
+                }
+            }
+            if (!units.probability_of_thunder) {
+                if (this.hasCapability('measure_thunder_next_1_hour')) {
+                    removeCaps.push('measure_thunder_next_1_hour');
+                }
+            } else {
+                if (!this.hasCapability('measure_thunder_next_1_hour')) {
+                    addCaps.push('measure_thunder_next_1_hour');
+                }
+            }
+
+            await this.updateAndSortCapabilities(removeCaps, addCaps);
+        }
+    }
+
+    async updateAndSortCapabilities(removeCaps: string[], addCaps: string[]): Promise<void> {
+        try {
+            /*
+            if (removeCaps.length === 0 && addCaps.length === 0) {
+                return;
+            }
+            const caps = this.driver.manifest.capabilities as string[];
+            const allCapsAndValues = caps.map(capabilityId => ({capabilityId, value: this.getCapabilityValue(capabilityId)}));
+            */
+
+            for (const cap of removeCaps) {
+                if (this.hasCapability(cap)) {
+                    await this.removeCapability(cap);
+                }
+            }
+            for (const cap of addCaps) {
+                if (!this.hasCapability(cap)) {
+                    await this.addCapability(cap);
+                }
+            }
+        } catch (err) {
+            this.logger.error(err);
+        }
+    }
+
     clearFetchData() {
         if (this._fetchDataTimeout) {
             this.homey.clearTimeout(this._fetchDataTimeout);
@@ -108,6 +184,7 @@ module.exports = class YrDevice extends Homey.Device {
             this.clearFetchData();
             this.clearUpdateDevice();
             this._weatherData = await this.fetchWeather();
+            await this.updateCapabilities();
             if (this._forceUpdateDevice === true) {
                 await this.updateDevice(this._weatherData);
             }
@@ -256,22 +333,22 @@ module.exports = class YrDevice extends Homey.Device {
             }
 
             await this.updateCapability('measure_temperature', ts.data.instant.details.air_temperature);
-            await this.updateCapability('measure_temperature.feels_like', this.calculateFeelsLike(ts.data.instant.details));
+            await this.updateCapability('measure_temperature.feels_like', calculateFeelsLike(ts.data.instant.details));
             await this.updateCapability('measure_temperature.min_next_6_hours', ts.data.next_6_hours?.details.air_temperature_min);
             await this.updateCapability('measure_temperature.max_next_6_hours', ts.data.next_6_hours?.details.air_temperature_max);
             await this.updateCapability('measure_pressure', ts.data.instant.details.air_pressure_at_sea_level);
             await this.updateCapability('measure_humidity', ts.data.instant.details.relative_humidity);
             await this.updateCapability('measure_rain.next_1_hour', ts.data.next_1_hours?.details.precipitation_amount);
-            await this.updateCapability('measure_rain_next_1_hour', ts.data.next_1_hours?.details.probability_of_precipitation);
+            await this.updateCapability('measure_rain_next_1_hour', ts.data.next_1_hours?.details.probability_of_precipitation); // Not supported for all places
             await this.updateCapability('measure_rain.next_6_hours', ts.data.next_6_hours?.details.precipitation_amount);
-            await this.updateCapability('measure_rain_next_6_hours', ts.data.next_6_hours?.details.probability_of_precipitation);
+            await this.updateCapability('measure_rain_next_6_hours', ts.data.next_6_hours?.details.probability_of_precipitation); // Not supported for all places
             await this.updateCapability('measure_cloud_area_fraction', ts.data.instant.details.cloud_area_fraction);
             await this.updateCapability('measure_fog_area_fraction', ts.data.instant.details.fog_area_fraction);
             await this.updateCapability('measure_wind_strength', ts.data.instant.details.wind_speed);
-            await this.updateCapability('measure_wind_direction', this.degToCompass(ts.data.instant.details.wind_from_direction as number));
-            await this.updateCapability('measure_gust_strength', ts.data.instant.details.wind_speed_of_gust);
+            await this.updateCapability('measure_wind_direction', degreesToText(ts.data.instant.details.wind_from_direction as number));
+            await this.updateCapability('measure_gust_strength', ts.data.instant.details.wind_speed_of_gust); // Not supported for all places
             await this.updateCapability('measure_wind_angle', ts.data.instant.details.wind_from_direction);
-            await this.updateCapability('measure_thunder_next_1_hour', ts.data.next_1_hours?.details.probability_of_thunder);
+            await this.updateCapability('measure_thunder_next_1_hour', ts.data.next_1_hours?.details.probability_of_thunder); // Not supported for all places
             await this.updateCapability('measure_ultraviolet', ts.data.instant.details.ultraviolet_index_clear_sky);
 
             if (symbolCode) {
@@ -308,27 +385,6 @@ module.exports = class YrDevice extends Homey.Device {
             // something's fishy
         }
         return wl ? (lang === 'no' ? wl.desc_nb : wl.desc_en) : symbolCode;
-    }
-
-    calculateFeelsLike = (instant: InstantDetails): number => {
-        const config = {
-            temp: instant.air_temperature,
-            humidity: instant.relative_humidity,
-            speed: instant.wind_speed,
-            units: {
-                temp: 'c',
-                speed: 'mps'
-            }
-        };
-        return math.round1(new Feels(config).like());
-    }
-
-    degToCompass = (num: number): string => {
-        while (num < 0) num += 360;
-        while (num >= 360) num -= 360;
-        const val = Math.round((num - 11.25) / 22.5);
-        const arr = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
-        return arr[Math.abs(val)];
     }
 
     async onWeatherAutocomplete(query: any, args: any) {

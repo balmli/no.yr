@@ -15,7 +15,7 @@
     {
       "name": "device",
       "type": "device",
-      "filter": "driver_id=myr"
+      "filter": "driver_id=myr&capabilities=measure_rain_next_1_hour"
     },
     {
       "type": "number",

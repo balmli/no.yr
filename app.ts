@@ -16,6 +16,23 @@ class YrApp extends Homey.App {
             .getArgument('code')
             .registerAutocompleteListener((query, args) => args.device.onWeatherAutocomplete(query, args));
 
+        this.homey.flow.getConditionCard('01_weather_next_hours')
+            .registerRunListener((args, state) => args.device.nextHoursComparer(args, state,
+                (ts: YrTimeserie, value: number) => {
+                    const symbolCode = !!ts.data.next_1_hours && (ts.data.next_1_hours.summary.symbol_code as string);
+                    return !!symbolCode && symbolCode.split('_')[0] === args.code.id;
+                }))
+            .registerArgumentAutocompleteListener('code', async (query: string, args: any) => args.device.onWeatherAutocomplete(query, args))
+            .registerArgumentAutocompleteListener('start', async (query: string, args: any) => args.device.onTimeStartAutocomplete(query, args));
+
+        this.homey.flow.getConditionCard('01_weather_period')
+            .registerRunListener((args, state) => args.device.periodComparer(args, state,
+                (ts: YrTimeserie, value: number) => {
+                    const symbolCode = !!ts.data.next_1_hours && (ts.data.next_1_hours.summary.symbol_code as string);
+                    return !!symbolCode && symbolCode.split('_')[0] === args.code.id;
+                }))
+            .registerArgumentAutocompleteListener('code', async (query: string, args: any) => args.device.onWeatherAutocomplete(query, args));
+
         this.homey.flow.getConditionCard('02_measure_temperature_below')
             .registerRunListener(args => args.device.getCapabilityValue(`measure_temperature`) < args.value);
 

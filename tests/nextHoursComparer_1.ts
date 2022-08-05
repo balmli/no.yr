@@ -31,6 +31,37 @@ describe('nextHoursComparer', function () {
                 hours: 5
             }, yrData2.properties.timeseries as YrTimeseries, (ts: YrTimeserie, value: number) => !!ts.data.next_1_hours && (ts.data.next_1_hours.details.precipitation_amount as number) > value)).eq(true);
         });
+
+        it('Check weather situation starting 2022-08-02T12:00:00Z + 0 hours for 5 hours', function () {
+            expect(nextHoursComparer('2022-08-02T12:00:00Z', {
+                code: {id: 'rainandthunder'},
+                start: {id: '0'},
+                hours: 5
+            }, yrData2.properties.timeseries as YrTimeseries, (ts: YrTimeserie, value: number) => !!ts.data.next_1_hours && (ts.data.next_1_hours.summary.symbol_code as string) === 'rainandthunder')).eq(true);
+            expect(nextHoursComparer('2022-08-02T12:00:00Z', {
+                code: {id: 'lightrain'},
+                start: {id: '0'},
+                hours: 5
+            }, yrData2.properties.timeseries as YrTimeseries, (ts: YrTimeserie, value: number) => !!ts.data.next_1_hours && (ts.data.next_1_hours.summary.symbol_code as string) === 'lightrain')).eq(false);
+            expect(nextHoursComparer('2022-08-02T12:00:00Z', {
+                code: {id: 'lightrain'},
+                start: {id: '5'},
+                hours: 5
+            }, yrData2.properties.timeseries as YrTimeseries, (ts: YrTimeserie, value: number) => !!ts.data.next_1_hours && (ts.data.next_1_hours.summary.symbol_code as string) === 'lightrain')).eq(true);
+            expect(nextHoursComparer('2022-08-02T12:00:00Z', {
+                code: {id: 'fog'},
+                start: {id: '5'},
+                hours: 5
+            }, yrData2.properties.timeseries as YrTimeseries, (ts: YrTimeserie, value: number) => !!ts.data.next_1_hours && (ts.data.next_1_hours.summary.symbol_code as string) === 'fog')).eq(true);
+            expect(nextHoursComparer('2022-08-04T14:00:00Z', {
+                code: {id: 'partlycloudy'},
+                start: {id: '0'},
+                hours: 3
+            }, yrData2.properties.timeseries as YrTimeseries, (ts: YrTimeserie, value: number) => {
+                const symbolCode = !!ts.data.next_1_hours && (ts.data.next_1_hours.summary.symbol_code as string);
+                return !!symbolCode && symbolCode.split('_')[0] === 'partlycloudy';
+            })).eq(true);
+        });
     });
 
 });

@@ -1,36 +1,33 @@
 {
   "title": {
-    "en": "Is wind strength !{{|not}} above X m/s between HH:mm and HH:mm today/tomorrow",
-    "no": "Er vindstyrke !{{|ikke}} over X m/s fra HH:mm til HH:mm i dag/i morgen"
+    "en": "Is the weather situation !{{|not}} X between HH:mm and HH:mm today/tomorrow",
+    "no": "Er været !{{|ikke}} X fra HH:mm til HH:mm i dag/i morgen"
   },
   "titleFormatted": {
-    "en": "Is wind strength !{{|not}} above [[value]] m/s between [[start]] and [[end]] [[day]]",
-    "no": "Er vindstyrke !{{|ikke}} over [[value]] m/s fra [[start]] til [[end]] [[day]]"
+    "en": "Is the weather situation !{{|not}} [[code]] between [[start]] and [[end]] [[day]]",
+    "no": "Er været !{{|ikke}} [[code]] fra [[start]] til [[end]] [[day]]"
   },
   "hint": {
-    "en": "Condition to check if wind strength is above a specific value for at least one of the hours in a period today or tomorrow",
-    "no": "For å sjekke om vindstyrke er over en spesifikk verdi for minst en av timene i en periode i dag eller i morgen"
+    "en": "Condition to check if the weather situation is a specific type for at least one of the hours in a period today or tomorrow",
+    "no": "For å sjekke om været er en spesifikk type for minst en av timene i en periode i dag eller i morgen"
   },
   "args": [
     {
       "name": "device",
       "type": "device",
-      "filter": "driver_id=myr&capabilities=measure_wind_strength"
+      "filter": "driver_id=myr"
     },
     {
-      "type": "number",
-      "name": "value",
-      "title": {
-        "en": "Wind strength",
-        "no": "Vindstyrke"
+      "name": "code",
+      "label": {
+        "en": "Weather",
+        "no": "Vær"
       },
+      "type": "autocomplete",
       "placeholder": {
-        "en": "Wind strength...",
-        "no": "Vindstyrke..."
-      },
-      "min": 0,
-      "max": 100,
-      "step": 0.1
+        "en": "Weather...",
+        "no": "Vær..."
+      }
     },
     {
       "name": "start",

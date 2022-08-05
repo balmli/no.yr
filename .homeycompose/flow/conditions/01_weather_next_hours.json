@@ -1,0 +1,60 @@
+{
+  "title": {
+    "en": "Is the weather situation !{{|not}} X starting Y to Z hours later",
+    "no": "Er været !{{|ikke}} X fra Y til Z timer senere"
+  },
+  "titleFormatted": {
+    "en": "Is the weather situation !{{|not}} [[code]] starting [[start]] to [[hours]] hours later",
+    "no": "Er været !{{|ikke}} [[code]] fra [[start]] til [[hours]] timer senere"
+  },
+  "hint": {
+    "en": "Condition to check if the weather situation is a spesifikk type for at least one of the hours in a period",
+    "no": "For å sjekke om været er en spesifikk type for minst en av timene i en periode"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=myr"
+    },
+    {
+      "name": "code",
+      "label": {
+        "en": "Weather",
+        "no": "Vær"
+      },
+      "type": "autocomplete",
+      "placeholder": {
+        "en": "Weather...",
+        "no": "Vær..."
+      }
+    },
+    {
+      "name": "start",
+      "title": {
+        "en": "Start",
+        "no": "Start"
+      },
+      "type": "autocomplete",
+      "placeholder": {
+        "en": "Start...",
+        "no": "Start..."
+      }
+    },
+    {
+      "type": "number",
+      "name": "hours",
+      "title": {
+        "en": "Hours",
+        "no": "Timer"
+      },
+      "placeholder": {
+        "en": "2",
+        "no": "2"
+      },
+      "min": 1,
+      "max": 24,
+      "step": 1
+    }
+  ]
+}

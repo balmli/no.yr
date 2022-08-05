@@ -77,8 +77,8 @@ export interface YrComplete {
                 air_temperature: string;
                 air_temperature_max: string;
                 air_temperature_min: string;
-                air_temperature_percentile_10: string;
-                air_temperature_percentile_90: string;
+                air_temperature_percentile_10?: string;
+                air_temperature_percentile_90?: string;
                 cloud_area_fraction: string;
                 cloud_area_fraction_high: string;
                 cloud_area_fraction_low: string;
@@ -86,17 +86,17 @@ export interface YrComplete {
                 dew_point_temperature: string;
                 fog_area_fraction: string;
                 precipitation_amount: string;
-                precipitation_amount_max: string;
-                precipitation_amount_min: string;
-                probability_of_precipitation: string;
-                probability_of_thunder: string;
+                precipitation_amount_max?: string;
+                precipitation_amount_min?: string;
+                probability_of_precipitation?: string;
+                probability_of_thunder?: string;
                 relative_humidity: string;
                 ultraviolet_index_clear_sky: 1,
                 wind_from_direction: string;
                 wind_speed: string;
-                wind_speed_of_gust: string;
-                wind_speed_percentile_10: string;
-                wind_speed_percentile_90: string;
+                wind_speed_of_gust?: string;
+                wind_speed_percentile_10?: string;
+                wind_speed_percentile_90?: string;
             }
         },
         timeseries: YrTimeseries

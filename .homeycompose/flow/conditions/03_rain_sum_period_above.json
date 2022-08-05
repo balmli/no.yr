@@ -1,6 +1,6 @@
 {
   "title": {
-    "en": "Is the sum of rain rain !{{|not}} above X mm between HH:mm and HH:mm today/tomorrow",
+    "en": "Is the sum of rain !{{|not}} above X mm between HH:mm and HH:mm today/tomorrow",
     "no": "Er sum av regn !{{|ikke}} over X mm fra HH:mm til HH:mm i dag/i morgen"
   },
   "titleFormatted": {

@@ -1,11 +1,11 @@
 {
   "title": {
-    "en": "Is the temperature above X °C between HH:mm and HH:mm today/tomorrow",
-    "no": "Er temperaturen over X °C fra HH:mm til HH:mm i dag/i morgen"
+    "en": "Is the temperature !{{|not}} above X °C between HH:mm and HH:mm today/tomorrow",
+    "no": "Er temperaturen !{{|ikke}} over X °C fra HH:mm til HH:mm i dag/i morgen"
   },
   "titleFormatted": {
-    "en": "Is the temperature above [[value]] °C between [[start]] and [[end]] [[day]]",
-    "no": "Er temperaturen over [[value]] °C fra [[start]] til [[end]] [[day]]"
+    "en": "Is the temperature !{{|not}} above [[value]] °C between [[start]] and [[end]] [[day]]",
+    "no": "Er temperaturen !{{|ikke}} over [[value]] °C fra [[start]] til [[end]] [[day]]"
   },
   "hint": {
     "en": "Condition to check if the temperature is above a specific value for at least one of the hours in a period today or tomorrow",

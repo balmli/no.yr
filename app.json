@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "no.yr",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "brandColor": "#53b7ee",
@@ -138,7 +138,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_cloud_area_fraction"
           }
         ]
       },
@@ -166,7 +166,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_fog_area_fraction"
           }
         ]
       },
@@ -194,7 +194,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_rain_next_1_hour"
           }
         ]
       },
@@ -222,7 +222,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_rain_next_6_hours"
           }
         ]
       },
@@ -250,7 +250,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_thunder_next_1_hour"
           }
         ]
       },
@@ -278,7 +278,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_wind_direction"
           }
         ]
       }
@@ -318,6 +318,147 @@
           }
         ],
         "id": "01_is_weather"
+      },
+      {
+        "title": {
+          "en": "Is the weather situation !{{|not}} X starting Y to Z hours later",
+          "no": "Er været !{{|ikke}} X fra Y til Z timer senere"
+        },
+        "titleFormatted": {
+          "en": "Is the weather situation !{{|not}} [[code]] starting [[start]] to [[hours]] hours later",
+          "no": "Er været !{{|ikke}} [[code]] fra [[start]] til [[hours]] timer senere"
+        },
+        "hint": {
+          "en": "Condition to check if the weather situation is a spesifikk type for at least one of the hours in a period",
+          "no": "For å sjekke om været er en spesifikk type for minst en av timene i en periode"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "code",
+            "label": {
+              "en": "Weather",
+              "no": "Vær"
+            },
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Weather...",
+              "no": "Vær..."
+            }
+          },
+          {
+            "name": "start",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Start...",
+              "no": "Start..."
+            }
+          },
+          {
+            "type": "number",
+            "name": "hours",
+            "title": {
+              "en": "Hours",
+              "no": "Timer"
+            },
+            "placeholder": {
+              "en": "2",
+              "no": "2"
+            },
+            "min": 1,
+            "max": 24,
+            "step": 1
+          }
+        ],
+        "id": "01_weather_next_hours"
+      },
+      {
+        "title": {
+          "en": "Is the weather situation !{{|not}} X between HH:mm and HH:mm today/tomorrow",
+          "no": "Er været !{{|ikke}} X fra HH:mm til HH:mm i dag/i morgen"
+        },
+        "titleFormatted": {
+          "en": "Is the weather situation !{{|not}} [[code]] between [[start]] and [[end]] [[day]]",
+          "no": "Er været !{{|ikke}} [[code]] fra [[start]] til [[end]] [[day]]"
+        },
+        "hint": {
+          "en": "Condition to check if the weather situation is a specific type for at least one of the hours in a period today or tomorrow",
+          "no": "For å sjekke om været er en spesifikk type for minst en av timene i en periode i dag eller i morgen"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "code",
+            "label": {
+              "en": "Weather",
+              "no": "Vær"
+            },
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Weather...",
+              "no": "Vær..."
+            }
+          },
+          {
+            "name": "start",
+            "type": "time",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "placeholder": {
+              "en": "08:00"
+            }
+          },
+          {
+            "name": "end",
+            "type": "time",
+            "title": {
+              "en": "End",
+              "no": "Slutt"
+            },
+            "placeholder": {
+              "en": "14:00"
+            }
+          },
+          {
+            "name": "day",
+            "type": "dropdown",
+            "title": {
+              "en": "Day",
+              "no": "Dag"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "today",
+                  "no": "i dag"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "tomorrow",
+                  "no": "i morgen"
+                }
+              }
+            ]
+          }
+        ],
+        "id": "01_weather_period"
       },
       {
         "title": {
@@ -388,7 +529,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_temperature.max_next_6_hours"
           },
           {
             "name": "value",
@@ -414,7 +555,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_temperature.min_next_6_hours"
           },
           {
             "name": "value",
@@ -553,12 +694,12 @@
       },
       {
         "title": {
-          "en": "Is the temperature above X °C between HH:mm and HH:mm today/tomorrow",
-          "no": "Er temperaturen over X °C fra HH:mm til HH:mm i dag/i morgen"
+          "en": "Is the temperature !{{|not}} above X °C between HH:mm and HH:mm today/tomorrow",
+          "no": "Er temperaturen !{{|ikke}} over X °C fra HH:mm til HH:mm i dag/i morgen"
         },
         "titleFormatted": {
-          "en": "Is the temperature above [[value]] °C between [[start]] and [[end]] [[day]]",
-          "no": "Er temperaturen over [[value]] °C fra [[start]] til [[end]] [[day]]"
+          "en": "Is the temperature !{{|not}} above [[value]] °C between [[start]] and [[end]] [[day]]",
+          "no": "Er temperaturen !{{|ikke}} over [[value]] °C fra [[start]] til [[end]] [[day]]"
         },
         "hint": {
           "en": "Condition to check if the temperature is above a specific value for at least one of the hours in a period today or tomorrow",
@@ -734,7 +875,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_rain_next_1_hour"
           },
           {
             "name": "value",
@@ -760,7 +901,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_rain_next_6_hours"
           },
           {
             "name": "value",
@@ -786,7 +927,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_rain.next_1_hour"
           },
           {
             "name": "value",
@@ -812,7 +953,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_rain.next_6_hours"
           },
           {
             "name": "value",
@@ -838,7 +979,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_rain_next_1_hour"
           },
           {
             "type": "number",
@@ -902,7 +1043,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_rain_next_1_hour"
           },
           {
             "type": "number",
@@ -1034,7 +1175,7 @@
       },
       {
         "title": {
-          "en": "Is the sum of rain rain !{{|not}} above X mm between HH:mm and HH:mm today/tomorrow",
+          "en": "Is the sum of rain !{{|not}} above X mm between HH:mm and HH:mm today/tomorrow",
           "no": "Er sum av regn !{{|ikke}} over X mm fra HH:mm til HH:mm i dag/i morgen"
         },
         "titleFormatted": {
@@ -1132,7 +1273,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_wind_strength"
           },
           {
             "name": "value",
@@ -1158,7 +1299,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_wind_strength"
           },
           {
             "type": "number",
@@ -1222,7 +1363,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_wind_strength"
           },
           {
             "type": "number",
@@ -1305,7 +1446,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_wind_angle"
           },
           {
             "name": "value",
@@ -1331,7 +1472,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_gust_strength"
           },
           {
             "name": "value",
@@ -1357,7 +1498,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_humidity"
           },
           {
             "name": "value",
@@ -1383,7 +1524,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_pressure"
           },
           {
             "name": "value",
@@ -1409,7 +1550,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_cloud_area_fraction"
           },
           {
             "name": "value",
@@ -1435,7 +1576,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_cloud_area_fraction"
           },
           {
             "type": "number",
@@ -1499,7 +1640,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_cloud_area_fraction"
           },
           {
             "type": "number",
@@ -1582,7 +1723,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_fog_area_fraction"
           },
           {
             "name": "value",
@@ -1608,7 +1749,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_fog_area_fraction"
           },
           {
             "type": "number",
@@ -1672,7 +1813,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_fog_area_fraction"
           },
           {
             "type": "number",
@@ -1755,7 +1896,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_thunder_next_1_hour"
           },
           {
             "name": "value",
@@ -1781,7 +1922,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_thunder_next_1_hour"
           },
           {
             "type": "number",
@@ -1845,7 +1986,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_thunder_next_1_hour"
           },
           {
             "type": "number",
@@ -1928,7 +2069,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr"
+            "filter": "driver_id=myr&capabilities=measure_ultraviolet"
           },
           {
             "name": "value",
@@ -2299,7 +2440,7 @@
               },
               "hint": {
                 "en": "Latitude",
-                "no": "Breddegrad"
+                "no": "Breddegrad (latitude)"
               },
               "value": 0
             },
@@ -2312,7 +2453,7 @@
               },
               "hint": {
                 "en": "Longitude",
-                "no": "Lengdegrad"
+                "no": "Lengdegrad (longitude)"
               },
               "value": 0
             },
