@@ -1,7 +1,7 @@
 {
   "1.0.3": {
-    "en": "New conditions for the weather situation for next hours and a period. Fixed smaller issues.",
-    "no": "Ny sjekk for vær for neste timer og periode. Rettet diverse feil."
+    "en": "New conditions for the weather situation for next hours and a period. New conditions for checking rain (mm/h) for next hours and a period. Fixed smaller issues.",
+    "no": "Nye sjekker for vær for neste timer og periode. Nye sjekker for regn (mm/t) for neste timer og periode. Rettet diverse feil."
   },
   "1.0.2": {
     "en": "Initial release.",

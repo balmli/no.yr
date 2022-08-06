@@ -1,0 +1,82 @@
+{
+  "title": {
+    "en": "Is rain !{{|not}} above X mm/h between HH:mm and HH:mm today/tomorrow",
+    "no": "Er regn !{{|ikke}} over X mm/t fra HH:mm til HH:mm i dag/i morgen"
+  },
+  "titleFormatted": {
+    "en": "Is rain !{{|not}} above [[value]] mm/h between [[start]] and [[end]] [[day]]",
+    "no": "Er regn !{{|ikke}} over [[value]] mm/t fra [[start]] til [[end]] [[day]]"
+  },
+  "hint": {
+    "en": "Condition to check if rain (mm/h) is above a specific value for at least one of the hours in a period today or tomorrow",
+    "no": "For å sjekke om regn (mm/t) er over en spesifikk verdi for minst en av timene i en periode i dag eller i morgen"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=myr&capabilities=measure_rain.next_1_hour"
+    },
+    {
+      "type": "number",
+      "name": "value",
+      "title": {
+        "en": "Rain",
+        "no": "Regn"
+      },
+      "placeholder": {
+        "en": "Rain...",
+        "no": "Regn..."
+      },
+      "min": 0,
+      "max": 100,
+      "step": 0.1
+    },
+    {
+      "name": "start",
+      "type": "time",
+      "title": {
+        "en": "Start",
+        "no": "Start"
+      },
+      "placeholder": {
+        "en": "08:00"
+      }
+    },
+    {
+      "name": "end",
+      "type": "time",
+      "title": {
+        "en": "End",
+        "no": "Slutt"
+      },
+      "placeholder": {
+        "en": "14:00"
+      }
+    },
+    {
+      "name": "day",
+      "type": "dropdown",
+      "title": {
+        "en": "Day",
+        "no": "Dag"
+      },
+      "values": [
+        {
+          "id": "0",
+          "label": {
+            "en": "today",
+            "no": "i dag"
+          }
+        },
+        {
+          "id": "1",
+          "label": {
+            "en": "tomorrow",
+            "no": "i morgen"
+          }
+        }
+      ]
+    }
+  ]
+}

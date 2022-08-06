@@ -1,0 +1,63 @@
+{
+  "title": {
+    "en": "Is rain !{{|not}} above X mm/h starting Y to Z hours later",
+    "no": "Er regn !{{|ikke}} over X mm/t fra Y til Z timer senere"
+  },
+  "titleFormatted": {
+    "en": "Is rain !{{|not}} above [[value]] mm/h starting [[start]] to [[hours]] hours later",
+    "no": "Er regn !{{|ikke}} over [[value]] mm/t fra [[start]] til [[hours]] timer senere"
+  },
+  "hint": {
+    "en": "Condition to check if rain (mm/h) is above a specific value for at least one of the hours in a period",
+    "no": "For å sjekke om regn (mm/t) er over en spesifikk verdi for minst en av timene i en periode"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=myr&capabilities=measure_rain.next_1_hour"
+    },
+    {
+      "type": "number",
+      "name": "value",
+      "title": {
+        "en": "Rain",
+        "no": "Regn"
+      },
+      "placeholder": {
+        "en": "Rain...",
+        "no": "Regn..."
+      },
+      "min": 0,
+      "max": 100,
+      "step": 0.1
+    },
+    {
+      "name": "start",
+      "title": {
+        "en": "Start",
+        "no": "Start"
+      },
+      "type": "autocomplete",
+      "placeholder": {
+        "en": "Start...",
+        "no": "Start..."
+      }
+    },
+    {
+      "type": "number",
+      "name": "hours",
+      "title": {
+        "en": "Hours",
+        "no": "Timer"
+      },
+      "placeholder": {
+        "en": "2",
+        "no": "2"
+      },
+      "min": 1,
+      "max": 24,
+      "step": 1
+    }
+  ]
+}

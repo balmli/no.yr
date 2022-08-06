@@ -77,6 +77,26 @@ class YrApp extends Homey.App {
         this.homey.flow.getConditionCard('03_measure_rain_next_6_hours_below')
             .registerRunListener(args => args.device.getCapabilityValue(`measure_rain_next_6_hours`) < args.value);
 
+        this.homey.flow.getConditionCard('03_rain_mm_next_hours_above')
+            .registerRunListener((args, state) => args.device.nextHoursComparer(args, state,
+                (ts: YrTimeserie, value: number) => (!!ts.data.next_1_hours && (ts.data.next_1_hours.details.precipitation_amount as number)) > value))
+            .getArgument('start')
+            .registerAutocompleteListener((query, args) => args.device.onTimeStartAutocomplete(query, args));
+
+        this.homey.flow.getConditionCard('03_rain_mm_next_hours_below')
+            .registerRunListener((args, state) => args.device.nextHoursComparer(args, state,
+                (ts: YrTimeserie, value: number) => (!!ts.data.next_1_hours && (ts.data.next_1_hours.details.precipitation_amount as number)) < value))
+            .getArgument('start')
+            .registerAutocompleteListener((query, args) => args.device.onTimeStartAutocomplete(query, args));
+
+        this.homey.flow.getConditionCard('03_rain_mm_period_above')
+            .registerRunListener((args, state) => args.device.periodComparer(args, state,
+                (ts: YrTimeserie, value: number) => (!!ts.data.next_1_hours && (ts.data.next_1_hours.details.precipitation_amount as number)) > value));
+
+        this.homey.flow.getConditionCard('03_rain_mm_period_below')
+            .registerRunListener((args, state) => args.device.periodComparer(args, state,
+                (ts: YrTimeserie, value: number) => (!!ts.data.next_1_hours && (ts.data.next_1_hours.details.precipitation_amount as number)) < value));
+
         this.homey.flow.getConditionCard('03_rain_probability_next_hours_above')
             .registerRunListener((args, state) => args.device.nextHoursComparer(args, state,
                 (ts: YrTimeserie, value: number) => (!!ts.data.next_1_hours && (ts.data.next_1_hours.details.probability_of_precipitation as number)) > value))
