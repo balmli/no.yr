@@ -239,8 +239,8 @@ module.exports = class YrDevice extends Homey.Device {
             const lon = math.round4(settings.lon);
             const uri = `https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=${lat}&lon=${lon}` +
                 (this._clearAltitude !== true && settings.altitude !== -1 ? `&altitude=${settings.altitude}` : '');
-            this.logger.verbose(`Fetch weather:`, {uri});
-            const userAgent = 'YrAthomHomeyApp/1.0.1 github.com/balmli/no.yr';
+            const userAgent = `YrAthomHomeyApp/${this.homey.manifest.version} github.com/balmli/no.yr`;
+            this.logger.verbose(`Fetch weather:`, {uri, userAgent});
             const result = await http.get({
                     uri,
                     headers: {
