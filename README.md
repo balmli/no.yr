@@ -16,6 +16,10 @@ The app is not created or endorsed in any way by Yr.no.
 
 ### Release Notes:
 
+#### 1.1.0
+
+- New conditions for UV for next hours and a period
+
 #### 1.0.3
 
 - New conditions for the weather situation for next hours and a period

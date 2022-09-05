@@ -186,6 +186,16 @@ class YrApp extends Homey.App {
         this.homey.flow.getConditionCard('70_measure_ultraviolet_below')
             .registerRunListener(args => args.device.getCapabilityValue(`measure_ultraviolet`) < args.value);
 
+        this.homey.flow.getConditionCard('71_ultraviolet_next_hours_above')
+            .registerRunListener((args, state) => args.device.nextHoursComparer(args, state,
+                (ts: YrTimeserie, value: number) => (ts.data.instant.details.ultraviolet_index_clear_sky as number) > value))
+            .getArgument('start')
+            .registerAutocompleteListener((query, args) => args.device.onTimeStartAutocomplete(query, args));
+
+        this.homey.flow.getConditionCard('71_ultraviolet_period_above')
+            .registerRunListener((args, state) => args.device.periodComparer(args, state,
+                (ts: YrTimeserie, value: number) => (ts.data.instant.details.ultraviolet_index_clear_sky as number) > value));
+
     }
 
 }

@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "no.yr",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "brandColor": "#53b7ee",
@@ -2371,6 +2371,153 @@
           }
         ],
         "id": "70_measure_ultraviolet_below"
+      },
+      {
+        "title": {
+          "en": "Is ultraviolet !{{|not}} above X UVI starting Y to Z hours later",
+          "no": "Er ultrafiolett !{{|ikke}} over X UVI fra Y til Z timer senere"
+        },
+        "titleFormatted": {
+          "en": "Is ultraviolet !{{|not}} above [[value]] UVI starting [[start]] to [[hours]] hours later",
+          "no": "Er ultrafiolett !{{|ikke}} over [[value]] UVI fra [[start]] til [[hours]] timer senere"
+        },
+        "hint": {
+          "en": "Condition to check if ultraviolet is above a specific value for at least one of the hours in a period",
+          "no": "For å sjekke om ultrafiolett er over en spesifikk verdi for minst en av timene i en periode"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr&capabilities=measure_thunder_next_1_hour"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Ultraviolet",
+              "no": "Ultrafiolett"
+            },
+            "placeholder": {
+              "en": "Ultraviolet...",
+              "no": "Ultrafiolett..."
+            },
+            "min": 0,
+            "max": 100,
+            "step": 0.01
+          },
+          {
+            "name": "start",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Start...",
+              "no": "Start..."
+            }
+          },
+          {
+            "type": "number",
+            "name": "hours",
+            "title": {
+              "en": "Hours",
+              "no": "Timer"
+            },
+            "placeholder": {
+              "en": "2",
+              "no": "2"
+            },
+            "min": 1,
+            "max": 24,
+            "step": 1
+          }
+        ],
+        "id": "71_ultraviolet_next_hours_above"
+      },
+      {
+        "title": {
+          "en": "Is ultraviolet !{{|not}} above X UVI between HH:mm and HH:mm today/tomorrow",
+          "no": "Er ultrafiolett !{{|ikke}} over X UVI fra HH:mm til HH:mm i dag/i morgen"
+        },
+        "titleFormatted": {
+          "en": "Is ultraviolet !{{|not}} above [[value]] UVI between [[start]] and [[end]] [[day]]",
+          "no": "Er ultrafiolett !{{|ikke}} over [[value]] UVI fra [[start]] til [[end]] [[day]]"
+        },
+        "hint": {
+          "en": "Condition to check if ultraviolet is above a specific value for at least one of the hours in a period today or tomorrow",
+          "no": "For å sjekke om ultrafiolett er over en spesifikk verdi for minst en av timene i en periode i dag eller i morgen"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr&capabilities=measure_thunder_next_1_hour"
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "Ultraviolet",
+              "no": "Ultrafiolett"
+            },
+            "placeholder": {
+              "en": "Ultraviolet...",
+              "no": "Ultrafiolett..."
+            },
+            "min": 0,
+            "max": 100,
+            "step": 0.01
+          },
+          {
+            "name": "start",
+            "type": "time",
+            "title": {
+              "en": "Start",
+              "no": "Start"
+            },
+            "placeholder": {
+              "en": "08:00"
+            }
+          },
+          {
+            "name": "end",
+            "type": "time",
+            "title": {
+              "en": "End",
+              "no": "Slutt"
+            },
+            "placeholder": {
+              "en": "14:00"
+            }
+          },
+          {
+            "name": "day",
+            "type": "dropdown",
+            "title": {
+              "en": "Day",
+              "no": "Dag"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "today",
+                  "no": "i dag"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "tomorrow",
+                  "no": "i morgen"
+                }
+              }
+            ]
+          }
+        ],
+        "id": "71_ultraviolet_period_above"
       }
     ]
   },
