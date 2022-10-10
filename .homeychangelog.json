@@ -1,4 +1,8 @@
 {
+  "1.1.1": {
+    "en": "Fix issue if 'Altitude' has decimals. ",
+    "no": "Rettelse hvis 'Høyde over havet ' er angitt med desimaler. "
+  },
   "1.1.0": {
     "en": "New conditions for UV for next hours and a period. ",
     "no": "Nye sjekker for UV for neste timer og periode. "
