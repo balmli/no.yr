@@ -6,5 +6,16 @@
     "now": "nå",
     "hour": "om 1 time",
     "hours": "om __hour__ timer"
+  },
+  "errors": {
+    "fetching_sunrise_failed": "Nedlasting av soloppgang- og solnedgangdata feilet.",
+    "parsing_sunrise_failed": "Feil ved tolkning soloppgang- og solnedgangdata.",
+    "fetching_areas_failed": "Nedlasting av lokasjoner feilet.",
+    "parsing_areas_failed": "Feil ved tolkning av lokasjoner.",
+    "textforecast_not_supported": "Kun norske lokasjoner er støttet for tekstlig værvarsel.",
+    "fetching_textforecast_failed": "Nedlasting av værvarsel feilet.",
+    "parsing_textareas_failed": "Feil ved tolkning av værvarsel.",
+    "unable_to_send_forecast": "Feil ved henting av værvarsel.",
+    "unavailable_due_to_data_error": "Nedlasting av værvarsel feilet. Sjekk at lokasjon er riktig."
   }
 }

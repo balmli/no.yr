@@ -6,5 +6,16 @@
     "now": "now",
     "hour": "in 1 hour",
     "hours": "in __hour__ hours"
+  },
+  "errors": {
+    "fetching_sunrise_failed": "Fetching sunrise and sunset data failed.",
+    "parsing_sunrise_failed": "Unable to parse sunrise and sunset file.",
+    "fetching_areas_failed": "Fetching areas failed.",
+    "parsing_areas_failed": "Unable to parse areas file.",
+    "textforecast_not_supported": "Only Norwegian locations are supported for text forcasts.",
+    "fetching_textforecast_failed": "Fetching forecast failed.",
+    "parsing_textareas_failed": "Unable to parse areas file.",
+    "unable_to_send_forecast": "Unable find forecast data.",
+    "unavailable_due_to_data_error": "Fetching forecast failed. Check the location."
   }
 }

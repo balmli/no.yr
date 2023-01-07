@@ -1,3 +1,5 @@
+import {Moment} from "./moment";
+
 type Pressure = number | undefined;
 type Humidity = number | undefined;
 type Temperature = number | undefined;
@@ -103,3 +105,33 @@ export interface YrComplete {
     }
 }
 
+export interface Sunrise {
+    sunrise: Moment,
+    sunset: Moment,
+}
+
+export type Point = [number, number];
+export type Points = Point[];
+
+export interface Area {
+    id: string;
+    areaDesc: string;
+    polygon: Points;
+}
+
+export type Areas = Area[];
+
+export interface LocationForecast {
+    id: string;
+    name: string;
+    forecast: string;
+}
+
+export interface Textforecast {
+    from: string;
+    to: string;
+    type: string;
+    locations: LocationForecast[];
+}
+
+export type Textforecasts = Textforecast[];

@@ -1,4 +1,8 @@
 {
+  "1.2.0": {
+    "en": "Added sunrise and sunset. Support for textual forecast for Norway, for advanced flow. ",
+    "no": "La inn felt for soloppgang og solnedgang. Støtte for tekstlig værvarsel for Norge, for advanced flow. "
+  },
   "1.1.1": {
     "en": "Fix issue if 'Altitude' has decimals. ",
     "no": "Rettelse hvis 'Høyde over havet ' er angitt med desimaler. "

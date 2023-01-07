@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<textforecast xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.api.met.no/schemas/textforecast-0.3.xsd">
+    <meta licenseurl="https://www.met.no/en/free-meteorological-data/Licensing-and-crediting"/>
+    <time from="2022-08-07T00:00:00" to="2022-08-08T00:00:00">
+        <forecasttype name="normal">
+            <location name="Østlandet unntatt Telemark" id="0503">Skiftende bris, fra i ettermiddag sørvestlig, på kysten opp i frisk bris. Skyet, nord for Lillehammer delvis skyet. Stort sett oppholdsvær. I kveld lettere skydekke, men mulighet for lokal tåke sør for Minnesund.</location>
+            <location name="Telemark og Agder" id="0502_0608">Vestlig bris, fra i ettermiddag sørvestlig, til dels frisk bris på kysten. Skyet. Litt spredt regn, i kveld spredte regnbyger.</location>
+            <location name="Fjellet i Sør-Norge" id="0710">Dreining til sørvestlig bris. Sør for Dovre skyet og litt regn. Ellers delvis skyet, stort sett oppholdsvær.</location>
+            <location name="Rogaland" id="0611">Sørlig bris, på kysten økning til frisk bris. Regn. I kveld vestlig bris. Avtagende nedbøraktivitet.</location>
+            <location name="Hordaland" id="0612">Økning til sør-søraust liten kuling på kysten. Regn. I ettermiddag minking til sørlig, senere vestlig bris. Avtagende nedbøraktivitet.</location>
+            <location name="Sogn og Fjordane" id="0614">Økning til sør-søraust opp i liten kuling på kysten. Skyet. Regn, lite nedbør i indre strøk og lengst nord. I kveld minking til sørlig bris. Avtagende nedbøraktivitet.</location>
+            <location name="Møre og Romsdal" id="0615">Søraust bris, fra i ettermiddag nordaust bris på kysten. Utrygt for litt regn på Sunnmøre, ellers opphold og i nord stort sett pent vær. I kveld økning til sørvest opp i frisk bris på kysten, først i sør. Skyet, litt regn i ytre strøk, ellers opphold.</location>
+            <location name="Trøndelag" id="0504">Vestlig frisk bris utsatte steder, først på dagen periodevis liten kuling på kysten. Skyet, enkelte regnbyger. I ettermiddag bris av skiftende retning, i kveld nordaust bris. Gradvis lettere vær, i sør oppklarning til stort sett pent vær.</location>
+            <location name="Nordland" id="0618">Vestlig frisk bris utsatte steder, først på dagen av og til liten kuling. Regnbyger. I kveld skiftende bris og oppholdsvær lengst sør.</location>
+            <location name="Troms" id="0619">Opptil frisk bris av skiftende retning, senere for det meste vestlig. Regnbyger.</location>
+            <location name="Finnmark" id="0620">Nord og nordøst frisk bris utsatte steder, opp i stiv kuling på kysten i øst, utover ettermiddagen dreiende nordvestlig. Regn.</location>
+            <location name="Spitsbergen" id="3011">Skiftende bris. Stort sett oppholdsvær.</location>
+        </forecasttype>
+    </time>
+    <time from="2022-08-08T00:00:00" to="2022-08-09T00:00:00">
+        <forecasttype name="normal">
+            <location name="Østlandet" id="0503_0608">Vestleg bris, måndag ettermiddag dreiande sørleg. Opphaldsver og periodar med sol.</location>
+            <location name="Agder" id="0502">Vest og sørvest bris, frå måndag ettermiddag opp i liten kuling på kysten. Stort sett opphaldsver og periodar med sol.</location>
+            <location name="Fjellet i Sør-Norge" id="0710">Vest og sørvest bris. Stort sett opphaldsver og periodar med sol.</location>
+            <location name="Rogaland" id="0611">Vest og nordvest bris, opp i frisk bris på kysten i sørlege del. For det meste skya. Enkelte regnbyer først på dagen, seinare opphaldsver.</location>
+            <location name="Vestland fylke" id="0612_0614">Sør og sørvest opp i frisk bris på kysten, liten til stiv kuling kring Stad. Skya. Enkelte regnbyer først på dagen, seinare opphaldsver, om kvelden regn.</location>
+            <location name="Møre og Romsdal" id="0615">Sørvest opp i frisk bris på kysten, liten kuling i sør. For det meste skya. Enkelte regnbyer først på dagen, seinare opphaldsver, om kvelden litt regn.</location>
+            <location name="Trøndelag" id="0504">Søraust bris, på kysten sørvest bris. Stort sett opphaldsver og periodar med sol.</location>
+            <location name="Nordland" id="0618">Sør og sørvest bris, måndag ettermiddag auking til frisk bris på kysten, måndag kveld liten kuling. For det meste skya. Enkelte regnbyer først på dagen, seinare opphaldsver</location>
+            <location name="Troms" id="0619">Vest og sørvest periodevis frisk bris på kysten. Skya, regnbyer. Måndag kveld sørleg bris. Stort sett opphaldsver.</location>
+            <location name="Finnmark" id="0620">Vestleg frisk bris utsette stader, natt til måndag liten kuling på kysten i aust. Skya. Regnbyer. Utpå dagen avtakande byeaktivitet.</location>
+            <location name="Spitsbergen" id="3011">Bris av skiftande retning. Skya, periodar med litt regn.</location>
+        </forecasttype>
+    </time>
+    <time from="2022-08-09T00:00:00" to="2022-08-10T00:00:00">
+        <forecasttype name="normal">
+            <location name="Østlandet" id="0503_0608">Sørlig bris, på kysten periodevis frisk bris. Skiftende skydekke. Stort sett oppholdsvær.</location>
+            <location name="Agder" id="0502">Vestlig, senere sørvestlig bris, opp liten kuling på kysten. Skiftende skydekke. Kan hende litt spredt regn.</location>
+            <location name="Fjellet i Sør-Norge" id="0710">Sørlig bris, frisk bris utsatte steder. For det meste skyet og litt regn. Siste del av dagen økende til sørvestlig liten kuling utsatte steder nord for Filefjell og økende nedbør.</location>
+            <location name="Vestlandet sør for Stad" id="0505">Sørlig bris, frisk bris på kysten. Skyet. Litt regn. Utpå dagen økende til sørlig frisk bris på kysten, liten kuling nord for Bergen. Skyet. Regn, vesentlig nord for Stavanger.</location>
+            <location name="Møre og Romsdal og Trøndelag" id="0615_0616_0617">Sørlig frisk bris utsatte steder, liten kuling ved Stad. Skyet. Litt regn. Utpå dagen økende til sørvestlig liten kuling på kysten, sterk kuling ved Stad. Skyet. Regn.</location>
+            <location name="Nordland" id="0618">Sørlig bris, liten kuling utsatte steder. Regn.</location>
+            <location name="Troms og Finnmark" id="50890">Sørlig bris, liten kuling utsatte steder. Delvis skyet oppholdsvær, utover dagen tilskyende og etter hvert regn litt regn vest for Nordkapp.</location>
+            <location name="Spitsbergen" id="3011">Økning til sørøstlig frisk bris utsatte steder. Skyet. Litt spredt regn.</location>
+        </forecasttype>
+    </time>
+</textforecast>

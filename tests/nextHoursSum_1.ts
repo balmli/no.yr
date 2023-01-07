@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 
-import {nextHoursComparer, nextHoursSum} from '../lib/yr_lib';
+import {nextHoursSum} from '../lib/yr_lib';
 
 import yrData1 from './yr_data.json';
 import yrData2 from './yr_data_2.json';

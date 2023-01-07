@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "no.yr",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "brandColor": "#53b7ee",
@@ -2519,6 +2519,96 @@
         ],
         "id": "71_ultraviolet_period_above"
       }
+    ],
+    "actions": [
+      {
+        "id": "10_textforecast",
+        "title": {
+          "en": "Fetch textual forecast ...",
+          "no": "Hent tekstlig værvarsel ..."
+        },
+        "advanced": true,
+        "titleFormatted": {
+          "en": "Fetch textual forecast for [[day]]",
+          "no": "Hent tekstlig værvarsel for [[day]]"
+        },
+        "hint": {
+          "en": "Fetch textual forecast for today, tomorrow or the day after tomorrow. Only Norway is supported.",
+          "no": "Hent tekstlig værvarsel for i dag, i morgen eller i overmorgen."
+        },
+        "tokens": [
+          {
+            "name": "from",
+            "type": "string",
+            "title": {
+              "en": "From",
+              "no": "Fra"
+            }
+          },
+          {
+            "name": "to",
+            "type": "string",
+            "title": {
+              "en": "To",
+              "no": "Tila"
+            }
+          },
+          {
+            "name": "location",
+            "type": "string",
+            "title": {
+              "en": "Location",
+              "no": "Lokasjon"
+            }
+          },
+          {
+            "name": "forecast",
+            "type": "string",
+            "title": {
+              "en": "Forecast",
+              "no": "Værvarsel"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr"
+          },
+          {
+            "name": "day",
+            "type": "dropdown",
+            "title": {
+              "en": "Day",
+              "no": "Dag"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "today",
+                  "no": "i dag"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "tomorrow",
+                  "no": "i morgen"
+                }
+              },
+              {
+                "id": "2",
+                "label": {
+                  "en": "the day after tomorrow",
+                  "no": "i overmorgen"
+                }
+              }
+            ]
+          }
+        ]
+      }
     ]
   },
   "drivers": [
@@ -3060,6 +3150,30 @@
       "setable": false,
       "uiComponent": "sensor",
       "icon": "/assets/icon-wind.svg"
+    },
+    "sunrise_time": {
+      "type": "string",
+      "title": {
+        "en": "Sunrise",
+        "no": "Soloppgang"
+      },
+      "uiComponent": "sensor",
+      "getable": true,
+      "setable": false,
+      "insights": false,
+      "icon": "/assets/icon-sunrise.svg"
+    },
+    "sunset_time": {
+      "type": "string",
+      "title": {
+        "en": "Sunset",
+        "no": "Solnedgang"
+      },
+      "uiComponent": "sensor",
+      "getable": true,
+      "setable": false,
+      "insights": false,
+      "icon": "/assets/icon-sunset.svg"
     },
     "weather_description": {
       "type": "string",

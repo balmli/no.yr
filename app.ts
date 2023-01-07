@@ -196,6 +196,9 @@ class YrApp extends Homey.App {
             .registerRunListener((args, state) => args.device.periodComparer(args, state,
                 (ts: YrTimeserie, value: number) => (ts.data.instant.details.ultraviolet_index_clear_sky as number) > value));
 
+        this.homey.flow.getActionCard('10_textforecast')
+            .registerRunListener((args, state) => args.device.textforecastAction(args, state));
+
     }
 
 }
