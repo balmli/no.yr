@@ -195,6 +195,8 @@ module.exports = class YrDevice extends Homey.Device {
                         await this.setCapabilityValue('sunset_time', moment(sunrise.sunset).format("DD.MM.YYYY HH:mm")).catch(err => this.logger.error(err));
                     }
                 } catch (err1) {
+                    await this.setCapabilityValue('sunrise_time', '-').catch(err => this.logger.error(err));
+                    await this.setCapabilityValue('sunset_time', '-').catch(err => this.logger.error(err));
                     this.logger.error(err1);
                 }
                 try {

@@ -16,7 +16,7 @@ The app is not created or endorsed in any way by Yr.no.
 
 ### Release Notes:
 
-#### 1.2.0
+#### 1.2.1
 
 - Added sunrise and sunset
 - Support for textual forecast for Norway, for advanced flow

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<astrodata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="http://schema.api.met.no/schemas/astrodata-2.0.xsd">
+    <meta licenseurl="https://api.met.no/license_data.html"/>
+    <location latitude="69.6" longitude="18.9" height="0">
+        <time date="2022-12-20">
+            <moonphase time="2022-12-20T00:00:00+01:00" value="86.92487672"
+                       desc="LOCAL MOON STATE * MOON PHASE= 86.9 (waning crescent)"/>
+            <moonshadow time="2022-12-20T00:00:00+01:00" elevation="-43.442709344" azimuth="234.175845509"
+                        desc="LOCAL MOON STATE * SHADOW ANGLES (azi=234.2,ele=-43.4)"/>
+            <moonposition time="2022-12-20T00:00:00+01:00" elevation="-27.090790328" azimuth="60.260315446"
+                          range="377149.034216634" phase="86.92487672"
+                          desc="LOCAL MOON POSITION Elv: -27.091 deg, Azi: 60.260, Rng: 377149.0 km"/>
+            <moonrise time="2022-12-20T06:09:45+01:00" desc="LOCAL DIURNAL MOON RISE"/>
+            <high_moon time="2022-12-20T08:32:16+01:00" elevation="2.749137837"
+                       desc="LOCAL DIURNAL MAXIMUM MOON ELEVATION (Max= 2.74914)"/>
+            <moonset time="2022-12-20T10:53:55+01:00" desc="LOCAL DIURNAL MOON SET"/>
+            <solarnoon time="2022-12-20T11:41:53+01:00" elevation="-3.0321806"
+                       desc="LOCAL DIURNAL MAXIMUM SOLAR ELEVATION (Max= -3.03218)"/>
+            <low_moon time="2022-12-20T21:17:34+01:00" elevation="-40.458354463"
+                      desc="LOCAL DIURNAL MINIMUM MOON ELEVATION (Min= -40.45835)"/>
+            <solarmidnight time="2022-12-20T23:42:10+01:00" elevation="-43.836262517"
+                           desc="LOCAL DIURNAL MINIMUM SOLAR ELEVATION (Min= -43.83626)"/>
+        </time>
+        <time date="2022-12-21">
+            <moonposition time="2022-12-21T00:00:00+01:00" elevation="-35.532349467" azimuth="48.481512634"
+                          range="372107.856789363" phase="90.546732842"
+                          desc="LOCAL MOON POSITION Elv: -35.532 deg, Azi: 48.482, Rng: 372107.9 km"/>
+        </time>
+    </location>
+</astrodata>

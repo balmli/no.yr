@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<astrodata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="http://schema.api.met.no/schemas/astrodata-2.0.xsd">
+    <meta licenseurl="https://api.met.no/license_data.html"/>
+    <location latitude="69.6" longitude="18.9" height="0">
+        <time date="2022-03-20">
+            <moonphase time="2022-03-20T00:00:00+01:00" value="55.824639845"
+                       desc="LOCAL MOON STATE * MOON PHASE= 55.8 (waning gibbous)"/>
+            <moonshadow time="2022-03-20T00:00:00+01:00" elevation="68.522815664" azimuth="246.523480301"
+                        desc="LOCAL MOON STATE * SHADOW ANGLES (azi=246.5,ele=68.5)"/>
+            <moonposition time="2022-03-20T00:00:00+01:00" elevation="13.075323369" azimuth="161.047262606"
+                          range="373666.596585669" phase="55.824639845"
+                          desc="LOCAL MOON POSITION Elv: 13.075 deg, Azi: 161.047, Rng: 373666.6 km"/>
+            <high_moon time="2022-03-20T01:04:37+01:00" elevation="14.100749207"
+                       desc="LOCAL DIURNAL MAXIMUM MOON ELEVATION (Max= 14.10075)"/>
+            <sunrise time="2022-03-20T05:44:22+01:00" desc="LOCAL DIURNAL SUN RISE"/>
+            <moonset time="2022-03-20T06:08:07+01:00" desc="LOCAL DIURNAL MOON SET"/>
+            <solarnoon time="2022-03-20T11:52:33+01:00" elevation="20.320556128"
+                       desc="LOCAL DIURNAL MAXIMUM SOLAR ELEVATION (Max= 20.32056)"/>
+            <low_moon time="2022-03-20T13:50:39+01:00" elevation="-29.781194089"
+                      desc="LOCAL DIURNAL MINIMUM MOON ELEVATION (Min= -29.78119)"/>
+            <sunset time="2022-03-20T18:01:33+01:00" desc="LOCAL DIURNAL SUN SET"/>
+            <moonrise time="2022-03-20T22:02:55+01:00" desc="LOCAL DIURNAL MOON RISE"/>
+            <solarmidnight time="2022-03-20T23:51:03+01:00" elevation="-20.282129341"
+                           desc="LOCAL DIURNAL MINIMUM SOLAR ELEVATION (Min= -20.28213)"/>
+        </time>
+        <time date="2022-03-21">
+            <moonposition time="2022-03-21T00:00:00+01:00" elevation="5.424311071" azimuth="150.238100712"
+                          range="372040.280257316" phase="59.40319299"
+                          desc="LOCAL MOON POSITION Elv: 5.424 deg, Azi: 150.238, Rng: 372040.3 km"/>
+        </time>
+    </location>
+</astrodata>

@@ -14,9 +14,9 @@ describe('fetchSunrise', function () {
             const sunrise = await fetchSunrise(
                 59.933333,
                 10.716667,
-                 0,
-                 '2:0',
-                 moment('2023-01-07T10:00:00'),
+                0,
+                '2:0',
+                moment('2023-01-07T10:00:00'),
                 '1.2.0',
                 new Logger({
                     logLevel: 3,
@@ -24,8 +24,7 @@ describe('fetchSunrise', function () {
                     logFunc: this.log,
                     errorFunc: this.error,
                 }),
-                 {
-                } as Homey
+                {} as Homey
             );
             //console.log(sunrise);
             expect(sunrise?.sunrise.format()).eq('2023-01-07T09:14:27+01:00');
@@ -47,8 +46,7 @@ describe('fetchSunrise', function () {
                     logFunc: this.log,
                     errorFunc: this.error,
                 }),
-                {
-                } as Homey
+                {} as Homey
             );
             //console.log(sunrise);
             //expect(sunrise?.sunrise.format()).eq('2023-01-07T09:14:27+01:00');
@@ -70,8 +68,7 @@ describe('fetchSunrise', function () {
                     logFunc: this.log,
                     errorFunc: this.error,
                 }),
-                {
-                } as Homey
+                {} as Homey
             );
             //console.log(sunrise);
             //expect(sunrise?.sunrise.format()).eq('2023-01-07T09:14:27+01:00');
@@ -93,12 +90,39 @@ describe('fetchSunrise', function () {
                     logFunc: this.log,
                     errorFunc: this.error,
                 }),
-                {
-                } as Homey
+                {} as Homey
             );
             //console.log(sunrise);
             //expect(sunrise?.sunrise.format()).eq('2023-01-07T09:14:27+01:00');
             //expect(sunrise?.sunset.format()).eq('2023-01-07T15:32:33+01:00');
+        });
+
+        it('Check fetchSunrise - today Tromsøe', async function () {
+            moment.tz.setDefault("Europe/Oslo");
+            try {
+                const sunrise = await fetchSunrise(
+                    69.647506,
+                    18.955627,
+                    0,
+                    '0',
+                    undefined,
+                    '1.2.0',
+                    new Logger({
+                        logLevel: 3,
+                        prefix: undefined,
+                        logFunc: this.log,
+                        errorFunc: this.error,
+                    }),
+                    {
+                        "__": (key: string) => {
+                            console.log('Homey messaage: ', key);
+                        }
+                    } as Homey
+                );
+                //console.log(sunrise);
+            } catch (err) {
+                //console.log(err);
+            }
         });
     });
 });
