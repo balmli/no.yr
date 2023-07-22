@@ -108,7 +108,7 @@ class YrApp extends Homey.App {
                 (ts: YrTimeserie, value: number) => (!!ts.data.next_1_hours && (ts.data.next_1_hours.details.probability_of_precipitation as number)) > value));
 
         this.homey.flow.getConditionCard('03_rain_sum_next_hours_above')
-            .registerRunListener((args, state) => args.device.nextHoursSum(args, state,
+            .registerRunListener((args, state) => args.device.nextHoursSum(args,
                 (ts: YrTimeserie) => !!ts.data.next_1_hours ? ts.data.next_1_hours.details.precipitation_amount as number : 0,
                 (sum: number | undefined, value: number) => !!sum && sum > value))
             .getArgument('start')

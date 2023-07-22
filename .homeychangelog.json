@@ -1,4 +1,8 @@
 {
+  "1.2.2": {
+    "en": "Fixed 'Is the sum of rain !{{|not}} above X mm starting Y to Z hours later' flow. ",
+    "no": ""
+  },
   "1.2.1": {
     "en": "Added sunrise and sunset. Support for textual forecast for Norway, for advanced flow. ",
     "no": "La inn felt for soloppgang og solnedgang. Støtte for tekstlig værvarsel for Norge, for advanced flow. "
