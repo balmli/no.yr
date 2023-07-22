@@ -1,7 +1,7 @@
 {
   "1.2.2": {
-    "en": "Fixed 'Is the sum of rain !{{|not}} above X mm starting Y to Z hours later' flow. Fixed sunset and sunrise. ",
-    "no": ""
+    "en": "Fixed 'Is the sum of rain !{{|not}} above X mm starting Y to Z hours later' flow. Fixed sunset and sunrise. Fixed 'wind strength' and 'gust strength'. ",
+    "no": "Rettet 'Er sum av regn !{{|ikke}} over X mm fra Y til Z timer senere'. Rettet soloppgang og solnedgang. Rettet 'vindstyrke' og 'vindkast'. "
   },
   "1.2.1": {
     "en": "Added sunrise and sunset. Support for textual forecast for Norway, for advanced flow. ",

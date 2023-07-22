@@ -20,6 +20,7 @@ The app is not created or endorsed in any way by Yr.no.
 
 - Fixed 'Is the sum of rain !{{|not}} above X mm starting Y to Z hours later' flow
 - Fixed sunset and sunrise
+- Fixed 'wind strength' and 'gust strength'
 
 #### 1.2.1
 

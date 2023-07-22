@@ -14,7 +14,7 @@
     "args": [{
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr&capabilities=measure_gust_strength"
+            "filter": "driver_id=myr&capabilities=measure_gust_strength1"
         },
         {
             "name": "value",

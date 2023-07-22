@@ -43,6 +43,18 @@ module.exports = class YrDevice extends Homey.Device {
             if (!this.hasCapability('sunset_time')) {
                 await this.addCapability('sunset_time')
             }
+            if (this.hasCapability('measure_wind_strength')) {
+                await this.removeCapability('measure_wind_strength')
+            }
+            if (this.hasCapability('measure_gust_strength')) {
+                await this.removeCapability('measure_gust_strength')
+            }
+            if (!this.hasCapability('measure_wind_strength1')) {
+                await this.addCapability('measure_wind_strength1')
+            }
+            if (!this.hasCapability('measure_gust_strength1')) {
+                await this.addCapability('measure_gust_strength1')
+            }
         } catch (err) {
             this.logger.error('migration failed', err);
         }
@@ -95,12 +107,12 @@ module.exports = class YrDevice extends Homey.Device {
             }
         }
         if (!units.wind_speed_of_gust) {
-            if (this.hasCapability('measure_gust_strength')) {
-                removeCaps.push('measure_gust_strength');
+            if (this.hasCapability('measure_gust_strength1')) {
+                removeCaps.push('measure_gust_strength1');
             }
         } else {
-            if (!this.hasCapability('measure_gust_strength')) {
-                addCaps.push('measure_gust_strength');
+            if (!this.hasCapability('measure_gust_strength1')) {
+                addCaps.push('measure_gust_strength1');
             }
         }
         if (!units.probability_of_thunder) {
@@ -319,9 +331,9 @@ module.exports = class YrDevice extends Homey.Device {
             await this.updateCapability('measure_rain_next_6_hours', ts.data.next_6_hours?.details.probability_of_precipitation); // Not supported for all places
             await this.updateCapability('measure_cloud_area_fraction', ts.data.instant.details.cloud_area_fraction);
             await this.updateCapability('measure_fog_area_fraction', ts.data.instant.details.fog_area_fraction);
-            await this.updateCapability('measure_wind_strength', ts.data.instant.details.wind_speed);
+            await this.updateCapability('measure_wind_strength1', ts.data.instant.details.wind_speed);
             await this.updateCapability('measure_wind_direction', yrlib.degreesToText(ts.data.instant.details.wind_from_direction as number));
-            await this.updateCapability('measure_gust_strength', ts.data.instant.details.wind_speed_of_gust); // Not supported for all places
+            await this.updateCapability('measure_gust_strength1', ts.data.instant.details.wind_speed_of_gust); // Not supported for all places
             await this.updateCapability('measure_wind_angle', ts.data.instant.details.wind_from_direction);
             await this.updateCapability('measure_thunder_next_1_hour', ts.data.next_1_hours?.details.probability_of_thunder); // Not supported for all places
             await this.updateCapability('measure_ultraviolet', ts.data.instant.details.ultraviolet_index_clear_sky);

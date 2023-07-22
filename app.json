@@ -1567,7 +1567,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr&capabilities=measure_wind_strength"
+            "filter": "driver_id=myr&capabilities=measure_wind_strength1"
           },
           {
             "name": "value",
@@ -1593,7 +1593,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr&capabilities=measure_wind_strength"
+            "filter": "driver_id=myr&capabilities=measure_wind_strength1"
           },
           {
             "type": "number",
@@ -1657,7 +1657,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr&capabilities=measure_wind_strength"
+            "filter": "driver_id=myr&capabilities=measure_wind_strength1"
           },
           {
             "type": "number",
@@ -1766,7 +1766,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr&capabilities=measure_gust_strength"
+            "filter": "driver_id=myr&capabilities=measure_gust_strength1"
           },
           {
             "name": "value",
@@ -2654,9 +2654,9 @@
         "measure_humidity",
         "measure_cloud_area_fraction",
         "measure_fog_area_fraction",
-        "measure_wind_strength",
+        "measure_wind_strength1",
         "measure_wind_direction",
-        "measure_gust_strength",
+        "measure_gust_strength1",
         "measure_wind_angle",
         "measure_thunder_next_1_hour",
         "measure_ultraviolet"
@@ -3052,7 +3052,7 @@
       },
       "icon": "/assets/icon-partly-cloudy.svg"
     },
-    "measure_gust_strength": {
+    "measure_gust_strength1": {
       "type": "number",
       "title": {
         "en": "Gust strength",
@@ -3130,7 +3130,7 @@
       "insights": false,
       "icon": "/assets/icon-wind-direction.svg"
     },
-    "measure_wind_strength": {
+    "measure_wind_strength1": {
       "type": "number",
       "title": {
         "en": "Wind strength",

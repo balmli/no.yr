@@ -120,7 +120,7 @@ class YrApp extends Homey.App {
                 (sum: number | undefined, value: number) => !!sum && sum > value));
 
         this.homey.flow.getConditionCard('10_measure_wind_strength_below')
-            .registerRunListener(args => args.device.getCapabilityValue(`measure_wind_strength`) < args.value);
+            .registerRunListener(args => args.device.getCapabilityValue(`measure_wind_strength1`) < args.value);
 
         this.homey.flow.getConditionCard('10_wind_strength_next_hours_above')
             .registerRunListener((args, state) => args.device.nextHoursComparer(args, state,
@@ -136,7 +136,7 @@ class YrApp extends Homey.App {
             .registerRunListener(args => args.device.getCapabilityValue(`measure_wind_angle`) < args.value);
 
         this.homey.flow.getConditionCard('15_measure_gust_strength_below')
-            .registerRunListener(args => args.device.getCapabilityValue(`measure_gust_strength`) < args.value);
+            .registerRunListener(args => args.device.getCapabilityValue(`measure_gust_strength1`) < args.value);
 
         this.homey.flow.getConditionCard('20_measure_humidity_below')
             .registerRunListener(args => args.device.getCapabilityValue(`measure_humidity`) < args.value);
