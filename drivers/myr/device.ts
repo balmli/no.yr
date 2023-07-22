@@ -183,7 +183,7 @@ module.exports = class YrDevice extends Homey.Device {
                 }
                 try {
                     const sunrise = await yrlib.fetchSunrise(
-                        lat, lon, altitude,
+                        lat, lon,
                         settings.period,
                         undefined,
                         this.homey.manifest.version,

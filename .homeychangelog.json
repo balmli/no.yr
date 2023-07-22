@@ -1,6 +1,6 @@
 {
   "1.2.2": {
-    "en": "Fixed 'Is the sum of rain !{{|not}} above X mm starting Y to Z hours later' flow. ",
+    "en": "Fixed 'Is the sum of rain !{{|not}} above X mm starting Y to Z hours later' flow. Fixed sunset and sunrise. ",
     "no": ""
   },
   "1.2.1": {

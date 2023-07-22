@@ -19,6 +19,7 @@ The app is not created or endorsed in any way by Yr.no.
 #### 1.2.2
 
 - Fixed 'Is the sum of rain !{{|not}} above X mm starting Y to Z hours later' flow
+- Fixed sunset and sunrise
 
 #### 1.2.1
 

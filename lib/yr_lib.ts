@@ -13,6 +13,7 @@ import {
     Point,
     Points,
     Sunrise,
+    SunriseData,
     Textforecasts,
     YrComplete,
     YrTimeserie,
@@ -243,7 +244,7 @@ export const getTimeSeries = (wd: YrComplete, period: string, logger: Logger): Y
 }
 
 export const fetchSunrise = async (
-    lat: number, lon: number, height: number,
+    lat: number, lon: number,
     period: string,
     aDate: Moment | undefined,
     appVersion: string,
@@ -252,45 +253,34 @@ export const fetchSunrise = async (
 ): Promise<Sunrise> => {
     const forDate = aDate ? aDate : getDateFromPeriod(period);
     const date = forDate.format("yyyy-MM-DD");
-    const offset = forDate.format("Z")
-    logger.debug(`fetchSunrise: ${lat}, ${lon}, ${height} moh, ${date}, ${offset}`)
-    const uri = `https://api.met.no/weatherapi/sunrise/2.0/?lat=${lat}&lon=${lon}&height=${Math.round(height)}&date=${date}&offset=${offset}`;
+    const offset = forDate.format("Z");
+    logger.debug(`fetchSunrise: ${lat}, ${lon}, ${date}, ${offset}`);
+    const uri = `https://api.met.no/weatherapi/sunrise/3.0/sun?lat=${lat}&lon=${lon}&date=${date}&offset=${offset}`;
     const result = await doFetch(uri, appVersion, logger);
     if (result === null) {
         throw new Error(homey.__('errors.fetching_sunrise_failed'));
     }
 
-    const sunrise = await parseSunrise(result, date, logger);
+    const sunrise = await parseSunrise(result, logger);
     if (!sunrise) {
         logger.error('Unable to parse sunrise file');
         throw new Error(homey.__('errors.parsing_sunrise_failed'));
     }
 
-    const ret = {
-        sunrise: moment(sunrise?.sunrise),
-        sunset: moment(sunrise?.sunset),
-    }
-    logger.info(`Got sunrise data!`, ret);
-    return ret;
+    logger.info(`Got sunrise data!`, sunrise);
+    return sunrise;
 }
 
-export const parseSunrise = async (xmlFile: string, date: string, logger?: Logger): Promise<Sunrise | undefined> => {
+export const parseSunrise = async (data1: string, logger?: Logger): Promise<Sunrise | undefined> => {
     try {
-        const sunriseObj = await xmlParser.parseStringPromise(xmlFile);
-        const time = sunriseObj
-            .astrodata
-            .location[0]
-            .time
-            .find((t: any) => t['$'].date === date);
-        const hasData = time &&
-            time.sunrise && time.sunrise.length > 0 &&
-            time.sunset && time.sunset.length > 0;
+        const data = JSON.parse(data1) as SunriseData;
+        const hasData = data && data.properties && data.properties.sunrise && data.properties.sunset;
         return hasData ? {
-            sunrise: time.sunrise[0]['$'].time,
-            sunset: time.sunset[0]['$'].time,
+            sunrise: data.properties.sunrise.time ? moment(data.properties.sunrise.time) : undefined,
+            sunset: data.properties.sunset.time ? moment(data.properties.sunset.time) : undefined,
         } : undefined;
     } catch (err) {
-        logger?.error('parseAreasFile error:', err);
+        logger?.error('parseSunrise error:', err);
     }
     return undefined;
 }

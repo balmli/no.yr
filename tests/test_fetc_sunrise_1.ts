@@ -14,7 +14,6 @@ describe('fetchSunrise', function () {
             const sunrise = await fetchSunrise(
                 59.933333,
                 10.716667,
-                0,
                 '2:0',
                 moment('2023-01-07T10:00:00'),
                 '1.2.0',
@@ -27,8 +26,8 @@ describe('fetchSunrise', function () {
                 {} as Homey
             );
             //console.log(sunrise);
-            expect(sunrise?.sunrise.format()).eq('2023-01-07T09:14:27+01:00');
-            expect(sunrise?.sunset.format()).eq('2023-01-07T15:32:33+01:00');
+            expect(sunrise?.sunrise.format()).eq('2023-01-07T09:14:00+01:00');
+            expect(sunrise?.sunset.format()).eq('2023-01-07T15:32:00+01:00');
         });
 
         it('Check fetchSunrise - today ', async function () {
@@ -36,7 +35,6 @@ describe('fetchSunrise', function () {
             const sunrise = await fetchSunrise(
                 59.933333,
                 10.716667,
-                0,
                 '0',
                 undefined,
                 '1.2.0',
@@ -58,7 +56,6 @@ describe('fetchSunrise', function () {
             const sunrise = await fetchSunrise(
                 59.933333,
                 10.716667,
-                0,
                 '1:0',
                 undefined,
                 '1.2.0',
@@ -80,7 +77,6 @@ describe('fetchSunrise', function () {
             const sunrise = await fetchSunrise(
                 59.933333,
                 10.716667,
-                0,
                 '4:12',
                 undefined,
                 '1.2.0',
@@ -103,7 +99,6 @@ describe('fetchSunrise', function () {
                 const sunrise = await fetchSunrise(
                     69.647506,
                     18.955627,
-                    0,
                     '0',
                     undefined,
                     '1.2.0',
