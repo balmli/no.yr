@@ -171,6 +171,34 @@
         ]
       },
       {
+        "id": "measure_gust_strength1_changed",
+        "title": {
+          "en": "The gust strength changed",
+          "no": "Vindkast ble endret"
+        },
+        "hint": {
+          "en": "Triggers when the gust strength (m/s) changes.",
+          "no": "Dette kortet trigges når vindkat (m/s) endres."
+        },
+        "tokens": [
+          {
+            "name": "measure_gust_strength1",
+            "type": "number",
+            "title": {
+              "en": "Gust strength",
+              "no": "Vindkast"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr&capabilities=measure_gust_strength1"
+          }
+        ]
+      },
+      {
         "id": "measure_rain_next_1_hour_changed",
         "title": {
           "en": "Rain next hour changed",
@@ -279,6 +307,34 @@
             "name": "device",
             "type": "device",
             "filter": "driver_id=myr&capabilities=measure_wind_direction"
+          }
+        ]
+      },
+      {
+        "id": "measure_wind_strength1_changed",
+        "title": {
+          "en": "The wind strength changed",
+          "no": "Vindstyrken ble endret"
+        },
+        "hint": {
+          "en": "Triggers when the wind strength (m/s) changes.",
+          "no": "Dette kortet trigges når vindstyrke (m/s) endres."
+        },
+        "tokens": [
+          {
+            "name": "measure_wind_strength1",
+            "type": "number",
+            "title": {
+              "en": "Wind strength",
+              "no": "Vindstyrke"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr&capabilities=measure_wind_strength1"
           }
         ]
       }

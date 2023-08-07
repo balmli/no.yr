@@ -1,0 +1,28 @@
+{
+  "id": "measure_wind_strength1_changed",
+  "title": {
+    "en": "The wind strength changed",
+    "no": "Vindstyrken ble endret"
+  },
+  "hint": {
+    "en": "Triggers when the wind strength (m/s) changes.",
+    "no": "Dette kortet trigges når vindstyrke (m/s) endres."
+  },
+  "tokens": [
+    {
+      "name": "measure_wind_strength1",
+      "type": "number",
+      "title": {
+        "en": "Wind strength",
+        "no": "Vindstyrke"
+      }
+    }
+  ],
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=myr&capabilities=measure_wind_strength1"
+    }
+  ]
+}

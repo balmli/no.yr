@@ -1,4 +1,8 @@
 {
+  "1.3.0": {
+    "en": "Added triggers for 'The wind strength changed' and 'GThe gust strength changed'. ",
+    "no": "La inn triggere for 'Vindstyrke ble endret' og 'Vindkast ble endret'. "
+  },
   "1.2.2": {
     "en": "Fixed 'Is the sum of rain !{{|not}} above X mm starting Y to Z hours later' flow. Fixed sunset and sunrise. Fixed 'wind strength' and 'gust strength'. ",
     "no": "Rettet 'Er sum av regn !{{|ikke}} over X mm fra Y til Z timer senere'. Rettet soloppgang og solnedgang. Rettet 'vindstyrke' og 'vindkast'. "
