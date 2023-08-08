@@ -1,0 +1,28 @@
+{
+  "id": "measure_minutes_raining_changed",
+  "title": {
+    "en": "Starts raining in changed",
+    "no": "Regn starter om ble endret"
+  },
+  "hint": {
+    "en": "Triggers when the 'Starts raining in' (minutes) changes.",
+    "no": "Dette kortet trigges når 'Regn starter om' (minutter) endres."
+  },
+  "tokens": [
+    {
+      "name": "measure_minutes_raining",
+      "type": "number",
+      "title": {
+        "en": "Starts raining in",
+        "no": "Regn starter om"
+      }
+    }
+  ],
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=myr&capabilities=measure_minutes_raining"
+    }
+  ]
+}

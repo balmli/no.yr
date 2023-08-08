@@ -8,6 +8,7 @@ type DirectionDegrees = number | undefined;
 type Fraction = number | undefined;
 type UVI = number | undefined;
 type Precipitation = number | undefined;
+type PrecipitationRate = number | undefined;
 
 export interface InstantDetails {
     updated_at: string | undefined;
@@ -21,6 +22,7 @@ export interface InstantDetails {
     cloud_area_fraction_medium: Fraction;
     dew_point_temperature: Temperature;
     fog_area_fraction: Fraction;
+    precipitation_rate: PrecipitationRate;
     relative_humidity: Humidity;
     ultraviolet_index_clear_sky: UVI;
     wind_from_direction: DirectionDegrees;
@@ -65,6 +67,12 @@ export interface YrTimeserie {
 
 export type YrTimeseries = YrTimeserie[];
 
+export enum RadarCoverage {
+    ok = "ok",
+    temporarily_unavailable = "temporarily unavailable",
+    no_coverage = "no coverage",
+}
+
 export interface YrComplete {
     type: string;
     geometry: {
@@ -74,6 +82,7 @@ export interface YrComplete {
     properties: {
         meta: {
             updated_at: string;
+            radar_coverage?: RadarCoverage;
             units: {
                 air_pressure_at_sea_level: string;
                 air_temperature: string;
@@ -90,6 +99,7 @@ export interface YrComplete {
                 precipitation_amount: string;
                 precipitation_amount_max?: string;
                 precipitation_amount_min?: string;
+                precipitation_rate?: string;
                 probability_of_precipitation?: string;
                 probability_of_thunder?: string;
                 relative_humidity: string;

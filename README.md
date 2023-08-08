@@ -16,6 +16,10 @@ The app is not created or endorsed in any way by Yr.no.
 
 ### Release Notes:
 
+#### 1.4.0
+
+- Added support for immediate weather forecast for Nordic countries (Nowcast)
+
 #### 1.3.0
 
 - Added triggers for 'The wind strength changed' and 'The gust strength changed'

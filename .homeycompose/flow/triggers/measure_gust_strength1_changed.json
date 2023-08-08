@@ -6,7 +6,7 @@
   },
   "hint": {
     "en": "Triggers when the gust strength (m/s) changes.",
-    "no": "Dette kortet trigges når vindkat (m/s) endres."
+    "no": "Dette kortet trigges når vindkast (m/s) endres."
   },
   "tokens": [
     {

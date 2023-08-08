@@ -199,6 +199,8 @@ class YrApp extends Homey.App {
         this.homey.flow.getActionCard('10_textforecast')
             .registerRunListener((args, state) => args.device.textforecastAction(args, state));
 
+        this.homey.flow.getActionCard('50_nowcast')
+            .registerRunListener((args, state) => args.device.nowcastAction(args, state));
     }
 
 }

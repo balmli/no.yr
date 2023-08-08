@@ -1,0 +1,21 @@
+{
+    "type": "number",
+    "title": {
+        "en": "Starts raining in",
+        "no": "Regn starter om"
+    },
+    "units": {
+        "en": "minutes",
+        "no": "minutter"
+    },
+    "desc": {
+        "en": "This attribute represents the predicted duration, in minutes, from the current time until the onset of rainfall. Note, however, that it only assesses the forecast for the first 90 minutes from the current time. ",
+        "no": "Denne verdien er forventet tid, i minutter, fra nåværende tidspunkt til det starter å regne. Merk imidlertid at det kun vurderer prognosen for de første 90 minuttene fra nåværende tidspunkt. "
+    },
+    "insights": false,
+    "decimals": 0,
+    "getable": true,
+    "setable": false,
+    "uiComponent": "sensor",
+    "icon": "/assets/icon-rain.svg"
+}

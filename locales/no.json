@@ -16,6 +16,7 @@
     "fetching_textforecast_failed": "Nedlasting av værvarsel feilet.",
     "parsing_textareas_failed": "Feil ved tolkning av værvarsel.",
     "unable_to_send_forecast": "Feil ved henting av værvarsel.",
-    "unavailable_due_to_data_error": "Nedlasting av værvarsel feilet. Sjekk at lokasjon er riktig."
+    "unavailable_due_to_data_error": "Nedlasting av værvarsel feilet. Sjekk at lokasjon er riktig.",
+    "unable_to_send_nowcast": "Feil ved henting av umiddelbart værvarsel (Nowcast)."
   }
 }

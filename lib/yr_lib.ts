@@ -167,7 +167,15 @@ const doFetch = async (
             timeout: 30000
         }
     );
-    if (result.response.statusCode !== 200) {
+    if (result.response.statusCode === 422) {
+        // 422 Unprocessable Entity
+        logger.info(`Fetching "${uri}" failed:`, {
+            statusCode: result.response.statusCode,
+            statusMessage: result.response.statusMessage,
+            result: result.data
+        });
+        return null;
+    } else if (result.response.statusCode !== 200) {
         logger.error(`Fetching "${uri}" failed:`, {
             statusCode: result.response.statusCode,
             statusMessage: result.response.statusMessage,
@@ -229,6 +237,16 @@ export const getDateFromPeriod = (period: string): Moment => {
             .add(Number(period), 'hours');
 }
 
+export const getDateAddPeriod = (period: string): Moment => {
+    const splitted = period.split(':');
+    return period.includes(':')
+        ? moment().utc()
+            .add(Number(splitted[0]), 'days')
+            .hour(Number(splitted[1]))
+        : moment()
+            .add(Number(period), 'hours');
+}
+
 export const getTimeSeries = (wd: YrComplete, period: string, logger: Logger): YrTimeserie | null => {
     const forDate = getDateFromPeriod(period);
     logger.debug('Get time series. Search for: ', forDate);
@@ -283,6 +301,26 @@ export const parseSunrise = async (data1: string, logger?: Logger): Promise<Sunr
         logger?.error('parseSunrise error:', err);
     }
     return undefined;
+}
+
+export const fetchNowcast = async (
+    lat: number, lon: number, altitude: number,
+    clearAltitude: boolean | undefined,
+    appVersion: string,
+    logger: Logger
+): Promise<YrComplete | null> => {
+    const uri = `https://api.met.no/weatherapi/nowcast/2.0/complete?lat=${lat}&lon=${lon}` +
+        (!clearAltitude && altitude !== -1 ? `&altitude=${Math.round(altitude)}` : '');
+    const result = await doFetch(uri, appVersion, logger);
+    if (result === null) {
+        return null;
+    }
+
+    const wd = parseResult(result, logger);
+    logger.info(`Got nowcast data!`, {
+        wd: wd?.properties.meta.updated_at
+    });
+    return wd;
 }
 
 /**

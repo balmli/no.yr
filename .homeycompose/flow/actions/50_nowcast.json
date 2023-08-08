@@ -1,0 +1,33 @@
+{
+  "id": "50_nowcast",
+  "title": {
+    "en": "Fetch immediate weather forecast ...",
+    "no": "Hent umiddelbart værvarsel ..."
+  },
+  "advanced": true,
+  "titleFormatted": {
+    "en": "Fetch immediate weather forecast",
+    "no": "Hent umiddelbart værvarsel"
+  },
+  "hint": {
+    "en": "Fetches immediate weather forecast (Nowcast). Only Nordic area is supported.",
+    "no": "Henter umiddelbart værvarsel (Nowcast). Bare det nordiske området støttes."
+  },
+  "tokens": [
+    {
+      "name": "forecast",
+      "type": "string",
+      "title": {
+        "en": "Forecast (JSON)",
+        "no": "Værvarsel (JSON)"
+      }
+    }
+  ],
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=myr&capabilities=measure_minutes_raining"
+    }
+  ]
+}

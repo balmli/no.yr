@@ -3,7 +3,7 @@ import Homey from "homey";
 import Logger from '@balmli/homey-logger';
 
 import moment from "../../lib/moment-timezone-with-data";
-import {Textforecasts, YrComplete, YrTimeserie, YrTimeseries} from '../../lib/types';
+import {RadarCoverage, Textforecasts, YrComplete, YrTimeserie, YrTimeseries} from '../../lib/types';
 import {WeatherLegends} from "../../lib/legends";
 import * as yrlib from "../../lib/yr_lib";
 
@@ -14,11 +14,15 @@ module.exports = class YrDevice extends Homey.Device {
     logger!: Logger;
     _deleted?: boolean;
     _weatherData!: YrComplete | null;
-    _textualForecast!: Textforecasts | null;
     _fetchDataTimeout?: NodeJS.Timeout;
     _updateDeviceTimeout?: NodeJS.Timeout;
     _clearAltitude?: boolean;
     _forceUpdateDevice?: boolean;
+    _nowcastData!: YrComplete | null;
+    _fetchNowcastTimeout?: NodeJS.Timeout;
+    _updateNowcastDeviceTimeout?: NodeJS.Timeout;
+    _forceUpdateNowcastDevice?: boolean;
+    _textualForecast!: Textforecasts | null;
 
     async onInit(): Promise<void> {
         this.logger = new Logger({
@@ -28,10 +32,12 @@ module.exports = class YrDevice extends Homey.Device {
             errorFunc: this.error,
         });
         this._weatherData = null;
+        this._nowcastData = null;
         this._textualForecast = null;
         await this.migrate();
         await this.initialize();
         this.scheduleFetchData(2);
+        this.scheduleFetchNowcast(5);
         this.logger.verbose(this.getName() + ' -> device initialized');
     }
 
@@ -70,6 +76,8 @@ module.exports = class YrDevice extends Homey.Device {
         this._deleted = true;
         this.clearFetchData();
         this.clearUpdateDevice();
+        this.clearFetchNowcast();
+        this.clearUpdateNowcastDevice();
         this.logger.verbose(this.getName() + ' -> device deleted');
     }
 
@@ -81,8 +89,10 @@ module.exports = class YrDevice extends Homey.Device {
         if (changedKeys.includes('lat') || changedKeys.includes('lon') || changedKeys.includes('altitude')) {
             this._clearAltitude = !changedKeys.includes('altitude');
             this.scheduleFetchData(1);
+            this.scheduleFetchNowcast(2);
         } else if (changedKeys.includes('period')) {
             this.scheduleUpdateDevice(1);
+            this.scheduleUpdateNowcastDevice(2);
         }
     }
 
@@ -235,6 +245,70 @@ module.exports = class YrDevice extends Homey.Device {
         }
     }
 
+    clearFetchNowcast() {
+        if (this._fetchNowcastTimeout) {
+            this.homey.clearTimeout(this._fetchNowcastTimeout);
+            this._fetchNowcastTimeout = undefined;
+        }
+    }
+
+    scheduleFetchNowcast(seconds?: number) {
+        if (this._deleted) {
+            return;
+        }
+        this.clearFetchNowcast();
+        if (seconds === undefined) {
+            const syncTime = this.getStoreValue('syncTime') % 300;
+            const now = new Date();
+            seconds = syncTime - (now.getMinutes() * 60 + now.getSeconds()) % 300;
+            seconds = seconds <= 0 ? seconds + 300 : seconds;
+        } else {
+            this._forceUpdateNowcastDevice = true;
+        }
+        this.logger.info(`Next fetch nowcast data in ${seconds} seconds`);
+        this._fetchNowcastTimeout = this.homey.setTimeout(this.doFetchNowcast.bind(this), seconds * 1000);
+    }
+
+    async doFetchNowcast() {
+        if (this._deleted) {
+            return;
+        }
+        let newSchedule = true;
+        try {
+            this.clearFetchNowcast();
+            this.clearUpdateNowcastDevice();
+            const settings = this.getSettings();
+            const lat = math.round4(settings.lat);
+            const lon = math.round4(settings.lon);
+            const altitude = settings.altitude;
+            this._nowcastData = await yrlib.fetchNowcast(
+                lat, lon, altitude,
+                this._clearAltitude,
+                this.homey.manifest.version,
+                this.logger);
+            if (this._nowcastData === null) {
+                newSchedule = false;
+                if (this.hasCapability('measure_minutes_raining')) {
+                    await this.removeCapability('measure_minutes_raining');
+                }
+                this.logger.info(`Nowcast not supported for location ${lat}, ${lon}`);
+            } else if (this._forceUpdateNowcastDevice) {
+                const updated = await this.updateDeviceNowcast(this._nowcastData);
+                if (!updated) {
+                    newSchedule = false;
+                }
+            }
+        } catch (err) {
+            this.logger.error(err);
+        } finally {
+            this._forceUpdateNowcastDevice = false;
+            if (newSchedule) {
+                this.scheduleFetchNowcast();
+                this.scheduleUpdateNowcastDevice();
+            }
+        }
+    }
+
     async setDeviceUnavailable(): Promise<void> {
         let fetchFailures = this.getStoreValue('fetchFailures') || 0;
         fetchFailures++;
@@ -287,6 +361,43 @@ module.exports = class YrDevice extends Homey.Device {
             this.logger.error(err);
         } finally {
             this.scheduleUpdateDevice();
+        }
+    }
+
+    clearUpdateNowcastDevice() {
+        if (this._updateNowcastDeviceTimeout) {
+            this.homey.clearTimeout(this._updateNowcastDeviceTimeout);
+            this._updateNowcastDeviceTimeout = undefined;
+        }
+    }
+
+    scheduleUpdateNowcastDevice(seconds?: number) {
+        if (this._deleted) {
+            return;
+        }
+        this.clearUpdateNowcastDevice();
+        if (seconds == undefined) {
+            const now = new Date();
+            seconds = 2 - now.getSeconds(); // 2 seconds after top of each minute
+            seconds = seconds <= 0 ? seconds + 60 : seconds;
+        }
+        this.logger.debug(`Next update device with nowcast data in ${seconds} seconds`);
+        this._updateNowcastDeviceTimeout = this.homey.setTimeout(this.doUpdateNowcastDevice.bind(this), seconds * 1000);
+    }
+
+    async doUpdateNowcastDevice() {
+        if (this._deleted) {
+            return;
+        }
+        try {
+            this.clearUpdateNowcastDevice();
+            if (this._nowcastData) {
+                await this.updateDeviceNowcast(this._nowcastData);
+            }
+        } catch (err) {
+            this.logger.error(err);
+        } finally {
+            this.scheduleUpdateNowcastDevice();
         }
     }
 
@@ -356,6 +467,50 @@ module.exports = class YrDevice extends Homey.Device {
         }
     }
 
+    updateDeviceNowcast = async (wd: YrComplete | null): Promise<boolean> => {
+        const period = this.getSetting('period');
+        const now = yrlib.getDateAddPeriod(period);
+        const tsBefore = wd ? wd.properties.timeseries
+            .filter(ts => moment(ts.time).isBefore(now)) : [];
+        const tsAfter = wd ? wd.properties.timeseries
+            .filter(ts => moment(ts.time).isSameOrAfter(now)) : [];
+
+        if (!wd ||
+            wd.properties.meta.radar_coverage !== RadarCoverage.ok ||
+            tsAfter.length === 0) {
+            if (this.hasCapability('measure_minutes_raining')) {
+                await this.removeCapability('measure_minutes_raining');
+            }
+            return false;
+        }
+        if (!this.hasCapability('measure_minutes_raining')) {
+            await this.addCapability('measure_minutes_raining');
+        }
+
+        const tsLastBefore = tsBefore.length > 0 ? tsBefore[tsBefore.length - 1] : undefined;
+        const isRaining = tsLastBefore !== undefined &&
+            tsLastBefore.data.instant.details.precipitation_rate !== undefined &&
+            tsLastBefore.data.instant.details.precipitation_rate > 0;
+
+        const tsRainingAfter = tsAfter
+            .filter(ts => ts.data.instant.details.precipitation_rate !== undefined &&
+                ts.data.instant.details.precipitation_rate > 0);
+        const tsFirstRainingAfter = tsRainingAfter.length > 0 ? tsRainingAfter[0] : undefined;
+
+        let minutesUntilStartsRaining: number | undefined = undefined;
+
+        if (isRaining) {
+            minutesUntilStartsRaining = 0;
+        } else if (!isRaining && !!tsFirstRainingAfter) {
+            const now = moment();
+            const start = moment(tsFirstRainingAfter.time);
+            minutesUntilStartsRaining = start.diff(now, 'minutes');
+        }
+
+        await this.updateCapability('measure_minutes_raining', minutesUntilStartsRaining);
+        return true;
+    }
+
     updateCapability = async (capabilityId: string, value: any): Promise<void> => {
         if (this.hasCapability(capabilityId)) {
             await this.setCapabilityValue(capabilityId, value === undefined ? 0 : value).catch(err => this.logger.error(err));
@@ -419,6 +574,21 @@ module.exports = class YrDevice extends Homey.Device {
         } catch (err) {
             this.logger.error('Unable send forecast data', err);
             throw new Error(this.homey.__('errors.unable_to_send_forecast'));
+        }
+    }
+
+    async nowcastAction(args: any, state: any): Promise<any> {
+        if (!this._nowcastData) {
+            throw new Error(this.homey.__('errors.unable_to_send_nowcast'));
+        }
+        try {
+            const forecast = JSON.stringify(this._nowcastData.properties.timeseries);
+            return {
+                forecast
+            };
+        } catch (err) {
+            this.logger.error('Unable send nowcast data', err);
+            throw new Error(this.homey.__('errors.unable_to_send_nowcast'));
         }
     }
 

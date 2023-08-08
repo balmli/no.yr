@@ -1,4 +1,8 @@
 {
+  "1.4.0": {
+    "en": "Added support for immediate weather forecast for Nordic countries (Nowcast). ",
+    "no": "La inn støtte for umiddelbart værvarsel for nordiske land (Nowcast). "
+  },
   "1.3.0": {
     "en": "Added triggers for 'The wind strength changed' and 'GThe gust strength changed'. ",
     "no": "La inn triggere for 'Vindstyrke ble endret' og 'Vindkast ble endret'. "

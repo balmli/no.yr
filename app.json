@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "no.yr",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "brandColor": "#53b7ee",
@@ -178,7 +178,7 @@
         },
         "hint": {
           "en": "Triggers when the gust strength (m/s) changes.",
-          "no": "Dette kortet trigges når vindkat (m/s) endres."
+          "no": "Dette kortet trigges når vindkast (m/s) endres."
         },
         "tokens": [
           {
@@ -195,6 +195,34 @@
             "name": "device",
             "type": "device",
             "filter": "driver_id=myr&capabilities=measure_gust_strength1"
+          }
+        ]
+      },
+      {
+        "id": "measure_minutes_raining_changed",
+        "title": {
+          "en": "Starts raining in changed",
+          "no": "Regn starter om ble endret"
+        },
+        "hint": {
+          "en": "Triggers when the 'Starts raining in' (minutes) changes.",
+          "no": "Dette kortet trigges når 'Regn starter om' (minutter) endres."
+        },
+        "tokens": [
+          {
+            "name": "measure_minutes_raining",
+            "type": "number",
+            "title": {
+              "en": "Starts raining in",
+              "no": "Regn starter om"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr&capabilities=measure_minutes_raining"
           }
         ]
       },
@@ -2664,6 +2692,39 @@
             ]
           }
         ]
+      },
+      {
+        "id": "50_nowcast",
+        "title": {
+          "en": "Fetch immediate weather forecast ...",
+          "no": "Hent umiddelbart værvarsel ..."
+        },
+        "advanced": true,
+        "titleFormatted": {
+          "en": "Fetch immediate weather forecast",
+          "no": "Hent umiddelbart værvarsel"
+        },
+        "hint": {
+          "en": "Fetches immediate weather forecast (Nowcast). Only Nordic area is supported.",
+          "no": "Henter umiddelbart værvarsel (Nowcast). Bare det nordiske området støttes."
+        },
+        "tokens": [
+          {
+            "name": "forecast",
+            "type": "string",
+            "title": {
+              "en": "Forecast (JSON)",
+              "no": "Værvarsel (JSON)"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr&capabilities=measure_minutes_raining"
+          }
+        ]
       }
     ]
   },
@@ -3128,6 +3189,27 @@
       "setable": false,
       "uiComponent": "sensor",
       "icon": "/assets/icon-wind.svg"
+    },
+    "measure_minutes_raining": {
+      "type": "number",
+      "title": {
+        "en": "Starts raining in",
+        "no": "Regn starter om"
+      },
+      "units": {
+        "en": "minutes",
+        "no": "minutter"
+      },
+      "desc": {
+        "en": "This attribute represents the predicted duration, in minutes, from the current time until the onset of rainfall. Note, however, that it only assesses the forecast for the first 90 minutes from the current time. ",
+        "no": "Denne verdien er forventet tid, i minutter, fra nåværende tidspunkt til det starter å regne. Merk imidlertid at det kun vurderer prognosen for de første 90 minuttene fra nåværende tidspunkt. "
+      },
+      "insights": false,
+      "decimals": 0,
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/icon-rain.svg"
     },
     "measure_rain_next_1_hour": {
       "type": "number",
