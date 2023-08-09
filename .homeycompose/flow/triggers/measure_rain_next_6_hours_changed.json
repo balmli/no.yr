@@ -1,8 +1,8 @@
 {
   "id": "measure_rain_next_6_hours_changed",
   "title": {
-    "en": "Rain next 6 hours changed",
-    "no": "Regn neste 6 timer ble endret"
+    "en": "Rain next 6 hours (%) changed",
+    "no": "Regn neste 6 timer (%) ble endret"
   },
   "hint": {
     "en": "Triggers when the probability for rain next 6 hours (%) changes.",
@@ -13,8 +13,8 @@
       "name": "measure_rain_next_6_hours",
       "type": "number",
       "title": {
-        "en": "Rain next 6 hours",
-        "no": "Regn neste 6 timer"
+        "en": "Rain next 6 hours (%)",
+        "no": "Regn neste 6 timer (%)"
       }
     }
   ],

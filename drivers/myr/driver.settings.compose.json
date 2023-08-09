@@ -32,5 +32,18 @@
         "$extends": "altitude"
       }
     ]
+  },
+  {
+    "type": "group",
+    "label": {
+      "en": "Immediate weather forecast (Nordic area)",
+      "no": "Umiddelbart værvarsel (Nordiske land)"
+    },
+    "children": [
+      {
+        "id": "raining_threshold",
+        "$extends": "raining_threshold"
+      }
+    ]
   }
 ]

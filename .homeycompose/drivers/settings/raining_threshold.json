@@ -1,0 +1,19 @@
+{
+  "id": "raining_threshold",
+  "type": "number",
+  "label": {
+    "en": "Raining threshold",
+    "no": "Terskelverdi for regn"
+  },
+  "hint": {
+    "en": "Value above this threshold is considered as rain, which is used to calculate the 'Starts raining in' capability. ",
+    "no": "Verdi over terskelen betraktes som regn, som brukes for å beregne 'Regn starter om'. "
+  },
+  "value": 0.1,
+  "min": 0,
+  "max": 9,
+  "units": {
+    "en": "mm/h",
+    "no": "mm/h"
+  }
+}

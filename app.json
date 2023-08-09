@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "no.yr",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "brandColor": "#53b7ee",
@@ -229,8 +229,8 @@
       {
         "id": "measure_rain_next_1_hour_changed",
         "title": {
-          "en": "Rain next hour changed",
-          "no": "Regn neste time ble endret"
+          "en": "Rain next hour (%) changed",
+          "no": "Regn neste time (%) ble endret"
         },
         "hint": {
           "en": "Triggers when the probability for rain next hour (%) changes.",
@@ -241,8 +241,8 @@
             "name": "measure_rain_next_1_hour",
             "type": "number",
             "title": {
-              "en": "Rain next hour",
-              "no": "Regn neste time"
+              "en": "Rain next hour (%)",
+              "no": "Regn neste time (%)"
             }
           }
         ],
@@ -257,8 +257,8 @@
       {
         "id": "measure_rain_next_6_hours_changed",
         "title": {
-          "en": "Rain next 6 hours changed",
-          "no": "Regn neste 6 timer ble endret"
+          "en": "Rain next 6 hours (%) changed",
+          "no": "Regn neste 6 timer (%) ble endret"
         },
         "hint": {
           "en": "Triggers when the probability for rain next 6 hours (%) changes.",
@@ -267,6 +267,90 @@
         "tokens": [
           {
             "name": "measure_rain_next_6_hours",
+            "type": "number",
+            "title": {
+              "en": "Rain next 6 hours (%)",
+              "no": "Regn neste 6 timer (%)"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr&capabilities=measure_rain_next_6_hours"
+          }
+        ]
+      },
+      {
+        "id": "measure_rain.next_1_hour",
+        "title": {
+          "en": "Rain next hour (mm) changed",
+          "no": "Regn neste time (mm) ble endret"
+        },
+        "hint": {
+          "en": "Triggers when rain next hour (mm) changes.",
+          "no": "Dette kortet trigges når regn neste time (mm) endres."
+        },
+        "tokens": [
+          {
+            "name": "measure_rain.next_1_hour",
+            "type": "number",
+            "title": {
+              "en": "Rain next hour",
+              "no": "Regn neste time"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr&capabilities=measure_rain.next_1_hour"
+          }
+        ]
+      },
+      {
+        "id": "measure_rain.next_30_minutes",
+        "title": {
+          "en": "Rain next 30 minutes (mm) changed",
+          "no": "Regn neste 30 minutter (mm) ble endret"
+        },
+        "hint": {
+          "en": "Triggers when rain next 30 minutes (mm) changes.",
+          "no": "Dette kortet trigges når regn neste 30 minutter (mm) endres."
+        },
+        "tokens": [
+          {
+            "name": "measure_rain.next_30_minutes",
+            "type": "number",
+            "title": {
+              "en": "Rain next 30 minutes",
+              "no": "Regn neste 30 minutter"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=myr&capabilities=measure_rain.next_30_minutes"
+          }
+        ]
+      },
+      {
+        "id": "measure_rain.next_6_hours",
+        "title": {
+          "en": "Rain next 6 hours (mm) changed",
+          "no": "Regn neste 6 timer (mm) ble endret"
+        },
+        "hint": {
+          "en": "Triggers when rain next 6 hours (mm) changes.",
+          "no": "Dette kortet trigges når regn neste 6 timer (mm) endres."
+        },
+        "tokens": [
+          {
+            "name": "measure_rain.next_6_hours",
             "type": "number",
             "title": {
               "en": "Rain next 6 hours",
@@ -278,7 +362,7 @@
           {
             "name": "device",
             "type": "device",
-            "filter": "driver_id=myr&capabilities=measure_rain_next_6_hours"
+            "filter": "driver_id=myr&capabilities=measure_rain.next_6_hours"
           }
         ]
       },
@@ -2814,6 +2898,12 @@
             "en": "Rain next 6 hours",
             "no": "Regn neste 6 timer"
           }
+        },
+        "measure_rain.next_30_minutes": {
+          "title": {
+            "en": "Rain next 30 minutes",
+            "no": "Regn neste 30 minutter"
+          }
         }
       },
       "settings": [
@@ -3119,6 +3209,34 @@
               "value": -1,
               "units": {
                 "en": "m"
+              }
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Immediate weather forecast (Nordic area)",
+            "no": "Umiddelbart værvarsel (Nordiske land)"
+          },
+          "children": [
+            {
+              "id": "raining_threshold",
+              "type": "number",
+              "label": {
+                "en": "Raining threshold",
+                "no": "Terskelverdi for regn"
+              },
+              "hint": {
+                "en": "Value above this threshold is considered as rain, which is used to calculate the 'Starts raining in' capability. ",
+                "no": "Verdi over terskelen betraktes som regn, som brukes for å beregne 'Regn starter om'. "
+              },
+              "value": 0.1,
+              "min": 0,
+              "max": 9,
+              "units": {
+                "en": "mm/h",
+                "no": "mm/h"
               }
             }
           ]

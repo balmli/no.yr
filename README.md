@@ -16,6 +16,12 @@ The app is not created or endorsed in any way by Yr.no.
 
 ### Release Notes:
 
+#### 1.4.1
+
+- Added setting for the raining threshold for immediate weather forecast 
+- Added 'Rain next 30 minutes' capability for immediate weather forecast
+- Added triggers for 'Rain next hour (mm) changed', 'Rain next 6 hours (mm) changed' and 'Rain next 30 minutes (mm) changed'
+
 #### 1.4.0
 
 - Added support for immediate weather forecast for Nordic countries (Nowcast)

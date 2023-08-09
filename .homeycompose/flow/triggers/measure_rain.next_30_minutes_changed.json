@@ -1,0 +1,28 @@
+{
+  "id": "measure_rain.next_30_minutes",
+  "title": {
+    "en": "Rain next 30 minutes (mm) changed",
+    "no": "Regn neste 30 minutter (mm) ble endret"
+  },
+  "hint": {
+    "en": "Triggers when rain next 30 minutes (mm) changes.",
+    "no": "Dette kortet trigges når regn neste 30 minutter (mm) endres."
+  },
+  "tokens": [
+    {
+      "name": "measure_rain.next_30_minutes",
+      "type": "number",
+      "title": {
+        "en": "Rain next 30 minutes",
+        "no": "Regn neste 30 minutter"
+      }
+    }
+  ],
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=myr&capabilities=measure_rain.next_30_minutes"
+    }
+  ]
+}

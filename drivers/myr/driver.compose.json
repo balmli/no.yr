@@ -68,6 +68,12 @@
         "en": "Rain next 6 hours",
         "no": "Regn neste 6 timer"
       }
+    },
+    "measure_rain.next_30_minutes": {
+      "title": {
+        "en": "Rain next 30 minutes",
+        "no": "Regn neste 30 minutter"
+      }
     }
   }
 }

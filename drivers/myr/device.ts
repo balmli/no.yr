@@ -6,6 +6,7 @@ import moment from "../../lib/moment-timezone-with-data";
 import {RadarCoverage, Textforecasts, YrComplete, YrTimeserie, YrTimeseries} from '../../lib/types';
 import {WeatherLegends} from "../../lib/legends";
 import * as yrlib from "../../lib/yr_lib";
+import {round2} from "../../lib/math";
 
 const math = require('../../lib/math');
 
@@ -469,6 +470,8 @@ module.exports = class YrDevice extends Homey.Device {
 
     updateDeviceNowcast = async (wd: YrComplete | null): Promise<boolean> => {
         const period = this.getSetting('period');
+        const rainingThreshold = this.getSetting('raining_threshold') || 0.1;
+
         const now = yrlib.getDateAddPeriod(period);
         const tsBefore = wd ? wd.properties.timeseries
             .filter(ts => moment(ts.time).isBefore(now)) : [];
@@ -481,33 +484,45 @@ module.exports = class YrDevice extends Homey.Device {
             if (this.hasCapability('measure_minutes_raining')) {
                 await this.removeCapability('measure_minutes_raining');
             }
+            if (this.hasCapability('measure_rain.next_30_minutes')) {
+                await this.removeCapability('measure_rain.next_30_minutes');
+            }
             return false;
         }
         if (!this.hasCapability('measure_minutes_raining')) {
             await this.addCapability('measure_minutes_raining');
         }
+        if (!this.hasCapability('measure_rain.next_30_minutes')) {
+            await this.addCapability('measure_rain.next_30_minutes');
+        }
+
+        const next30Minutes = tsAfter.slice(0, 6);
+        const rainNext30Minutes = round2(next30Minutes
+            .reduce((acc, ts) => {
+                const rate = ts.data?.instant?.details?.precipitation_rate || 0;
+                return acc + rate * 5 / 60;
+            }, 0));
+        this.logger.debug('Rain next 30 minutes: ', next30Minutes.map(ts => ts.data.instant.details.precipitation_rate), rainNext30Minutes);
 
         const tsLastBefore = tsBefore.length > 0 ? tsBefore[tsBefore.length - 1] : undefined;
         const isRaining = tsLastBefore !== undefined &&
             tsLastBefore.data.instant.details.precipitation_rate !== undefined &&
-            tsLastBefore.data.instant.details.precipitation_rate > 0;
+            tsLastBefore.data.instant.details.precipitation_rate > rainingThreshold;
 
-        const tsRainingAfter = tsAfter
-            .filter(ts => ts.data.instant.details.precipitation_rate !== undefined &&
-                ts.data.instant.details.precipitation_rate > 0);
-        const tsFirstRainingAfter = tsRainingAfter.length > 0 ? tsRainingAfter[0] : undefined;
+        const tsFirstRainingAfter = tsAfter
+            .find(ts => ts.data.instant.details.precipitation_rate !== undefined &&
+                ts.data.instant.details.precipitation_rate > rainingThreshold);
 
         let minutesUntilStartsRaining: number | undefined = undefined;
 
         if (isRaining) {
             minutesUntilStartsRaining = 0;
         } else if (!isRaining && !!tsFirstRainingAfter) {
-            const now = moment();
-            const start = moment(tsFirstRainingAfter.time);
-            minutesUntilStartsRaining = start.diff(now, 'minutes');
+            minutesUntilStartsRaining = moment(tsFirstRainingAfter.time).diff(moment(), 'minutes');
         }
 
         await this.updateCapability('measure_minutes_raining', minutesUntilStartsRaining);
+        await this.updateCapability('measure_rain.next_30_minutes', rainNext30Minutes);
         return true;
     }
 
