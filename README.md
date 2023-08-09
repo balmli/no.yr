@@ -16,6 +16,10 @@ The app is not created or endorsed in any way by Yr.no.
 
 ### Release Notes:
 
+#### 1.4.2
+
+- Small textual changes
+
 #### 1.4.1
 
 - Added setting for the raining threshold for immediate weather forecast 

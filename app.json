@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "no.yr",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "brandColor": "#53b7ee",
@@ -3332,8 +3332,8 @@
     "measure_rain_next_1_hour": {
       "type": "number",
       "title": {
-        "en": "Rain next hour",
-        "no": "Regn neste time"
+        "en": "Rain next hour (%)",
+        "no": "Regn neste time (%)"
       },
       "uiComponent": "sensor",
       "getable": true,
@@ -3347,8 +3347,8 @@
     "measure_rain_next_6_hours": {
       "type": "number",
       "title": {
-        "en": "Rain next 6 hours",
-        "no": "Regn neste 6 timer"
+        "en": "Rain next 6 hours (%)",
+        "no": "Regn neste 6 timer (%)"
       },
       "uiComponent": "sensor",
       "getable": true,

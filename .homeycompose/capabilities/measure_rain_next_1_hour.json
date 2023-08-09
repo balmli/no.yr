@@ -1,8 +1,8 @@
 {
     "type": "number",
     "title": {
-        "en": "Rain next hour",
-        "no": "Regn neste time"
+        "en": "Rain next hour (%)",
+        "no": "Regn neste time (%)"
     },
     "uiComponent": "sensor",
     "getable": true,

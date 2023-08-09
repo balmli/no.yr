@@ -1,7 +1,11 @@
 {
+  "1.4.2": {
+    "en": "Added support for immediate weather forecast for Nordic countries (Nowcast). Added triggers for 'Rain next hour (mm) changed' and 'Rain next 6 hours (mm) changed'. ",
+    "no": "La inn støtte for umiddelbart værvarsel for nordiske land (Nowcast). La inn triggere for 'Regn neste time (mm) ble endret' og 'Regn neste 6 timer (mm) ble endret'."
+  },
   "1.4.1": {
     "en": "Added support for immediate weather forecast for Nordic countries (Nowcast). Added triggers for 'Rain next hour (mm) changed' and 'Rain next 6 hours (mm) changed'. ",
-    "no": "La inn støtte for umiddelbart værvarsel for nordiske land (Nowcast). La inn triggere for 'Regn neste time (mm) ble endre' og 'Regn neste 6 timer (mm) ble endret'."
+    "no": "La inn støtte for umiddelbart værvarsel for nordiske land (Nowcast). La inn triggere for 'Regn neste time (mm) ble endret' og 'Regn neste 6 timer (mm) ble endret'."
   },
   "1.4.0": {
     "en": "Added support for immediate weather forecast for Nordic countries (Nowcast). ",
