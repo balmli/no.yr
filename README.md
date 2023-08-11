@@ -16,6 +16,10 @@ The app is not created or endorsed in any way by Yr.no.
 
 ### Release Notes:
 
+#### 1.4.3
+
+- Improvements for 'Starts raining in' capability
+
 #### 1.4.2
 
 - Small textual changes

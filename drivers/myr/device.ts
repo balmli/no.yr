@@ -294,7 +294,7 @@ module.exports = class YrDevice extends Homey.Device {
                 }
                 this.logger.info(`Nowcast not supported for location ${lat}, ${lon}`);
             } else if (this._forceUpdateNowcastDevice) {
-                const updated = await this.updateDeviceNowcast(this._nowcastData);
+                const updated = await this.updateDeviceNowcast(this._weatherData, this._nowcastData);
                 if (!updated) {
                     newSchedule = false;
                 }
@@ -393,7 +393,7 @@ module.exports = class YrDevice extends Homey.Device {
         try {
             this.clearUpdateNowcastDevice();
             if (this._nowcastData) {
-                await this.updateDeviceNowcast(this._nowcastData);
+                await this.updateDeviceNowcast(this._weatherData, this._nowcastData);
             }
         } catch (err) {
             this.logger.error(err);
@@ -468,18 +468,18 @@ module.exports = class YrDevice extends Homey.Device {
         }
     }
 
-    updateDeviceNowcast = async (wd: YrComplete | null): Promise<boolean> => {
+    updateDeviceNowcast = async (wd: YrComplete | null, nowcast: YrComplete | null): Promise<boolean> => {
         const period = this.getSetting('period');
         const rainingThreshold = this.getSetting('raining_threshold') || 0.1;
 
         const now = yrlib.getDateAddPeriod(period);
-        const tsBefore = wd ? wd.properties.timeseries
+        const tsBefore = nowcast ? nowcast.properties.timeseries
             .filter(ts => moment(ts.time).isBefore(now)) : [];
-        const tsAfter = wd ? wd.properties.timeseries
+        const tsAfter = nowcast ? nowcast.properties.timeseries
             .filter(ts => moment(ts.time).isSameOrAfter(now)) : [];
 
-        if (!wd ||
-            wd.properties.meta.radar_coverage !== RadarCoverage.ok ||
+        if (!nowcast ||
+            nowcast.properties.meta.radar_coverage !== RadarCoverage.ok ||
             tsAfter.length === 0) {
             if (this.hasCapability('measure_minutes_raining')) {
                 await this.removeCapability('measure_minutes_raining');
@@ -513,12 +513,26 @@ module.exports = class YrDevice extends Homey.Device {
             .find(ts => ts.data.instant.details.precipitation_rate !== undefined &&
                 ts.data.instant.details.precipitation_rate > rainingThreshold);
 
-        let minutesUntilStartsRaining: number | undefined = undefined;
+        let minutesUntilStartsRaining: number | undefined = 99999;
 
         if (isRaining) {
             minutesUntilStartsRaining = 0;
-        } else if (!isRaining && !!tsFirstRainingAfter) {
+        } else if (!!tsFirstRainingAfter) {
             minutesUntilStartsRaining = moment(tsFirstRainingAfter.time).diff(moment(), 'minutes');
+        } else if (!!wd) {
+            const tsAfter2 = wd.properties.timeseries
+                .filter(ts => moment(ts.time).isSameOrAfter(now));
+
+            const tsFirstRainingAfter2 = tsAfter2
+                .find(ts => ts.data?.next_1_hours?.details?.precipitation_amount !== undefined &&
+                    ts.data?.next_1_hours?.details?.precipitation_amount > rainingThreshold ||
+                    ts.data?.next_1_hours?.details?.precipitation_amount === undefined &&
+                    ts.data?.next_6_hours?.details?.precipitation_amount !== undefined &&
+                    ts.data?.next_6_hours?.details?.precipitation_amount > rainingThreshold);
+
+            if (!!tsFirstRainingAfter2) {
+                minutesUntilStartsRaining = moment(tsFirstRainingAfter2.time).diff(moment(), 'minutes');
+            }
         }
 
         await this.updateCapability('measure_minutes_raining', minutesUntilStartsRaining);
