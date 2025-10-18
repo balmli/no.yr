@@ -15,11 +15,15 @@ module.exports = class YrDevice extends Homey.Device {
     logger!: Logger;
     _deleted?: boolean;
     _weatherData!: YrComplete | null;
+    _weatherLastModified?: string;
+    _weatherExpires?: string;
     _fetchDataTimeout?: NodeJS.Timeout;
     _updateDeviceTimeout?: NodeJS.Timeout;
     _clearAltitude?: boolean;
     _forceUpdateDevice?: boolean;
     _nowcastData!: YrComplete | null;
+    _nowcastLastModified?: string;
+    _nowcastExpires?: string;
     _fetchNowcastTimeout?: NodeJS.Timeout;
     _updateNowcastDeviceTimeout?: NodeJS.Timeout;
     _forceUpdateNowcastDevice?: boolean;
@@ -192,18 +196,41 @@ module.exports = class YrDevice extends Homey.Device {
             const lat = math.round4(settings.lat);
             const lon = math.round4(settings.lon);
             const altitude = settings.altitude;
-            this._weatherData = await yrlib.fetchWeather(
+
+            // Use cached Last-Modified header for conditional request
+            const weatherResult = await yrlib.fetchWeather(
                 lat, lon, altitude,
                 this._clearAltitude,
                 this.homey.manifest.version,
-                this.logger);
-            if (this._weatherData) {
+                this.logger,
+                this._weatherLastModified);
+
+            // If data was fetched (not 304 response)
+            if (weatherResult.data) {
+                this._weatherData = weatherResult.data;
+                this._weatherLastModified = weatherResult.lastModified;
+                this._weatherExpires = weatherResult.expires;
+
                 await this.setDeviceAvailable();
                 await this.updateLocation(this._weatherData);
                 await this.updateCapabilities(this._weatherData);
                 if (this._forceUpdateDevice === true) {
                     await this.updateDevice(this._weatherData);
                 }
+            } else if (weatherResult.lastModified) {
+                // HTTP 304 - data not modified, use existing cache
+                this.logger.info('Using cached weather data (HTTP 304)');
+                await this.setDeviceAvailable();
+                if (this._forceUpdateDevice === true && this._weatherData) {
+                    await this.updateDevice(this._weatherData);
+                }
+            } else {
+                // Fetch failed (null response)
+                await this.setDeviceUnavailable();
+            }
+
+            // Only fetch sunrise/sunset and textual forecast if we have valid weather data
+            if (this._weatherData) {
                 try {
                     const sunrise = await yrlib.fetchSunrise(
                         lat, lon,
@@ -233,8 +260,6 @@ module.exports = class YrDevice extends Homey.Device {
                     // TODO ikke logg hvis lat/lon ikke er støttet
                     this.logger.error(err2);
                 }
-            } else {
-                await this.setDeviceUnavailable();
             }
         } catch (err) {
             this.logger.error(err);
@@ -282,22 +307,43 @@ module.exports = class YrDevice extends Homey.Device {
             const lat = math.round4(settings.lat);
             const lon = math.round4(settings.lon);
             const altitude = settings.altitude;
-            this._nowcastData = await yrlib.fetchNowcast(
+
+            // Use cached Last-Modified header for conditional request
+            const nowcastResult = await yrlib.fetchNowcast(
                 lat, lon, altitude,
                 this._clearAltitude,
                 this.homey.manifest.version,
-                this.logger);
-            if (this._nowcastData === null) {
+                this.logger,
+                this._nowcastLastModified);
+
+            // If data was fetched (not 304 response)
+            if (nowcastResult.data) {
+                this._nowcastData = nowcastResult.data;
+                this._nowcastLastModified = nowcastResult.lastModified;
+                this._nowcastExpires = nowcastResult.expires;
+
+                if (this._forceUpdateNowcastDevice) {
+                    const updated = await this.updateDeviceNowcast(this._weatherData, this._nowcastData);
+                    if (!updated) {
+                        newSchedule = false;
+                    }
+                }
+            } else if (nowcastResult.lastModified) {
+                // HTTP 304 - data not modified, use existing cache
+                this.logger.info('Using cached nowcast data (HTTP 304)');
+                if (this._forceUpdateNowcastDevice && this._nowcastData) {
+                    const updated = await this.updateDeviceNowcast(this._weatherData, this._nowcastData);
+                    if (!updated) {
+                        newSchedule = false;
+                    }
+                }
+            } else {
+                // Fetch failed or not supported
                 newSchedule = false;
                 if (this.hasCapability('measure_minutes_raining')) {
                     await this.removeCapability('measure_minutes_raining');
                 }
                 this.logger.info(`Nowcast not supported for location ${lat}, ${lon}`);
-            } else if (this._forceUpdateNowcastDevice) {
-                const updated = await this.updateDeviceNowcast(this._weatherData, this._nowcastData);
-                if (!updated) {
-                    newSchedule = false;
-                }
             }
         } catch (err) {
             this.logger.error(err);

@@ -1,2 +1,4 @@
 files/
 tests/
+.claude/
+CLAUDE.md

@@ -152,22 +152,43 @@ export const calculateFeelsLike = (instant: InstantDetails): number => {
     return math.round1(new Feels(config).like());
 }
 
+export interface FetchResult {
+    data: any;
+    lastModified?: string;
+    expires?: string;
+    notModified?: boolean;
+}
+
 const doFetch = async (
     uri: string,
     appVersion: string,
-    logger: Logger
-): Promise<any> => {
+    logger: Logger,
+    ifModifiedSince?: string
+): Promise<FetchResult | null> => {
     const start = Date.now();
     const userAgent = `YrAthomHomeyApp/${appVersion} github.com/balmli/no.yr`;
+    const headers: any = {
+        'User-Agent': userAgent
+    };
+
+    // Add If-Modified-Since header if available for cache validation
+    if (ifModifiedSince) {
+        headers['If-Modified-Since'] = ifModifiedSince;
+        logger.debug(`Using If-Modified-Since: ${ifModifiedSince}`);
+    }
+
     const result = await http.get({
             uri,
-            headers: {
-                'User-Agent': userAgent
-            },
+            headers,
             timeout: 30000
         }
     );
-    if (result.response.statusCode === 422) {
+
+    if (result.response.statusCode === 304) {
+        // 304 Not Modified - data hasn't changed, use cached version
+        logger.info(`Data not modified for "${uri}", using cached version`);
+        return { data: null, notModified: true };
+    } else if (result.response.statusCode === 422) {
         // 422 Unprocessable Entity
         logger.info(`Fetching "${uri}" failed:`, {
             statusCode: result.response.statusCode,
@@ -175,7 +196,15 @@ const doFetch = async (
             result: result.data
         });
         return null;
-    } else if (result.response.statusCode !== 200) {
+    } else if (result.response.statusCode === 429) {
+        // 429 Too Many Requests - Rate limiting
+        logger.warn(`Rate limited by API for "${uri}":`, {
+            statusCode: result.response.statusCode,
+            statusMessage: result.response.statusMessage,
+            message: 'Too many requests. Please reduce request frequency.'
+        });
+        return null;
+    } else if (result.response.statusCode !== 200 && result.response.statusCode !== 203) {
         logger.error(`Fetching "${uri}" failed:`, {
             statusCode: result.response.statusCode,
             statusMessage: result.response.statusMessage,
@@ -188,27 +217,60 @@ const doFetch = async (
             statusMessage: result.response.statusMessage
         });
     }
-    return result.data;
+
+    // Extract cache-related headers
+    const responseHeaders = result.response.headers || {};
+    const fetchResult: FetchResult = {
+        data: result.data,
+        lastModified: responseHeaders['last-modified'],
+        expires: responseHeaders['expires'],
+        notModified: false
+    };
+
+    if (fetchResult.lastModified) {
+        logger.debug(`Cache headers - Last-Modified: ${fetchResult.lastModified}, Expires: ${fetchResult.expires}`);
+    }
+
+    return fetchResult;
+}
+
+export interface WeatherResult {
+    data: YrComplete | null;
+    lastModified?: string;
+    expires?: string;
 }
 
 export const fetchWeather = async (
     lat: number, lon: number, altitude: number,
     clearAltitude: boolean | undefined,
     appVersion: string,
-    logger: Logger
-): Promise<YrComplete | null> => {
+    logger: Logger,
+    ifModifiedSince?: string
+): Promise<WeatherResult> => {
     const uri = `https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=${lat}&lon=${lon}` +
         (!clearAltitude && altitude !== -1 ? `&altitude=${Math.round(altitude)}` : '');
-    const result = await doFetch(uri, appVersion, logger);
+    const result = await doFetch(uri, appVersion, logger, ifModifiedSince);
     if (result === null) {
-        return null;
+        return { data: null };
     }
 
-    const wd = parseResult(result, logger);
+    // If data not modified (HTTP 304), return notModified flag
+    if (result.notModified) {
+        logger.info('Weather data not modified, using cached version');
+        return { data: null, lastModified: ifModifiedSince };
+    }
+
+    const wd = parseResult(result.data, logger);
     logger.info(`Got weather data!`, {
-        wd: wd?.properties.meta.updated_at
+        wd: wd?.properties.meta.updated_at,
+        lastModified: result.lastModified,
+        expires: result.expires
     });
-    return wd;
+    return {
+        data: wd,
+        lastModified: result.lastModified,
+        expires: result.expires
+    };
 };
 
 const parseResult = (json: any, logger: Logger): YrComplete | null => {
@@ -275,11 +337,11 @@ export const fetchSunrise = async (
     logger.debug(`fetchSunrise: ${lat}, ${lon}, ${date}, ${offset}`);
     const uri = `https://api.met.no/weatherapi/sunrise/3.0/sun?lat=${lat}&lon=${lon}&date=${date}&offset=${offset}`;
     const result = await doFetch(uri, appVersion, logger);
-    if (result === null) {
+    if (result === null || !result.data) {
         throw new Error(homey.__('errors.fetching_sunrise_failed'));
     }
 
-    const sunrise = await parseSunrise(result, logger);
+    const sunrise = await parseSunrise(result.data, logger);
     if (!sunrise) {
         logger.error('Unable to parse sunrise file');
         throw new Error(homey.__('errors.parsing_sunrise_failed'));
@@ -307,20 +369,33 @@ export const fetchNowcast = async (
     lat: number, lon: number, altitude: number,
     clearAltitude: boolean | undefined,
     appVersion: string,
-    logger: Logger
-): Promise<YrComplete | null> => {
+    logger: Logger,
+    ifModifiedSince?: string
+): Promise<WeatherResult> => {
     const uri = `https://api.met.no/weatherapi/nowcast/2.0/complete?lat=${lat}&lon=${lon}` +
         (!clearAltitude && altitude !== -1 ? `&altitude=${Math.round(altitude)}` : '');
-    const result = await doFetch(uri, appVersion, logger);
+    const result = await doFetch(uri, appVersion, logger, ifModifiedSince);
     if (result === null) {
-        return null;
+        return { data: null };
     }
 
-    const wd = parseResult(result, logger);
+    // If data not modified (HTTP 304), return notModified flag
+    if (result.notModified) {
+        logger.info('Nowcast data not modified, using cached version');
+        return { data: null, lastModified: ifModifiedSince };
+    }
+
+    const wd = parseResult(result.data, logger);
     logger.info(`Got nowcast data!`, {
-        wd: wd?.properties.meta.updated_at
+        wd: wd?.properties.meta.updated_at,
+        lastModified: result.lastModified,
+        expires: result.expires
     });
-    return wd;
+    return {
+        data: wd,
+        lastModified: result.lastModified,
+        expires: result.expires
+    };
 }
 
 /**
@@ -338,11 +413,11 @@ export const fetchTextforecast = async (
     homey: Homey
 ): Promise<Textforecasts> => {
     const resultAreas = await doFetch(`https://api.met.no/weatherapi/textforecast/2.0/areas`, appVersion, logger);
-    if (resultAreas === null) {
+    if (resultAreas === null || !resultAreas.data) {
         throw new Error(homey.__('errors.fetching_areas_failed'));
     }
 
-    const areasObj = await parseAreasFile(resultAreas, logger);
+    const areasObj = await parseAreasFile(resultAreas.data, logger);
     if (!areasObj) {
         logger.error('Unable to parse areas file');
         throw new Error(homey.__('errors.parsing_areas_failed'));
@@ -355,11 +430,11 @@ export const fetchTextforecast = async (
     }
 
     const resultTextforecast = await doFetch(`https://api.met.no/weatherapi/textforecast/2.0/landoverview`, appVersion, logger);
-    if (resultTextforecast === null) {
+    if (resultTextforecast === null || !resultTextforecast.data) {
         throw new Error(homey.__('errors.fetching_textforecast_failed'));
     }
 
-    const forecastObj = await parseTextforecastFile(resultTextforecast, logger);
+    const forecastObj = await parseTextforecastFile(resultTextforecast.data, logger);
     if (!forecastObj) {
         logger.error('Unable to parse textforecast');
         throw new Error(homey.__('errors.parsing_textareas_failed'));
