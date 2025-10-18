@@ -44,7 +44,8 @@
     "small": "/assets/images/small.png"
   },
   "permissions": [
-    "homey:manager:geolocation"
+    "homey:manager:geolocation",
+    "homey:manager:api"
   ],
   "author": {
     "name": "Bjørnar Almli",
