@@ -17,6 +17,7 @@
     "parsing_textareas_failed": "Unable to parse areas file.",
     "unable_to_send_forecast": "Unable find forecast data.",
     "unavailable_due_to_data_error": "Fetching forecast failed. Check the location.",
-    "unable_to_send_nowcast": "Unable find immediate weather forecast (Nowcast)."
+    "unable_to_send_nowcast": "Unable find immediate weather forecast (Nowcast).",
+    "rate_limited": "API rate limit exceeded. Too many requests. The app will retry automatically."
   }
 }

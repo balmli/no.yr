@@ -17,6 +17,7 @@
     "parsing_textareas_failed": "Feil ved tolkning av værvarsel.",
     "unable_to_send_forecast": "Feil ved henting av værvarsel.",
     "unavailable_due_to_data_error": "Nedlasting av værvarsel feilet. Sjekk at lokasjon er riktig.",
-    "unable_to_send_nowcast": "Feil ved henting av umiddelbart værvarsel (Nowcast)."
+    "unable_to_send_nowcast": "Feil ved henting av umiddelbart værvarsel (Nowcast).",
+    "rate_limited": "API grense nådd. For mange forespørsler. Appen vil automatisk prøve på nytt."
   }
 }
