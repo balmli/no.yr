@@ -44,8 +44,23 @@
     "small": "/assets/images/small.png"
   },
   "permissions": [
-    "homey:manager:geolocation"
+    "homey:manager:geolocation",
+    "homey:manager:api"
   ],
+  "api": {
+    "getDevices": {
+      "method": "GET",
+      "path": "/devices"
+    },
+    "getWeather": {
+      "method": "GET",
+      "path": "/weather/:deviceId"
+    },
+    "getForecast": {
+      "method": "GET",
+      "path": "/forecast/:deviceId"
+    }
+  },
   "author": {
     "name": "Bjørnar Almli",
     "email": "bjornar.almli@gmail.com"
