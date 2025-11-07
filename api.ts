@@ -147,7 +147,7 @@ module.exports = {
         const devices = driver.getDevices();
 
         return devices.map((device: any) => ({
-            id: device.id,
+            id: device.getData().id,
             name: device.getName(),
             available: device.getAvailable(),
             location: {
