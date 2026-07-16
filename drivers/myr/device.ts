@@ -19,6 +19,7 @@ import {
 import {attemptTrackedFetch} from '../../lib/tracked_fetch';
 import {honorCacheExpiry} from '../../lib/cache_schedule';
 import {hasCapabilityValue} from '../../lib/capability_value';
+import {formatSunEvent} from '../../lib/sunrise';
 
 module.exports = class YrDevice extends Homey.Device {
 
@@ -270,8 +271,8 @@ module.exports = class YrDevice extends Homey.Device {
                         this.homey
                     );
                     if (sunrise) {
-                        await this.setCapabilityValue('sunrise_time', moment(sunrise.sunrise).format("DD.MM.YYYY HH:mm")).catch(err => this.logger.error(err));
-                        await this.setCapabilityValue('sunset_time', moment(sunrise.sunset).format("DD.MM.YYYY HH:mm")).catch(err => this.logger.error(err));
+                        await this.setCapabilityValue('sunrise_time', formatSunEvent(sunrise.sunrise)).catch(err => this.logger.error(err));
+                        await this.setCapabilityValue('sunset_time', formatSunEvent(sunrise.sunset)).catch(err => this.logger.error(err));
                     }
                 } catch (err1) {
                     await this.setCapabilityValue('sunrise_time', '-').catch(err => this.logger.error(err));

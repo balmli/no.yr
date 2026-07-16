@@ -24,8 +24,8 @@ describe('fetchSunrise', function () {
                 {} as Homey
             );
             //console.log(sunrise);
-            expect(sunrise?.sunrise.format()).eq('2023-01-07T09:14:00+01:00');
-            expect(sunrise?.sunset.format()).eq('2023-01-07T15:32:00+01:00');
+            expect(sunrise?.sunrise?.format()).eq('2023-01-07T09:14:00+01:00');
+            expect(sunrise?.sunset?.format()).eq('2023-01-07T15:32:00+01:00');
         });
 
         it('Check fetchSunrise - today ', async function () {

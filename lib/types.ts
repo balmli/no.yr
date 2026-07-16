@@ -127,12 +127,12 @@ export interface SunriseData {
     properties: {
         body: string;
         sunrise: {
-            time: string;
-            azimuth: number;
+            time: string | null;
+            azimuth: number | null;
         },
         sunset: {
-            time: string;
-            azimuth: number;
+            time: string | null;
+            azimuth: number | null;
         },
         solarnoon: {
             time: string;
@@ -148,8 +148,8 @@ export interface SunriseData {
 }
 
 export interface Sunrise {
-    sunrise: Moment,
-    sunset: Moment,
+    sunrise?: Moment,
+    sunset?: Moment,
 }
 
 export type Point = [number, number];
