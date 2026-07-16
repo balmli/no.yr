@@ -21,6 +21,7 @@ import {
     honorCacheExpiry,
     shouldRefreshDailyResource,
 } from '../../lib/cache_schedule';
+import {hasCapabilityValue} from '../../lib/capability_value';
 
 const math = require('../../lib/math');
 
@@ -611,8 +612,8 @@ module.exports = class YrDevice extends Homey.Device {
     }
 
     updateCapability = async (capabilityId: string, value: any): Promise<void> => {
-        if (this.hasCapability(capabilityId)) {
-            await this.setCapabilityValue(capabilityId, value === undefined ? 0 : value).catch(err => this.logger.error(err));
+        if (this.hasCapability(capabilityId) && hasCapabilityValue(value)) {
+            await this.setCapabilityValue(capabilityId, value).catch(err => this.logger.error(err));
         }
     }
 
