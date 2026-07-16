@@ -39,6 +39,11 @@ describe('degreesToText', function () {
             expect(degreesToText(270)).eq('W');
             expect(degreesToText(281)).eq('W');
         });
+        it('Normalizes negative cardinal directions', function () {
+            expect(degreesToText(-90)).eq('W');
+            expect(degreesToText(-180)).eq('S');
+            expect(degreesToText(-270)).eq('E');
+        });
 
     });
 

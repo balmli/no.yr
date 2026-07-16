@@ -144,7 +144,8 @@ export const weatherLegend = (symbolCode: string, language: string): string => {
 const degs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW", "N"];
 
 export const degreesToText = (num: number): string => {
-    const val = Math.abs(Math.round((num % 360) / 22.5));
+    const normalized = ((num % 360) + 360) % 360;
+    const val = Math.round(normalized / 22.5);
     return degs[val];
 }
 
