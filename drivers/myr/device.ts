@@ -20,8 +20,10 @@ import {attemptTrackedFetch} from '../../lib/tracked_fetch';
 import {honorCacheExpiry} from '../../lib/cache_schedule';
 import {hasCapabilityValue} from '../../lib/capability_value';
 import {clearSunEventCapabilities, formatSunEvent, shouldRefreshSunEvents} from '../../lib/sunrise';
-import {applyFetchedDataIfDue, millisecondsUntilUpdateDeadline} from '../../lib/update_schedule';
+import {applyFetchedDataIfDue} from '../../lib/update_schedule';
 import {applyFetchAvailability} from '../../lib/fetch_availability';
+import {ScheduledFetch, ScheduledUpdate, secondsUntilPeriodicOffset} from '../../lib/device_schedule';
+import {getCapabilityChanges, getWeatherCapabilityValues, selectSymbolCode} from '../../lib/weather_capabilities';
 
 module.exports = class YrDevice extends Homey.Device {
     logger!: Logger;
@@ -30,17 +32,15 @@ module.exports = class YrDevice extends Homey.Device {
     _weatherLastModified?: string;
     _weatherExpires?: string;
     _weatherRetrievedAt?: string;
-    _fetchDataTimeout?: NodeJS.Timeout;
-    _updateDeviceTimeout?: NodeJS.Timeout;
-    _updateDeviceDeadline?: number;
+    _fetchDataSchedule!: ScheduledFetch;
+    _updateDeviceSchedule!: ScheduledUpdate;
     _clearAltitude?: boolean;
     _forceUpdateDevice?: boolean;
     _nowcastData!: YrComplete | null;
     _nowcastLastModified?: string;
     _nowcastExpires?: string;
-    _fetchNowcastTimeout?: NodeJS.Timeout;
-    _updateNowcastDeviceTimeout?: NodeJS.Timeout;
-    _updateNowcastDeviceDeadline?: number;
+    _fetchNowcastSchedule!: ScheduledFetch;
+    _updateNowcastDeviceSchedule!: ScheduledUpdate;
     _forceUpdateNowcastDevice?: boolean;
     _textualForecast!: Textforecasts | null;
     _nowcastLocationKey?: string;
@@ -57,8 +57,9 @@ module.exports = class YrDevice extends Homey.Device {
         this._textualForecast = null;
         await this.migrate();
         await this.initialize();
-        this.scheduleFetchData(2);
-        this.scheduleFetchNowcast(5);
+        this.initializeSchedulers();
+        this._fetchDataSchedule.schedule(2);
+        this._fetchNowcastSchedule.schedule(5);
         this.logger.verbose(this.getName() + ' -> device initialized');
     }
 
@@ -89,14 +90,66 @@ module.exports = class YrDevice extends Homey.Device {
 
     async initialize(): Promise<void> {}
 
+    initializeSchedulers(): void {
+        const isDeleted = () => this._deleted === true;
+        this._fetchDataSchedule = new ScheduledFetch({
+            timerApi: this.homey,
+            isDeleted,
+            run: this.doFetchWeather.bind(this),
+            getNextDelaySeconds: () => {
+                const syncTime = this.getStoreValue('syncTime');
+                const now = new Date();
+                const seconds = honorCacheExpiry(
+                    secondsUntilPeriodicOffset(syncTime, 3600, now),
+                    this._weatherExpires,
+                    now,
+                );
+                this.logger.verbose(`Sync time: ${syncTime}`);
+                return seconds;
+            },
+            onExplicitSchedule: () => {
+                this._forceUpdateDevice = true;
+            },
+            logDelay: seconds => this.logger.info(`Next fetch data in ${seconds} seconds`),
+        });
+        this._fetchNowcastSchedule = new ScheduledFetch({
+            timerApi: this.homey,
+            isDeleted,
+            run: this.doFetchNowcast.bind(this),
+            getNextDelaySeconds: () => {
+                const syncTime = this.getStoreValue('syncTime') % 300;
+                const now = new Date();
+                return honorCacheExpiry(secondsUntilPeriodicOffset(syncTime, 300, now), this._nowcastExpires, now);
+            },
+            onExplicitSchedule: () => {
+                this._forceUpdateNowcastDevice = true;
+            },
+            logDelay: seconds => this.logger.info(`Next fetch nowcast data in ${seconds} seconds`),
+        });
+        this._updateDeviceSchedule = new ScheduledUpdate({
+            timerApi: this.homey,
+            isDeleted,
+            run: this.doUpdateDevice.bind(this),
+            getNextDelaySeconds: () => secondsUntilPeriodicOffset(3, 3600),
+            logDelay: seconds => this.logger.info(`Next update device in ${seconds} seconds`),
+        });
+        this._updateNowcastDeviceSchedule = new ScheduledUpdate({
+            timerApi: this.homey,
+            isDeleted,
+            run: this.doUpdateNowcastDevice.bind(this),
+            getNextDelaySeconds: () => secondsUntilPeriodicOffset(2, 60),
+            logDelay: seconds => this.logger.debug(`Next update device with nowcast data in ${seconds} seconds`),
+        });
+    }
+
     onAdded(): void {}
 
     onDeleted() {
         this._deleted = true;
-        this.clearFetchData();
-        this.clearUpdateDevice();
-        this.clearFetchNowcast();
-        this.clearUpdateNowcastDevice();
+        this._fetchDataSchedule.clear();
+        this._updateDeviceSchedule.clear();
+        this._fetchNowcastSchedule.clear();
+        this._updateNowcastDeviceSchedule.clear();
         this.logger.verbose(this.getName() + ' -> device deleted');
     }
 
@@ -114,58 +167,21 @@ module.exports = class YrDevice extends Homey.Device {
             await clearLocationCapabilityValues(this);
             await this.removeNowcastCapabilities();
             this._clearAltitude = !changedKeys.includes('altitude');
-            this.scheduleFetchData(1);
-            this.scheduleFetchNowcast(2);
+            this._fetchDataSchedule.schedule(1);
+            this._fetchNowcastSchedule.schedule(2);
         } else if (changedKeys.includes('period')) {
             if (shouldRefreshSunEvents(oldSettings.period, newSettings.period)) {
                 await clearSunEventCapabilities(this);
-                this.scheduleFetchData(1);
+                this._fetchDataSchedule.schedule(1);
             } else {
-                this.scheduleUpdateDevice(1);
+                this._updateDeviceSchedule.schedule(1);
             }
-            this.scheduleUpdateNowcastDevice(2);
+            this._updateNowcastDeviceSchedule.schedule(2);
         }
     }
 
     async updateCapabilities(wd: YrComplete): Promise<void> {
-        const units = wd.properties.meta.units;
-        const removeCaps: string[] = [];
-        const addCaps: string[] = [];
-
-        if (!units.probability_of_precipitation) {
-            if (this.hasCapability('measure_rain_next_1_hour')) {
-                removeCaps.push('measure_rain_next_1_hour');
-            }
-            if (this.hasCapability('measure_rain_next_6_hours')) {
-                removeCaps.push('measure_rain_next_6_hours');
-            }
-        } else {
-            if (!this.hasCapability('measure_rain_next_1_hour')) {
-                addCaps.push('measure_rain_next_1_hour');
-            }
-            if (!this.hasCapability('measure_rain_next_6_hours')) {
-                addCaps.push('measure_rain_next_6_hours');
-            }
-        }
-        if (!units.wind_speed_of_gust) {
-            if (this.hasCapability('measure_gust_strength1')) {
-                removeCaps.push('measure_gust_strength1');
-            }
-        } else {
-            if (!this.hasCapability('measure_gust_strength1')) {
-                addCaps.push('measure_gust_strength1');
-            }
-        }
-        if (!units.probability_of_thunder) {
-            if (this.hasCapability('measure_thunder_next_1_hour')) {
-                removeCaps.push('measure_thunder_next_1_hour');
-            }
-        } else {
-            if (!this.hasCapability('measure_thunder_next_1_hour')) {
-                addCaps.push('measure_thunder_next_1_hour');
-            }
-        }
-
+        const {removeCaps, addCaps} = getCapabilityChanges(wd, this.hasCapability.bind(this));
         await this.updateAndSortCapabilities(removeCaps, addCaps);
     }
 
@@ -186,41 +202,15 @@ module.exports = class YrDevice extends Homey.Device {
         }
     }
 
-    clearFetchData() {
-        if (this._fetchDataTimeout) {
-            this.homey.clearTimeout(this._fetchDataTimeout);
-            this._fetchDataTimeout = undefined;
-        }
-    }
-
-    scheduleFetchData(seconds?: number) {
-        if (this._deleted) {
-            return;
-        }
-        this.clearFetchData();
-        if (seconds === undefined) {
-            const syncTime = this.getStoreValue('syncTime');
-            const now = new Date();
-            seconds = syncTime - (now.getMinutes() * 60 + now.getSeconds());
-            seconds = seconds <= 0 ? seconds + 3600 : seconds;
-            seconds = honorCacheExpiry(seconds, this._weatherExpires, now);
-            this.logger.verbose(`Sync time: ${syncTime}`);
-        } else {
-            this._forceUpdateDevice = true;
-        }
-        this.logger.info(`Next fetch data in ${seconds} seconds`);
-        this._fetchDataTimeout = this.homey.setTimeout(this.doFetchWeather.bind(this), seconds * 1000);
-    }
-
     async doFetchWeather() {
         if (this._deleted) {
             return;
         }
-        const updateDeadline = this._updateDeviceDeadline;
+        const updateDeadline = this._updateDeviceSchedule.deadline;
         let weatherFetchSucceeded = false;
         try {
-            this.clearFetchData();
-            this.clearUpdateDevice();
+            this._fetchDataSchedule.clear();
+            this._updateDeviceSchedule.clear();
             const settings = this.getSettings();
             const lat = truncate4(settings.lat);
             const lon = truncate4(settings.lon);
@@ -327,51 +317,26 @@ module.exports = class YrDevice extends Homey.Device {
                 this.logger.error(err);
             }
             this._forceUpdateDevice = false;
-            this.scheduleFetchData();
+            this._fetchDataSchedule.schedule();
             if (!appliedFetchedData && weatherFetchSucceeded && this._weatherData && updateDeadline !== undefined) {
-                this.scheduleUpdateDeviceAt(updateDeadline);
+                this._updateDeviceSchedule.scheduleAt(updateDeadline);
             } else {
-                this.scheduleUpdateDevice();
+                this._updateDeviceSchedule.schedule();
             }
         }
-    }
-
-    clearFetchNowcast() {
-        if (this._fetchNowcastTimeout) {
-            this.homey.clearTimeout(this._fetchNowcastTimeout);
-            this._fetchNowcastTimeout = undefined;
-        }
-    }
-
-    scheduleFetchNowcast(seconds?: number) {
-        if (this._deleted) {
-            return;
-        }
-        this.clearFetchNowcast();
-        if (seconds === undefined) {
-            const syncTime = this.getStoreValue('syncTime') % 300;
-            const now = new Date();
-            seconds = syncTime - ((now.getMinutes() * 60 + now.getSeconds()) % 300);
-            seconds = seconds <= 0 ? seconds + 300 : seconds;
-            seconds = honorCacheExpiry(seconds, this._nowcastExpires, now);
-        } else {
-            this._forceUpdateNowcastDevice = true;
-        }
-        this.logger.info(`Next fetch nowcast data in ${seconds} seconds`);
-        this._fetchNowcastTimeout = this.homey.setTimeout(this.doFetchNowcast.bind(this), seconds * 1000);
     }
 
     async doFetchNowcast() {
         if (this._deleted) {
             return;
         }
-        const updateDeadline = this._updateNowcastDeviceDeadline;
+        const updateDeadline = this._updateNowcastDeviceSchedule.deadline;
         let newSchedule = true;
         let nowcastFetchSucceeded = false;
         let appliedFetchedData = false;
         try {
-            this.clearFetchNowcast();
-            this.clearUpdateNowcastDevice();
+            this._fetchNowcastSchedule.clear();
+            this._updateNowcastDeviceSchedule.clear();
             const settings = this.getSettings();
             const lat = truncate4(settings.lat);
             const lon = truncate4(settings.lon);
@@ -437,11 +402,11 @@ module.exports = class YrDevice extends Homey.Device {
         } finally {
             this._forceUpdateNowcastDevice = false;
             if (newSchedule) {
-                this.scheduleFetchNowcast();
+                this._fetchNowcastSchedule.schedule();
                 if (!appliedFetchedData && nowcastFetchSucceeded && this._nowcastData && updateDeadline !== undefined) {
-                    this.scheduleUpdateNowcastDeviceAt(updateDeadline);
+                    this._updateNowcastDeviceSchedule.scheduleAt(updateDeadline);
                 } else {
-                    this.scheduleUpdateNowcastDevice();
+                    this._updateNowcastDeviceSchedule.schedule();
                 }
             }
         }
@@ -481,85 +446,20 @@ module.exports = class YrDevice extends Homey.Device {
         }
     }
 
-    clearUpdateDevice() {
-        if (this._updateDeviceTimeout) {
-            this.homey.clearTimeout(this._updateDeviceTimeout);
-            this._updateDeviceTimeout = undefined;
-        }
-        this._updateDeviceDeadline = undefined;
-    }
-
-    scheduleUpdateDeviceAt(deadline: number) {
-        if (this._deleted) {
-            return;
-        }
-        this.clearUpdateDevice();
-        const delayMilliseconds = millisecondsUntilUpdateDeadline(deadline);
-        this._updateDeviceDeadline = deadline;
-        this.logger.info(`Next update device in ${delayMilliseconds / 1000} seconds`);
-        this._updateDeviceTimeout = this.homey.setTimeout(this.doUpdateDevice.bind(this), delayMilliseconds);
-    }
-
-    scheduleUpdateDevice(seconds?: number) {
-        if (this._deleted) {
-            return;
-        }
-        if (seconds == undefined) {
-            const now = new Date();
-            seconds = 3 - (now.getMinutes() * 60 + now.getSeconds()); // 3 seconds after top of the hour
-            seconds = seconds <= 0 ? seconds + 3600 : seconds;
-        }
-        this.scheduleUpdateDeviceAt(Date.now() + seconds * 1000);
-    }
-
     async doUpdateDevice() {
         if (this._deleted) {
             return;
         }
         try {
-            this.clearUpdateDevice();
+            this._updateDeviceSchedule.clear();
             if (this._weatherData) {
                 await this.updateDevice(this._weatherData);
             }
         } catch (err) {
             this.logger.error(err);
         } finally {
-            this.scheduleUpdateDevice();
+            this._updateDeviceSchedule.schedule();
         }
-    }
-
-    clearUpdateNowcastDevice() {
-        if (this._updateNowcastDeviceTimeout) {
-            this.homey.clearTimeout(this._updateNowcastDeviceTimeout);
-            this._updateNowcastDeviceTimeout = undefined;
-        }
-        this._updateNowcastDeviceDeadline = undefined;
-    }
-
-    scheduleUpdateNowcastDeviceAt(deadline: number) {
-        if (this._deleted) {
-            return;
-        }
-        this.clearUpdateNowcastDevice();
-        const delayMilliseconds = millisecondsUntilUpdateDeadline(deadline);
-        this._updateNowcastDeviceDeadline = deadline;
-        this.logger.debug(`Next update device with nowcast data in ${delayMilliseconds / 1000} seconds`);
-        this._updateNowcastDeviceTimeout = this.homey.setTimeout(
-            this.doUpdateNowcastDevice.bind(this),
-            delayMilliseconds,
-        );
-    }
-
-    scheduleUpdateNowcastDevice(seconds?: number) {
-        if (this._deleted) {
-            return;
-        }
-        if (seconds == undefined) {
-            const now = new Date();
-            seconds = 2 - now.getSeconds(); // 2 seconds after top of each minute
-            seconds = seconds <= 0 ? seconds + 60 : seconds;
-        }
-        this.scheduleUpdateNowcastDeviceAt(Date.now() + seconds * 1000);
     }
 
     async doUpdateNowcastDevice() {
@@ -567,14 +467,14 @@ module.exports = class YrDevice extends Homey.Device {
             return;
         }
         try {
-            this.clearUpdateNowcastDevice();
+            this._updateNowcastDeviceSchedule.clear();
             if (this._nowcastData) {
                 await this.updateDeviceNowcast(this._weatherData, this._nowcastData);
             }
         } catch (err) {
             this.logger.error(err);
         } finally {
-            this.scheduleUpdateNowcastDevice();
+            this._updateNowcastDeviceSchedule.schedule();
         }
     }
 
@@ -597,13 +497,7 @@ module.exports = class YrDevice extends Homey.Device {
         if (ts) {
             await this.setCapabilityValue('forecast_time', ts.localTime).catch(err => this.logger.error(err));
 
-            const symbolCode = ts.data.next_1_hours
-                ? ts.data.next_1_hours?.summary.symbol_code
-                : ts.data.next_6_hours
-                  ? ts.data.next_6_hours?.summary.symbol_code
-                  : ts.data.next_12_hours
-                    ? ts.data.next_12_hours?.summary.symbol_code
-                    : undefined;
+            const symbolCode = selectSymbolCode(ts);
 
             if (symbolCode) {
                 await this.setCapabilityValue(
@@ -612,48 +506,9 @@ module.exports = class YrDevice extends Homey.Device {
                 ).catch(err => this.logger.error(err));
             }
 
-            await this.updateCapability('measure_temperature', ts.data.instant.details.air_temperature);
-            await this.updateCapability(
-                'measure_temperature.feels_like',
-                yrlib.calculateFeelsLike(ts.data.instant.details),
-            );
-            await this.updateCapability(
-                'measure_temperature.min_next_6_hours',
-                ts.data.next_6_hours?.details.air_temperature_min,
-            );
-            await this.updateCapability(
-                'measure_temperature.max_next_6_hours',
-                ts.data.next_6_hours?.details.air_temperature_max,
-            );
-            await this.updateCapability('measure_pressure', ts.data.instant.details.air_pressure_at_sea_level);
-            await this.updateCapability('measure_humidity', ts.data.instant.details.relative_humidity);
-            await this.updateCapability('measure_rain.next_1_hour', ts.data.next_1_hours?.details.precipitation_amount);
-            await this.updateCapability(
-                'measure_rain_next_1_hour',
-                ts.data.next_1_hours?.details.probability_of_precipitation,
-            ); // Not supported for all places
-            await this.updateCapability(
-                'measure_rain.next_6_hours',
-                ts.data.next_6_hours?.details.precipitation_amount,
-            );
-            await this.updateCapability(
-                'measure_rain_next_6_hours',
-                ts.data.next_6_hours?.details.probability_of_precipitation,
-            ); // Not supported for all places
-            await this.updateCapability('measure_cloud_area_fraction', ts.data.instant.details.cloud_area_fraction);
-            await this.updateCapability('measure_fog_area_fraction', ts.data.instant.details.fog_area_fraction);
-            await this.updateCapability('measure_wind_strength1', ts.data.instant.details.wind_speed);
-            await this.updateCapability(
-                'measure_wind_direction',
-                yrlib.degreesToText(ts.data.instant.details.wind_from_direction as number),
-            );
-            await this.updateCapability('measure_gust_strength1', ts.data.instant.details.wind_speed_of_gust); // Not supported for all places
-            await this.updateCapability('measure_wind_angle', ts.data.instant.details.wind_from_direction);
-            await this.updateCapability(
-                'measure_thunder_next_1_hour',
-                ts.data.next_1_hours?.details.probability_of_thunder,
-            ); // Not supported for all places
-            await this.updateCapability('measure_ultraviolet', ts.data.instant.details.ultraviolet_index_clear_sky);
+            for (const {capabilityId, value} of getWeatherCapabilityValues(ts)) {
+                await this.updateCapability(capabilityId, value);
+            }
 
             if (symbolCode) {
                 const tokens = {
