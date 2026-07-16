@@ -37,6 +37,22 @@ npm run lint
 TS_NODE_PROJECT=tsconfig.test.json npx mocha --require ts-node/register tests/calculateFeelsLike.ts
 ```
 
+## Task Workflow and Atomic Commits
+
+The `.tasks/` directory contains the project backlog and is excluded from Homey release packages by `.homeyignore`. Its `TASK-###-slug.md`, `AGENTS.md`, and `CLAUDE.md` files are version-controlled. The original review reports—`.tasks/BUG_REPORT.md`, `.tasks/MET_API_TERMS_REVIEW.md`, and `.tasks/REBRANDING_TODO.md`—are local reference material, are explicitly gitignored, and must never be staged or committed. Read [`.tasks/AGENTS.md`](.tasks/AGENTS.md) before creating or handling a task; it is the authoritative task-file and task-execution standard.
+
+When working from a `TASK-###-slug.md` file:
+
+1. Update its frontmatter status and `updated` date as work progresses: `open` → `in_progress` → `done`, `blocked`, or `wont_fix`.
+2. Prefer TDD: add and run a focused failing test, implement the smallest fix, then run the focused and relevant broader test suites. Document why when automated TDD is impractical.
+3. Keep each task isolated. Do not mix unrelated fixes or cleanup into its changes.
+4. Before committing, add a `## Resolution` with changed files, decisions, and exact verification results, then stage the updated task file with its implementation, tests, and documentation.
+5. Create one atomic commit per completed task. Prefix the commit message with the task ID, for example `TASK-004 Handle unknown weather symbols`.
+
+Working directly on the main branch is allowed. A feature branch is optional unless the user explicitly requests one.
+
+`AGENTS.md` files are authoritative. `CLAUDE.md` files should remain short pointers to the applicable `AGENTS.md` files rather than duplicate their instructions.
+
 ## Release Checklist
 
 For every release, complete these versioning steps before publishing:
