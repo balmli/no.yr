@@ -1,7 +1,7 @@
 ---
 id: TASK-018
 title: "a 429 does not trigger application-wide immediate traffic reduction"
-status: open
+status: done
 priority: high
 type: compliance
 source: MET_API_TERMS_REVIEW.md
@@ -26,6 +26,16 @@ related: []
 - A 429 from sunrise is caught, after which textforecast is still attempted (`drivers/myr/device.ts:234-262`).
 - There is no application-wide request limiter or circuit breaker coordinating devices or endpoints.
 - Nowcast stops rescheduling after any null result (`drivers/myr/device.ts:340-355`), which reduces traffic but conflates rate limiting, unsupported locations, and transient failures; it does not coordinate the other endpoints.
+
+## Resolution
+
+- Added a process-wide `RateLimitBackoff` shared by the common MET transport. Every device and endpoint checks the same deadline before making a network request.
+- HTTP 429 now parses `Retry-After` as either delta-seconds or an HTTP date, uses a 60-second safe fallback when absent/invalid, and never shortens an existing longer deadline.
+- Once a 429 is seen, subsequent locationforecast, nowcast, sunrise, and textforecast calls return without network traffic until the deadline. This also prevents auxiliary calls from continuing after a rate-limited primary or auxiliary request.
+- Added `tests/rateLimitBackoff.ts` with delta/date/fallback/monotonic deadline coverage and extended `tests/nativeFetch.ts` to prove that a second endpoint call after 429 does not reach the local server.
+- TDD evidence: the focused suite first failed because the rate-limit module was absent, then passed with `3 passing`; the transport integration also passed.
+- Verification on Node.js 22: `npx tsc -p tsconfig.test.json` passed; `npm run build` passed; `npm test` passed with `78 passing`, and the Homey publish validation passed.
+- The cited local `MET_API_TERMS_REVIEW.md` was unavailable in this checkout; the task record supplied the compliance evidence.
 
 **Impact:** The app may issue more MET calls immediately after being told to reduce traffic. Independent devices can continue at their existing schedules. At sufficient adoption, randomized local schedules alone also cannot guarantee that aggregate traffic from all installations remains below the application-wide 20 requests/second threshold.
 

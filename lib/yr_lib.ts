@@ -20,11 +20,13 @@ import {
 } from "./types";
 import {WeatherLegends} from "./legends";
 import {CacheableFetchResult, HttpResourceCache} from './http_cache';
+import {RateLimitBackoff} from './rate_limit';
 
 
 const math = require('./math');
 const Feels = require('feels');
 const metResourceCache = new HttpResourceCache();
+const metRateLimitBackoff = new RateLimitBackoff();
 
 const getStartTimeNextHours = (forDate: any, args: any): any => {
     const {start} = args;
@@ -171,7 +173,15 @@ export const doFetch = async (
     logger: Logger,
     ifModifiedSince?: string,
     timeoutMs = 30000,
+    rateLimitBackoff = metRateLimitBackoff,
 ): Promise<FetchResult | null> => {
+    const remainingBackoff = rateLimitBackoff.remainingMilliseconds();
+    if (remainingBackoff > 0) {
+        logger.warn(`MET request suppressed by application-wide rate-limit backoff`, {
+            retryInSeconds: Math.ceil(remainingBackoff / 1000),
+        });
+        return null;
+    }
     const start = Date.now();
     const userAgent = `WeatherForecastHomeyApp/${appVersion} github.com/balmli/weather.forecast`;
     const headers: any = {
@@ -208,6 +218,7 @@ export const doFetch = async (
         return null;
     } else if (statusCode === 429) {
         // 429 Too Many Requests - Rate limiting
+        rateLimitBackoff.register429(response.headers.get('retry-after') ?? undefined);
         logger.warn(`Rate limited by API for "${uri}":`, {
             statusCode,
             statusMessage,

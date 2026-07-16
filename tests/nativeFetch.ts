@@ -3,6 +3,7 @@ import {createServer, Server} from 'http';
 import {deflateSync, gzipSync} from 'zlib';
 
 import {doFetch} from '../lib/yr_lib';
+import {RateLimitBackoff} from '../lib/rate_limit';
 
 const logger: any = {debug() {}, info() {}, warn() {}, error() {}};
 
@@ -10,9 +11,11 @@ describe('native MET fetch transport', () => {
     let server: Server;
     let origin: string;
     let receivedHeaders: any;
+    let requestCount = 0;
 
     before(done => {
         server = createServer((request, response) => {
+            requestCount++;
             receivedHeaders = request.headers;
             if (request.url === '/redirect') {
                 response.writeHead(302, {location: '/gzip'}).end();
@@ -62,7 +65,7 @@ describe('native MET fetch transport', () => {
         expect((await doFetch(`${origin}/203`, '1', logger, undefined, 500))?.data).to.equal('{"deprecated":true}');
         expect(await doFetch(`${origin}/304`, '1', logger, undefined, 500)).to.deep.include({notModified: true});
         expect(await doFetch(`${origin}/422`, '1', logger, undefined, 500)).to.equal(null);
-        expect(await doFetch(`${origin}/429`, '1', logger, undefined, 500)).to.equal(null);
+        expect(await doFetch(`${origin}/429`, '1', logger, undefined, 500, new RateLimitBackoff())).to.equal(null);
         expect(await doFetch(`${origin}/500`, '1', logger, undefined, 500)).to.equal(null);
     });
 
@@ -74,6 +77,14 @@ describe('native MET fetch transport', () => {
             error = caught;
         }
         expect(error).to.be.instanceOf(Error);
+    });
+
+    it('suppresses all subsequent requests immediately after a 429', async () => {
+        const limiter = new RateLimitBackoff();
+        const before = requestCount;
+        expect(await doFetch(`${origin}/429`, '1', logger, undefined, 500, limiter)).to.equal(null);
+        expect(await doFetch(`${origin}/200`, '1', logger, undefined, 500, limiter)).to.equal(null);
+        expect(requestCount).to.equal(before + 1);
     });
 
     it('rejects deterministic transport failures', async () => {
