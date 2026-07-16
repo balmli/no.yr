@@ -17,6 +17,9 @@ module.exports = {
         const capabilities = device.getCapabilities();
         const generatedAt = new Date().toISOString();
         const weatherData = (device as any)._weatherData;
+        if (!weatherData || !weatherData.properties || !weatherData.properties.timeseries) {
+            throw new Error('No weather data available');
+        }
         const currentWeather: any = {
             deviceId: params.deviceId,
             deviceName: device.getName(),

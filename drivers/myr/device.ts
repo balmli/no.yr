@@ -7,7 +7,7 @@ import {RadarCoverage, Textforecasts, YrComplete, YrTimeserie, YrTimeseries} fro
 import {WeatherLegends} from "../../lib/legends";
 import * as yrlib from "../../lib/yr_lib";
 import {round2, truncate4} from "../../lib/math";
-import {invalidateLocationCaches} from '../../lib/location_cache';
+import {clearLocationCapabilityValues, invalidateLocationCaches} from '../../lib/location_cache';
 import {
     isNowcastValid,
     getRainingThreshold,
@@ -105,6 +105,8 @@ module.exports = class YrDevice extends Homey.Device {
     }): Promise<string | void> {
         if (changedKeys.includes('lat') || changedKeys.includes('lon') || changedKeys.includes('altitude')) {
             invalidateLocationCaches(this);
+            await clearLocationCapabilityValues(this);
+            await this.removeNowcastCapabilities();
             this._clearAltitude = !changedKeys.includes('altitude');
             this.scheduleFetchData(1);
             this.scheduleFetchNowcast(2);
