@@ -7,6 +7,7 @@ import {RadarCoverage, Textforecasts, YrComplete, YrTimeserie, YrTimeseries} fro
 import {WeatherLegends} from "../../lib/legends";
 import * as yrlib from "../../lib/yr_lib";
 import {round2} from "../../lib/math";
+import {invalidateLocationCaches} from '../../lib/location_cache';
 
 const math = require('../../lib/math');
 
@@ -92,6 +93,7 @@ module.exports = class YrDevice extends Homey.Device {
         changedKeys: string[];
     }): Promise<string | void> {
         if (changedKeys.includes('lat') || changedKeys.includes('lon') || changedKeys.includes('altitude')) {
+            invalidateLocationCaches(this);
             this._clearAltitude = !changedKeys.includes('altitude');
             this.scheduleFetchData(1);
             this.scheduleFetchNowcast(2);

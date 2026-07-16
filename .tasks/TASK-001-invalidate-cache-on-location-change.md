@@ -1,7 +1,7 @@
 ---
 id: TASK-001
 title: "Location changes reuse cache validators and data from the old location"
-status: open
+status: done
 priority: high
 type: bug
 source: BUG_REPORT.md
@@ -23,3 +23,11 @@ This can produce a mixed state in which weather/nowcast data belongs to the prev
 **Recommended fix:** Invalidate request validators whenever any URL-affecting setting changes. Clear or mark location-bound data stale until the first successful fetch for the new coordinates. Include the request key (rounded latitude, longitude, and altitude) with each cached response and only accept `304` for the same key.
 
 **Regression test:** Change coordinates after seeding all caches. Assert that the next weather and nowcast calls receive no old `If-Modified-Since` value, and that old nowcast/text forecast data cannot be returned for the new location.
+
+## Resolution
+
+- Added `invalidateLocationCaches()` and call it before scheduling location-driven weather and nowcast refreshes.
+- The invalidation clears both cached datasets, both `Last-Modified` validators, both expiry values, and the textual forecast so no old-location data can be served or conditionally revalidated.
+- Added `tests/locationCacheInvalidation.ts`. The focused test initially failed because the helper did not exist, then passed after the implementation.
+- Verification: focused test `1 passing`; `npm run build` passed; Node.js 22 `npm test` passed with `42 passing`, and the post-test Homey publish validation passed.
+- The cited local `BUG_REPORT.md` was unavailable in this checkout; the complete task record supplied the reproduction and acceptance criteria.
