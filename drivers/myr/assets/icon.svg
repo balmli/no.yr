@@ -1,23 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="960" height="960" viewBox="0 0 960 960" role="img" aria-label="Sun, cloud and rain">
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" role="img" aria-label="Sun, cloud and rain">
   <g fill="#000">
-    <!-- Sun and rays, matching the weather artwork used by the driver images. -->
-    <circle cx="390" cy="360" r="142"/>
-    <rect x="364" y="42" width="52" height="126" rx="26"/>
-    <rect x="169" y="128" width="52" height="126" rx="26" transform="rotate(-45 195 191)"/>
-    <rect x="78" y="334" width="126" height="52" rx="26"/>
-    <rect x="172" y="503" width="52" height="126" rx="26" transform="rotate(45 198 566)"/>
-    <rect x="559" y="128" width="52" height="126" rx="26" transform="rotate(45 585 191)"/>
+    <!-- Sun and rays (upper-left, tucked behind the cloud). -->
+    <g transform="translate(188,176)">
+      <g stroke="#000" stroke-width="13" stroke-linecap="round">
+        <line x1="0" y1="-98" x2="0" y2="-72"/>
+        <line x1="69" y1="-69" x2="50" y2="-50"/>
+        <line x1="98" y1="0"  x2="72" y2="0"/>
+        <line x1="-69" y1="-69" x2="-50" y2="-50"/>
+        <line x1="-98" y1="0"  x2="-72" y2="0"/>
+        <line x1="-69" y1="69" x2="-50" y2="50"/>
+        <line x1="0" y1="98" x2="0" y2="72"/>
+      </g>
+      <circle cx="0" cy="0" r="54"/>
+    </g>
 
-    <!-- One simple cloud silhouette. -->
-    <circle cx="286" cy="552" r="126"/>
-    <circle cx="466" cy="484" r="184"/>
-    <circle cx="660" cy="554" r="134"/>
-    <rect x="286" y="552" width="374" height="134"/>
-    <rect x="164" y="582" width="620" height="104" rx="52"/>
+    <!-- Cloud (overlapping lobes + rounded base). -->
+    <circle cx="250" cy="238" r="74"/>
+    <circle cx="322" cy="272" r="60"/>
+    <circle cx="182" cy="280" r="54"/>
+    <rect x="155" y="280" width="212" height="62" rx="31"/>
 
     <!-- Three rain drops. -->
-    <path d="M270 738c0 0-67 90-67 134a67 67 0 0 0 134 0c0-44-67-134-67-134z"/>
-    <path d="M480 738c0 0-67 90-67 134a67 67 0 0 0 134 0c0-44-67-134-67-134z"/>
-    <path d="M690 738c0 0-67 90-67 134a67 67 0 0 0 134 0c0-44-67-134-67-134z"/>
+    <path d="M205 360 c0 0 -17 22 -17 33 a17 17 0 0 0 34 0 c0 -11 -17 -33 -17 -33 Z"/>
+    <path d="M252 370 c0 0 -17 22 -17 33 a17 17 0 0 0 34 0 c0 -11 -17 -33 -17 -33 Z"/>
+    <path d="M299 360 c0 0 -17 22 -17 33 a17 17 0 0 0 34 0 c0 -11 -17 -33 -17 -33 Z"/>
   </g>
 </svg>
