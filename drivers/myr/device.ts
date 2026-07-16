@@ -8,6 +8,7 @@ import {WeatherLegends} from "../../lib/legends";
 import * as yrlib from "../../lib/yr_lib";
 import {round2} from "../../lib/math";
 import {invalidateLocationCaches} from '../../lib/location_cache';
+import {NOWCAST_CAPABILITIES, shouldContinueNowcastPolling} from '../../lib/nowcast';
 
 const math = require('../../lib/math');
 
@@ -324,10 +325,14 @@ module.exports = class YrDevice extends Homey.Device {
                 this._nowcastLastModified = nowcastResult.lastModified;
                 this._nowcastExpires = nowcastResult.expires;
 
-                if (this._forceUpdateNowcastDevice) {
+                if (this._nowcastData.properties.meta.radar_coverage !== RadarCoverage.ok) {
+                    newSchedule = shouldContinueNowcastPolling(this._nowcastData);
+                    await this.clearNowcastState();
+                } else if (this._forceUpdateNowcastDevice) {
                     const updated = await this.updateDeviceNowcast(this._weatherData, this._nowcastData);
                     if (!updated) {
-                        newSchedule = false;
+                        newSchedule = shouldContinueNowcastPolling(this._nowcastData);
+                        await this.clearNowcastState();
                     }
                 }
             } else if (nowcastResult.lastModified) {
@@ -336,18 +341,18 @@ module.exports = class YrDevice extends Homey.Device {
                 if (this._forceUpdateNowcastDevice && this._nowcastData) {
                     const updated = await this.updateDeviceNowcast(this._weatherData, this._nowcastData);
                     if (!updated) {
-                        newSchedule = false;
+                        newSchedule = shouldContinueNowcastPolling(this._nowcastData);
+                        await this.clearNowcastState();
                     }
                 }
             } else {
-                // Fetch failed or not supported
-                newSchedule = false;
-                if (this.hasCapability('measure_minutes_raining')) {
-                    await this.removeCapability('measure_minutes_raining');
-                }
-                this.logger.info(`Nowcast not supported for location ${lat}, ${lon}`);
+                // A null result can be a transient HTTP or parsing failure. Clear stale
+                // values and keep polling until the API confirms permanent no-coverage.
+                await this.clearNowcastState();
+                this.logger.warn(`Nowcast unavailable for location ${lat}, ${lon}; retrying`);
             }
         } catch (err) {
+            await this.clearNowcastState();
             this.logger.error(err);
         } finally {
             this._forceUpdateNowcastDevice = false;
@@ -356,6 +361,21 @@ module.exports = class YrDevice extends Homey.Device {
                 this.scheduleUpdateNowcastDevice();
             }
         }
+    }
+
+    async removeNowcastCapabilities(): Promise<void> {
+        for (const capability of NOWCAST_CAPABILITIES) {
+            if (this.hasCapability(capability)) {
+                await this.removeCapability(capability);
+            }
+        }
+    }
+
+    async clearNowcastState(): Promise<void> {
+        this._nowcastData = null;
+        this._nowcastLastModified = undefined;
+        this._nowcastExpires = undefined;
+        await this.removeNowcastCapabilities();
     }
 
     async setDeviceUnavailable(): Promise<void> {
@@ -529,12 +549,7 @@ module.exports = class YrDevice extends Homey.Device {
         if (!nowcast ||
             nowcast.properties.meta.radar_coverage !== RadarCoverage.ok ||
             tsAfter.length === 0) {
-            if (this.hasCapability('measure_minutes_raining')) {
-                await this.removeCapability('measure_minutes_raining');
-            }
-            if (this.hasCapability('measure_rain.next_30_minutes')) {
-                await this.removeCapability('measure_rain.next_30_minutes');
-            }
+            await this.removeNowcastCapabilities();
             return false;
         }
         if (!this.hasCapability('measure_minutes_raining')) {
