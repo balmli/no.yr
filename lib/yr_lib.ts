@@ -1,7 +1,6 @@
 import Homey from "homey/lib/Homey";
 
 const xml2js = require('xml2js');
-const http = require('http.min');
 
 import Logger from '@balmli/homey-logger';
 
@@ -169,16 +168,18 @@ export interface FetchResult {
     notModified: boolean;
 }
 
-const doFetch = async (
+export const doFetch = async (
     uri: string,
     appVersion: string,
     logger: Logger,
-    ifModifiedSince?: string
+    ifModifiedSince?: string,
+    timeoutMs = 30000,
 ): Promise<FetchResult | null> => {
     const start = Date.now();
     const userAgent = `WeatherForecastHomeyApp/${appVersion} github.com/balmli/weather.forecast`;
     const headers: any = {
-        'User-Agent': userAgent
+        'User-Agent': userAgent,
+        'Accept-Encoding': 'gzip, deflate',
     };
 
     // Add If-Modified-Since header if available for cache validation
@@ -187,53 +188,53 @@ const doFetch = async (
         logger.debug(`Using If-Modified-Since: ${ifModifiedSince}`);
     }
 
-    const result = await http.get({
-            uri,
-            headers,
-            timeout: 30000
-        }
-    );
+    const response = await (globalThis as any).fetch(uri, {
+        headers,
+        redirect: 'follow',
+        signal: (AbortSignal as any).timeout(timeoutMs),
+    });
+    const statusCode = response.status;
+    const statusMessage = response.statusText;
+    const lastModified = response.headers.get('last-modified') ?? undefined;
+    const expires = response.headers.get('expires') ?? undefined;
 
-    if (result.response.statusCode === 304) {
+    if (statusCode === 304) {
         // 304 Not Modified - data hasn't changed, use cached version
         logger.info(`Data not modified for "${uri}", using cached version`);
-        return { data: null, notModified: true };
-    } else if (result.response.statusCode === 422) {
+        return {data: null, lastModified, expires, notModified: true};
+    } else if (statusCode === 422) {
         // 422 Unprocessable Entity
         logger.info(`Fetching "${uri}" failed:`, {
-            statusCode: result.response.statusCode,
-            statusMessage: result.response.statusMessage,
-            result: result.data
+            statusCode,
+            statusMessage,
         });
         return null;
-    } else if (result.response.statusCode === 429) {
+    } else if (statusCode === 429) {
         // 429 Too Many Requests - Rate limiting
         logger.warn(`Rate limited by API for "${uri}":`, {
-            statusCode: result.response.statusCode,
-            statusMessage: result.response.statusMessage,
+            statusCode,
+            statusMessage,
             message: 'Too many requests. Please reduce request frequency.'
         });
         return null;
-    } else if (result.response.statusCode !== 200 && result.response.statusCode !== 203) {
+    } else if (statusCode !== 200 && statusCode !== 203) {
         logger.error(`Fetching "${uri}" failed:`, {
-            statusCode: result.response.statusCode,
-            statusMessage: result.response.statusMessage,
-            result
+            statusCode,
+            statusMessage,
         });
         return null;
     } else {
         logger.debug(`Fetched "${uri}" OK, in ${Date.now() - start} ms:`, {
-            statusCode: result.response.statusCode,
-            statusMessage: result.response.statusMessage
+            statusCode,
+            statusMessage,
         });
     }
 
     // Extract cache-related headers
-    const responseHeaders = result.response.headers || {};
     const fetchResult: FetchResult = {
-        data: result.data,
-        lastModified: responseHeaders['last-modified'],
-        expires: responseHeaders['expires'],
+        data: await response.text(),
+        lastModified,
+        expires,
         notModified: false
     };
 

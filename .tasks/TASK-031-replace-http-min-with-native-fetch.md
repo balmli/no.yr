@@ -1,7 +1,7 @@
 ---
 id: TASK-031
 title: "Replace http.min with the native Node.js fetch API"
-status: open
+status: done
 priority: high
 type: compliance
 source: user-request
@@ -50,3 +50,13 @@ This task is the concrete client-migration work related to `TASK-015`. Keep stru
 - Timeout and HTTP error behavior is deterministic and covered by tests.
 - The focused tests, `npm test`, and `npm run build` pass on Node.js 22.
 - The completed work is delivered as one atomic commit whose message starts with `TASK-031`.
+
+## Resolution
+
+- Replaced `http.min` with Node.js 22's native `fetch()`, configured with safe redirect following, explicit `Accept-Encoding: gzip, deflate`, and `AbortSignal.timeout()` using a 30-second production bound.
+- Preserved the versioned/contact `User-Agent`, `If-Modified-Since`, `Last-Modified`, and `Expires` behavior, along with explicit 200/203/304/422/429 and other-error handling. Error logs now avoid response bodies.
+- Kept response bodies as text so both JSON and XML endpoint parsers remain compatible, while Undici transparently decompresses gzip and deflate responses.
+- Removed `http.min` from `package.json`, `package-lock.json`, and production code; repository search confirms no remaining reference.
+- Added `tests/nativeFetch.ts` using a local HTTP server. The focused suite covers redirect-to-gzip, deflate XML, request/cache headers, 200/203/304/422/429/500, timeout, and transport rejection. Malformed payload behavior remains covered by `tests/weatherFetchResult.ts` from TASK-006.
+- TDD evidence: the focused test initially failed against the missing native transport export/current client; after implementation, the combined transport/result suite passed with `7 passing`.
+- Verification on Node.js 22: `npx tsc -p tsconfig.test.json` passed; `npm run build` passed; `npm test` passed with `73 passing`, and the Homey publish validation passed.
