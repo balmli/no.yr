@@ -1,4 +1,5 @@
 import {YrTimeserie} from './lib/types';
+import {mapForecastInstant} from './lib/api_forecast';
 
 module.exports = {
     async getWeather({homey, params}: { homey: any, params: { deviceId: string } }) {
@@ -80,18 +81,7 @@ module.exports = {
             hoursRequested: hoursAhead,
             forecast: filteredTimeseries.map((ts: YrTimeserie) => ({
                 time: ts.time,
-                instant: {
-                    temperature: ts.data.instant.details.air_temperature,
-                    feelsLike: ts.data.instant.details.air_temperature, // Will be calculated if available
-                    windSpeed: ts.data.instant.details.wind_speed,
-                    windFromDirection: ts.data.instant.details.wind_from_direction,
-                    windSpeedOfGust: ts.data.instant.details.wind_speed_of_gust,
-                    relativeHumidity: ts.data.instant.details.relative_humidity,
-                    airPressureAtSeaLevel: ts.data.instant.details.air_pressure_at_sea_level,
-                    cloudAreaFraction: ts.data.instant.details.cloud_area_fraction,
-                    fogAreaFraction: ts.data.instant.details.fog_area_fraction,
-                    uvIndex: ts.data.instant.details.ultraviolet_index_clear_sky,
-                },
+                instant: mapForecastInstant(ts.data.instant.details),
                 next1Hour: ts.data.next_1_hours ? {
                     symbolCode: ts.data.next_1_hours.summary.symbol_code,
                     precipitationAmount: ts.data.next_1_hours.details.precipitation_amount,
