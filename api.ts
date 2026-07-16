@@ -4,6 +4,7 @@ import {isNowcastValid, mapNowcastEntry, nowcastLocationKey} from './lib/nowcast
 import {truncate4} from './lib/math';
 import {MET_ATTRIBUTION} from './lib/attribution';
 import {getSourceTiming} from './lib/api_metadata';
+import {parseForecastHours} from './lib/api_query';
 
 module.exports = {
     async getWeather({homey, params}: { homey: any, params: { deviceId: string } }) {
@@ -67,10 +68,7 @@ module.exports = {
         }
 
         // Parse hours parameter (default to 24 hours if not specified)
-        const hoursAhead = query.hours ? parseInt(query.hours, 10) : 24;
-        if (isNaN(hoursAhead) || hoursAhead < 1 || hoursAhead > 240) {
-            throw new Error('Invalid hours parameter. Must be between 1 and 240.');
-        }
+        const hoursAhead = parseForecastHours(query.hours);
 
         // Filter timeseries to the requested number of hours
         const now = new Date();
