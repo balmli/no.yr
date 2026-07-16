@@ -2,6 +2,7 @@ import {YrTimeserie} from './lib/types';
 import {mapForecastInstant} from './lib/api_forecast';
 import {isNowcastValid, mapNowcastEntry, nowcastLocationKey} from './lib/nowcast';
 import {round4} from './lib/math';
+import {MET_ATTRIBUTION} from './lib/attribution';
 
 module.exports = {
     async getWeather({homey, params}: { homey: any, params: { deviceId: string } }) {
@@ -22,6 +23,7 @@ module.exports = {
                 altitude: device.getSetting('altitude'),
             },
             timestamp: new Date().toISOString(),
+            attribution: MET_ATTRIBUTION,
             current: {}
         };
 
@@ -81,6 +83,7 @@ module.exports = {
                 altitude: device.getSetting('altitude'),
             },
             timestamp: new Date().toISOString(),
+            attribution: MET_ATTRIBUTION,
             hoursRequested: hoursAhead,
             forecast: filteredTimeseries.map((ts: YrTimeserie) => ({
                 time: ts.time,
