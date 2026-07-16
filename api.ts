@@ -1,5 +1,7 @@
 import {YrTimeserie} from './lib/types';
 import {mapForecastInstant} from './lib/api_forecast';
+import {isNowcastValid, mapNowcastEntry, nowcastLocationKey} from './lib/nowcast';
+import {round4} from './lib/math';
 
 module.exports = {
     async getWeather({homey, params}: { homey: any, params: { deviceId: string } }) {
@@ -48,6 +50,7 @@ module.exports = {
         // Access the internal weather data from the device
         const weatherData = (device as any)._weatherData;
         const nowcastData = (device as any)._nowcastData;
+        const cachedNowcastLocationKey = (device as any)._nowcastLocationKey;
 
         if (!weatherData || !weatherData.properties || !weatherData.properties.timeseries) {
             throw new Error('No weather data available');
@@ -107,7 +110,11 @@ module.exports = {
         };
 
         // Add nowcast data if available (Nordic countries only)
-        if (nowcastData && nowcastData.properties && nowcastData.properties.timeseries) {
+        const expectedNowcastLocationKey = nowcastLocationKey(
+            round4(device.getSetting('lat')),
+            round4(device.getSetting('lon')),
+        );
+        if (isNowcastValid(nowcastData, cachedNowcastLocationKey, expectedNowcastLocationKey, now)) {
             const nowcastLimit = new Date(now.getTime() + Math.min(hoursAhead, 1) * 60 * 60 * 1000);
             const filteredNowcast = nowcastData.properties.timeseries.filter((ts: YrTimeserie) => {
                 const tsTime = new Date(ts.time);
@@ -116,16 +123,12 @@ module.exports = {
 
             forecastResponse.nowcast = {
                 available: true,
-                data: filteredNowcast.map((ts: YrTimeserie) => ({
-                    time: ts.time,
-                    precipitationRate: ts.data.instant.details.precipitation_rate,
-                    precipitationAmount: ts.data.next_1_hours?.details.precipitation_amount,
-                }))
+                data: filteredNowcast.map(mapNowcastEntry)
             };
         } else {
             forecastResponse.nowcast = {
                 available: false,
-                reason: 'Nowcast is only available for Nordic countries'
+                reason: 'Nowcast is unavailable, stale, or outside radar coverage'
             };
         }
 

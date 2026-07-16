@@ -8,7 +8,13 @@ import {WeatherLegends} from "../../lib/legends";
 import * as yrlib from "../../lib/yr_lib";
 import {round2} from "../../lib/math";
 import {invalidateLocationCaches} from '../../lib/location_cache';
-import {minutesUntilRain, NOWCAST_CAPABILITIES, shouldContinueNowcastPolling} from '../../lib/nowcast';
+import {
+    isNowcastValid,
+    minutesUntilRain,
+    NOWCAST_CAPABILITIES,
+    nowcastLocationKey,
+    shouldContinueNowcastPolling,
+} from '../../lib/nowcast';
 import {attemptTrackedFetch} from '../../lib/tracked_fetch';
 import {
     dailyResourceCacheKey,
@@ -38,6 +44,7 @@ module.exports = class YrDevice extends Homey.Device {
     _textualForecast!: Textforecasts | null;
     _sunriseCacheKey?: string;
     _textForecastCacheKey?: string;
+    _nowcastLocationKey?: string;
 
     async onInit(): Promise<void> {
         this.logger = new Logger({
@@ -346,6 +353,7 @@ module.exports = class YrDevice extends Homey.Device {
             // If data was fetched (not 304 response)
             if (nowcastResult.data) {
                 this._nowcastData = nowcastResult.data;
+                this._nowcastLocationKey = nowcastLocationKey(lat, lon);
                 this._nowcastLastModified = nowcastResult.lastModified;
                 this._nowcastExpires = nowcastResult.expires;
 
@@ -399,6 +407,7 @@ module.exports = class YrDevice extends Homey.Device {
         this._nowcastData = null;
         this._nowcastLastModified = undefined;
         this._nowcastExpires = undefined;
+        this._nowcastLocationKey = undefined;
         await this.removeNowcastCapabilities();
     }
 
@@ -568,8 +577,9 @@ module.exports = class YrDevice extends Homey.Device {
         const tsAfter = nowcast ? nowcast.properties.timeseries
             .filter(ts => moment(ts.time).isSameOrAfter(now)) : [];
 
-        if (!nowcast ||
-            nowcast.properties.meta.radar_coverage !== RadarCoverage.ok ||
+        const settings = this.getSettings();
+        const expectedLocationKey = nowcastLocationKey(math.round4(settings.lat), math.round4(settings.lon));
+        if (!isNowcastValid(nowcast, this._nowcastLocationKey, expectedLocationKey) ||
             tsAfter.length === 0) {
             await this.removeNowcastCapabilities();
             return false;
@@ -590,7 +600,7 @@ module.exports = class YrDevice extends Homey.Device {
         this.logger.debug('Rain next 30 minutes: ', next30Minutes.map(ts => ts.data.instant.details.precipitation_rate), rainNext30Minutes);
 
         const minutesUntilStartsRaining = minutesUntilRain(
-            nowcast.properties.timeseries,
+            nowcast!.properties.timeseries,
             now.toDate(),
             rainingThreshold,
         );
@@ -667,11 +677,15 @@ module.exports = class YrDevice extends Homey.Device {
     }
 
     async nowcastAction(args: any, state: any): Promise<any> {
-        if (!this._nowcastData) {
+        const expectedLocationKey = nowcastLocationKey(
+            math.round4(this.getSetting('lat')),
+            math.round4(this.getSetting('lon')),
+        );
+        if (!isNowcastValid(this._nowcastData, this._nowcastLocationKey, expectedLocationKey)) {
             throw new Error(this.homey.__('errors.unable_to_send_nowcast'));
         }
         try {
-            const forecast = JSON.stringify(this._nowcastData.properties.timeseries);
+            const forecast = JSON.stringify(this._nowcastData!.properties.timeseries);
             return {
                 forecast
             };

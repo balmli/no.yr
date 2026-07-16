@@ -1,4 +1,5 @@
-import {RadarCoverage, YrComplete, YrTimeseries} from './types';
+import {RadarCoverage, YrComplete, YrTimeserie, YrTimeseries} from './types';
+import {round2} from './math';
 
 export const NOWCAST_CAPABILITIES = [
     'measure_minutes_raining',
@@ -29,4 +30,39 @@ export function minutesUntilRain(
         return minutes >= 0 && minutes <= horizonMinutes && rate !== undefined && rate > threshold;
     });
     return firstRain ? Math.floor((Date.parse(firstRain.time) - referenceTime) / 60_000) : null;
+}
+
+export function nowcastLocationKey(lat: number, lon: number): string {
+    return `${lat}:${lon}`;
+}
+
+export function isNowcastValid(
+    nowcast: YrComplete | null,
+    cachedLocationKey: string | undefined,
+    expectedLocationKey: string,
+    now = new Date(),
+    maximumAgeMinutes = 15,
+): boolean {
+    if (!nowcast || cachedLocationKey !== expectedLocationKey ||
+        nowcast.properties.meta.radar_coverage !== RadarCoverage.ok) {
+        return false;
+    }
+    const updatedAt = Date.parse(nowcast.properties.meta.updated_at);
+    const ageMinutes = (now.getTime() - updatedAt) / 60_000;
+    if (!Number.isFinite(updatedAt) || ageMinutes < -5 || ageMinutes > maximumAgeMinutes) {
+        return false;
+    }
+    return nowcast.properties.timeseries.some(series => {
+        const time = Date.parse(series.time);
+        return Number.isFinite(time) && time >= now.getTime() - 5 * 60_000;
+    });
+}
+
+export function mapNowcastEntry(timeserie: YrTimeserie) {
+    const precipitationRate = timeserie.data.instant.details.precipitation_rate;
+    return {
+        time: timeserie.time,
+        precipitationRate,
+        precipitationAmount: precipitationRate === undefined ? undefined : round2(precipitationRate * 5 / 60),
+    };
 }
