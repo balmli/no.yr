@@ -1,6 +1,6 @@
-Værinformasjon og prognoser fra Yr.no.
+Værinformasjon og prognoser fra MET Norway.
 
-Installér Yr enheten. Standard lokasjon hentes fra posisjonen til Homey.
+Installér Weather enheten. Standard lokasjon hentes fra posisjonen til Homey.
 
 Gå til enhetsinnstillinger for å sette periode (nå, +1 time, +2 timer, etc..)
 

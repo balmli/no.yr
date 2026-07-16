@@ -1,6 +1,6 @@
-Weather information and forecasts from Yr.no.
+Weather information and forecasts from MET Norway.
 
-Install the Yr device.  The default location will be the location of the Homey.
+Install the Weather device.  The default location will be the location of the Homey.
 
 Go to settings to set the period (now, +1 hour, +2 hours, etc..)
 

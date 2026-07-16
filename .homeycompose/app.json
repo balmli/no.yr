@@ -1,6 +1,6 @@
 {
   "id": "no.yr",
-  "version": "1.4.4",
+  "version": "1.5.0",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "brandColor": "#53b7ee",
@@ -20,7 +20,6 @@
   ],
   "tags": {
     "en": [
-      "yr",
       "weather",
       "forecast",
       "climate",
@@ -29,7 +28,6 @@
       "precipitation"
     ],
     "no": [
-      "yr",
       "weather",
       "vær",
       "varsel",

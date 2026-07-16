@@ -1,7 +1,7 @@
 {
   "id": "myr",
   "name": {
-    "en": "Yr"
+    "en": "Weather"
   },
   "$extends": [
     "defaults"

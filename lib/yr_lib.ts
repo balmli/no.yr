@@ -166,7 +166,7 @@ const doFetch = async (
     ifModifiedSince?: string
 ): Promise<FetchResult | null> => {
     const start = Date.now();
-    const userAgent = `YrAthomHomeyApp/${appVersion} github.com/balmli/no.yr`;
+    const userAgent = `WeatherForecastHomeyApp/${appVersion} github.com/balmli/weather.forecast`;
     const headers: any = {
         'User-Agent': userAgent
     };

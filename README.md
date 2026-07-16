@@ -1,20 +1,27 @@
 # Weather Forecast
 
-Weather Forecast from Yr.no
+Weather Forecast from MET Norway.
 
 ### Installation
 
-* Install the Yr device.  The default location will be the location of the Homey.
+* Install the Weather device.  The default location will be the location of the Homey.
 * Go to settings to set the Period (now, +1 hour, +2 hours, etc..)
 * If necessary the location can be updated (longitude, latitude).  The altitude will be set automatically, and can be fine-tuned afterwards.
 
-### Yr.no license:
+### Data source and license
 
-This app uses weather data from Yr.no.  See the license here: https://developer.yr.no/doc/License/
+Weather data is provided by MET Norway and is used under the [CC BY 4.0 license](https://creativecommons.org/licenses/by/4.0/). See the [MET Norway Licensing and Data Policy](https://docs.api.met.no/doc/License) for details.
 
-The app is not created or endorsed in any way by Yr.no.
+The source data is parsed, selected and presented for use in Homey. This independently developed app is not created or endorsed by Yr, NRK or MET Norway.
 
 ### Release Notes:
+
+#### 1.5.0
+
+- Rebranded the app and weather device
+- Replaced Yr branding and logos with original weather artwork
+- Updated MET Norway attribution and API identification
+- Updated the test setup for Node.js 22
 
 #### 1.4.3
 
