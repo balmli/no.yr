@@ -21,6 +21,7 @@ import {
 import {WeatherLegends} from "./legends";
 import {CacheableFetchResult, HttpResourceCache} from './http_cache';
 import {RateLimitBackoff} from './rate_limit';
+import {requireForecastTimeseries, WeatherDataUnavailableError} from './flow_condition';
 
 
 const math = require('./math');
@@ -68,14 +69,15 @@ const xComparer = (args: any,
                    tss: YrTimeseries | undefined,
                    compareFunc: (ts: YrTimeserie, value: number) => boolean
 ): boolean => {
-    if (!tss || tss.length === 0) {
-        return false;
+    const selected = requireForecastTimeseries(tss)
+        .filter(ts => {
+            const time = moment(ts.time);
+            return time.isSameOrAfter(startTime) && time.isBefore(endTime);
+        });
+    if (selected.length === 0) {
+        throw new WeatherDataUnavailableError('forecast data for the selected period');
     }
-    const vals = tss
-        .filter(ts => compareFunc(ts, args.value))
-        .map(ts => moment(ts.time))
-        .filter(t => t.isSameOrAfter(startTime) && t.isBefore(endTime));
-    return !!vals && vals.length > 0;
+    return selected.some(ts => compareFunc(ts, args.value));
 }
 
 const xSum = (args: any,
@@ -85,13 +87,16 @@ const xSum = (args: any,
               sumSelector: (ts: YrTimeserie) => number,
               compareFunc: (sum: number | undefined, value: number) => boolean
 ): boolean => {
-    if (!tss || tss.length === 0) {
-        return false;
+    const selected = requireForecastTimeseries(tss)
+        .filter(ts => {
+            const time = moment(ts.time);
+            return time.isSameOrAfter(startTime) && time.isBefore(endTime);
+        });
+    if (selected.length === 0) {
+        throw new WeatherDataUnavailableError('forecast data for the selected period');
     }
-    return compareFunc(math.round2(tss
-        .map(ts => ({time: moment(ts.time), val: sumSelector(ts)}))
-        .filter(t => t.time.isSameOrAfter(startTime) && t.time.isBefore(endTime))
-        .map(ts => ts.val)
+    return compareFunc(math.round2(selected
+        .map(sumSelector)
         .reduce((acc, c) => acc + c, 0)), args.value);
 }
 
