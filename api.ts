@@ -3,6 +3,7 @@ import {mapForecastInstant} from './lib/api_forecast';
 import {isNowcastValid, mapNowcastEntry, nowcastLocationKey} from './lib/nowcast';
 import {truncate4} from './lib/math';
 import {MET_ATTRIBUTION} from './lib/attribution';
+import {getSourceTiming} from './lib/api_metadata';
 
 module.exports = {
     async getWeather({homey, params}: { homey: any, params: { deviceId: string } }) {
@@ -14,6 +15,8 @@ module.exports = {
 
         // Get all current weather capabilities
         const capabilities = device.getCapabilities();
+        const generatedAt = new Date().toISOString();
+        const weatherData = (device as any)._weatherData;
         const currentWeather: any = {
             deviceId: params.deviceId,
             deviceName: device.getName(),
@@ -22,7 +25,9 @@ module.exports = {
                 longitude: device.getSetting('lon'),
                 altitude: device.getSetting('altitude'),
             },
-            timestamp: new Date().toISOString(),
+            timestamp: generatedAt,
+            generatedAt,
+            ...getSourceTiming(weatherData, (device as any)._weatherRetrievedAt, (device as any)._weatherExpires),
             attribution: MET_ATTRIBUTION,
             current: {}
         };
@@ -74,6 +79,7 @@ module.exports = {
         });
 
         // Build response
+        const generatedAt = new Date().toISOString();
         const forecastResponse: any = {
             deviceId: params.deviceId,
             deviceName: device.getName(),
@@ -82,7 +88,9 @@ module.exports = {
                 longitude: device.getSetting('lon'),
                 altitude: device.getSetting('altitude'),
             },
-            timestamp: new Date().toISOString(),
+            timestamp: generatedAt,
+            generatedAt,
+            ...getSourceTiming(weatherData, (device as any)._weatherRetrievedAt, (device as any)._weatherExpires),
             attribution: MET_ATTRIBUTION,
             hoursRequested: hoursAhead,
             forecast: filteredTimeseries.map((ts: YrTimeserie) => ({

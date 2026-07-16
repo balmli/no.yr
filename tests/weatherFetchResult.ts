@@ -32,6 +32,7 @@ describe('weather fetch result', () => {
             data: null,
             lastModified: 'cached-validator',
             expires: undefined,
+            retrievedAt: undefined,
             notModified: true,
         });
     });

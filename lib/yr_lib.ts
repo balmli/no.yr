@@ -248,6 +248,7 @@ export const doFetch = async (
         data: await response.text(),
         lastModified,
         expires,
+        retrievedAt: new Date().toISOString(),
         notModified: false
     };
 
@@ -272,6 +273,7 @@ export interface WeatherResult {
     data: YrComplete | null;
     lastModified?: string;
     expires?: string;
+    retrievedAt?: string;
     notModified: boolean;
 }
 
@@ -321,6 +323,7 @@ export const toWeatherResult = (
             data: null,
             lastModified: result.lastModified ?? ifModifiedSince,
             expires: result.expires,
+            retrievedAt: result.retrievedAt,
             notModified: true,
         };
     }
@@ -328,6 +331,7 @@ export const toWeatherResult = (
         data: parseResult(result.data, logger),
         lastModified: result.lastModified,
         expires: result.expires,
+        retrievedAt: result.retrievedAt,
         notModified: false,
     };
 }

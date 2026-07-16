@@ -27,6 +27,7 @@ module.exports = class YrDevice extends Homey.Device {
     _weatherData!: YrComplete | null;
     _weatherLastModified?: string;
     _weatherExpires?: string;
+    _weatherRetrievedAt?: string;
     _fetchDataTimeout?: NodeJS.Timeout;
     _updateDeviceTimeout?: NodeJS.Timeout;
     _clearAltitude?: boolean;
@@ -232,6 +233,7 @@ module.exports = class YrDevice extends Homey.Device {
                 this._weatherData = weatherResult.data;
                 this._weatherLastModified = weatherResult.lastModified;
                 this._weatherExpires = weatherResult.expires;
+                this._weatherRetrievedAt = weatherResult.retrievedAt;
 
                 await this.setDeviceAvailable();
                 await this.updateLocation(this._weatherData);
@@ -243,6 +245,7 @@ module.exports = class YrDevice extends Homey.Device {
                 // HTTP 304 - data not modified, use existing cache
                 this._weatherLastModified = weatherResult.lastModified ?? this._weatherLastModified;
                 this._weatherExpires = weatherResult.expires ?? this._weatherExpires;
+                this._weatherRetrievedAt = weatherResult.retrievedAt ?? this._weatherRetrievedAt;
                 this.logger.info('Using cached weather data (HTTP 304)');
                 await this.setDeviceAvailable();
                 if (this._forceUpdateDevice === true && this._weatherData) {

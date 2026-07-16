@@ -1,7 +1,7 @@
 ---
 id: TASK-023
 title: "data retrieval time is not clearly exposed"
-status: open
+status: done
 priority: low
 type: compliance
 source: MET_API_TERMS_REVIEW.md
@@ -27,3 +27,13 @@ related: []
 **Impact:** Users and API consumers cannot reliably distinguish fresh, cached, and stale source data.
 
 **Recommendation:** Store and expose `retrievedAt`, MET's `updated_at`, and, when useful, `expiresAt`. Keep response-generation time as a separately named field.
+
+## Resolution
+
+- Added `retrievedAt` to successful raw fetch/cache metadata and retained the original body-retrieval time through cache reuse and HTTP 304 revalidation.
+- Stored the active forecast retrieval time on the device and cleared it with all other location-bound cache state.
+- Added `getSourceTiming()` and exposed `sourceUpdatedAt` (MET `meta.updated_at`), `retrievedAt`, and `expiresAt` in current-weather and forecast REST responses.
+- Added an explicit `generatedAt` response timestamp while retaining the legacy `timestamp` alias for API compatibility.
+- Added `tests/sourceTiming.ts` and updated cache/result tests. The focused test first failed because the metadata helper was absent, then the relevant suite passed with `5 passing`.
+- Verification: `npm run build` passed; Node.js 22 `npm test` passed with `81 passing`, and the Homey publish validation passed.
+- The cited local `MET_API_TERMS_REVIEW.md` was unavailable in this checkout; the task record supplied the compliance evidence.

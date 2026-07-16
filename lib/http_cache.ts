@@ -2,6 +2,7 @@ export interface CacheableFetchResult {
     data: string | null;
     lastModified?: string;
     expires?: string;
+    retrievedAt?: string;
     notModified: boolean;
 }
 
@@ -48,6 +49,7 @@ export class HttpResourceCache {
                 data: cached.data,
                 lastModified: result.lastModified ?? cached.lastModified,
                 expires: result.expires ?? cached.expires,
+                retrievedAt: cached.retrievedAt,
                 notModified: false,
             };
             this.cache.set(key, revalidated);
