@@ -324,6 +324,7 @@ export const getDateAddPeriod = (period: string): Moment => {
     const splitted = period.split(':');
     return period.includes(':')
         ? moment().utc()
+            .startOf('day')
             .add(Number(splitted[0]), 'days')
             .hour(Number(splitted[1]))
         : moment()
