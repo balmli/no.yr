@@ -10,6 +10,11 @@ import {round2} from "../../lib/math";
 import {invalidateLocationCaches} from '../../lib/location_cache';
 import {NOWCAST_CAPABILITIES, shouldContinueNowcastPolling} from '../../lib/nowcast';
 import {attemptTrackedFetch} from '../../lib/tracked_fetch';
+import {
+    dailyResourceCacheKey,
+    honorCacheExpiry,
+    shouldRefreshDailyResource,
+} from '../../lib/cache_schedule';
 
 const math = require('../../lib/math');
 
@@ -31,6 +36,8 @@ module.exports = class YrDevice extends Homey.Device {
     _updateNowcastDeviceTimeout?: NodeJS.Timeout;
     _forceUpdateNowcastDevice?: boolean;
     _textualForecast!: Textforecasts | null;
+    _sunriseCacheKey?: string;
+    _textForecastCacheKey?: string;
 
     async onInit(): Promise<void> {
         this.logger = new Logger({
@@ -181,6 +188,7 @@ module.exports = class YrDevice extends Homey.Device {
             const now = new Date();
             seconds = syncTime - (now.getMinutes() * 60 + now.getSeconds());
             seconds = seconds <= 0 ? seconds + 3600 : seconds;
+            seconds = honorCacheExpiry(seconds, this._weatherExpires, now);
             this.logger.verbose(`Sync time: ${syncTime}`);
         } else {
             this._forceUpdateDevice = true;
@@ -216,6 +224,7 @@ module.exports = class YrDevice extends Homey.Device {
                 return;
             }
             const weatherResult = fetchAttempt.value;
+            const receivedFreshWeather = !!weatherResult.data;
 
             // If data was fetched (not 304 response)
             if (weatherResult.data) {
@@ -242,8 +251,10 @@ module.exports = class YrDevice extends Homey.Device {
             }
 
             // Only fetch sunrise/sunset and textual forecast if we have valid weather data
-            if (this._weatherData) {
-                try {
+            if (this._weatherData && receivedFreshWeather) {
+                const forecastDate = yrlib.getDateFromPeriod(settings.period).format('YYYY-MM-DD');
+                const sunriseCacheKey = dailyResourceCacheKey('sunrise', lat, lon, forecastDate);
+                if (shouldRefreshDailyResource(this._sunriseCacheKey, sunriseCacheKey)) try {
                     const sunrise = await yrlib.fetchSunrise(
                         lat, lon,
                         settings.period,
@@ -253,6 +264,7 @@ module.exports = class YrDevice extends Homey.Device {
                         this.homey
                     );
                     if (sunrise) {
+                        this._sunriseCacheKey = sunriseCacheKey;
                         await this.setCapabilityValue('sunrise_time', moment(sunrise.sunrise).format("DD.MM.YYYY HH:mm")).catch(err => this.logger.error(err));
                         await this.setCapabilityValue('sunset_time', moment(sunrise.sunset).format("DD.MM.YYYY HH:mm")).catch(err => this.logger.error(err));
                     }
@@ -261,13 +273,15 @@ module.exports = class YrDevice extends Homey.Device {
                     await this.setCapabilityValue('sunset_time', '-').catch(err => this.logger.error(err));
                     this.logger.error(err1);
                 }
-                try {
+                const textForecastCacheKey = dailyResourceCacheKey('textforecast', lat, lon, moment().format('YYYY-MM-DD'));
+                if (shouldRefreshDailyResource(this._textForecastCacheKey, textForecastCacheKey)) try {
                     this._textualForecast = await yrlib.fetchTextforecast(
                         lat, lon,
                         this.homey.manifest.version,
                         this.logger,
                         this.homey
                     );
+                    this._textForecastCacheKey = textForecastCacheKey;
                 } catch (err2) {
                     // TODO ikke logg hvis lat/lon ikke er støttet
                     this.logger.error(err2);
@@ -300,6 +314,7 @@ module.exports = class YrDevice extends Homey.Device {
             const now = new Date();
             seconds = syncTime - (now.getMinutes() * 60 + now.getSeconds()) % 300;
             seconds = seconds <= 0 ? seconds + 300 : seconds;
+            seconds = honorCacheExpiry(seconds, this._nowcastExpires, now);
         } else {
             this._forceUpdateNowcastDevice = true;
         }

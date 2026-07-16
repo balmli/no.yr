@@ -1,7 +1,7 @@
 ---
 id: TASK-007
 title: "`Expires` is ignored and auxiliary endpoints are fetched every hour"
-status: open
+status: done
 priority: medium
 type: bug
 source: BUG_REPORT.md
@@ -23,3 +23,13 @@ This creates avoidable traffic and makes the implementation less responsive to M
 **Recommended fix:** Schedule no earlier than the response’s `Expires` value, with a safe fallback if the header is missing or invalid. Cache sunrise by location/date and cache textual areas/forecast using their validators and expiry; consider sharing location-independent textual documents across devices.
 
 **Regression test:** Supply future `Expires` headers and assert that no request is scheduled before them. Assert that repeated hourly weather refreshes do not redownload unchanged sunrise/text documents.
+
+## Resolution
+
+- Added `honorCacheExpiry()` and applied it to location-forecast and nowcast scheduling. Valid future `Expires` values now set the earliest next request time; missing, invalid, and past values retain the normal synchronized schedule.
+- Auxiliary sunrise and textual forecast calls now run only after a fresh main forecast response, never after a failed request or HTTP 304 that merely retained old weather data.
+- Added location/day cache keys so repeated fresh hourly responses do not redownload the same sunrise or textual forecast documents. Keys are cleared together with other location-bound caches when settings change; failed auxiliary calls remain retryable.
+- Added `tests/cacheSchedule.ts` and expanded location-cache coverage. The focused test first failed because the scheduling helper did not exist, then passed with `4 passing` across expiry, fallback, daily reuse, and location invalidation behavior.
+- Verification: `npm run build` passed; Node.js 22 `npm test` passed with `56 passing`, and the Homey publish validation passed.
+- TASK-017 remains separately scoped for full validator persistence, 304 header preservation, app-wide text cache sharing, and in-flight deduplication.
+- The cited local `BUG_REPORT.md` was unavailable in this checkout; the task record supplied the actionable evidence.

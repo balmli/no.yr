@@ -6,6 +6,8 @@ export interface LocationBoundCache {
     _nowcastLastModified?: string;
     _nowcastExpires?: string;
     _textualForecast: unknown | null;
+    _sunriseCacheKey?: string;
+    _textForecastCacheKey?: string;
 }
 
 export function invalidateLocationCaches(cache: LocationBoundCache): void {
@@ -16,4 +18,6 @@ export function invalidateLocationCaches(cache: LocationBoundCache): void {
     cache._nowcastLastModified = undefined;
     cache._nowcastExpires = undefined;
     cache._textualForecast = null;
+    cache._sunriseCacheKey = undefined;
+    cache._textForecastCacheKey = undefined;
 }
