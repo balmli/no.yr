@@ -6,7 +6,7 @@ import moment from "../../lib/moment-timezone-with-data";
 import {RadarCoverage, Textforecasts, YrComplete, YrTimeserie, YrTimeseries} from '../../lib/types';
 import {WeatherLegends} from "../../lib/legends";
 import * as yrlib from "../../lib/yr_lib";
-import {round2} from "../../lib/math";
+import {round2, truncate4} from "../../lib/math";
 import {invalidateLocationCaches} from '../../lib/location_cache';
 import {
     isNowcastValid,
@@ -19,8 +19,6 @@ import {
 import {attemptTrackedFetch} from '../../lib/tracked_fetch';
 import {honorCacheExpiry} from '../../lib/cache_schedule';
 import {hasCapabilityValue} from '../../lib/capability_value';
-
-const math = require('../../lib/math');
 
 module.exports = class YrDevice extends Homey.Device {
 
@@ -208,8 +206,8 @@ module.exports = class YrDevice extends Homey.Device {
             this.clearFetchData();
             this.clearUpdateDevice();
             const settings = this.getSettings();
-            const lat = math.round4(settings.lat);
-            const lon = math.round4(settings.lon);
+            const lat = truncate4(settings.lat);
+            const lon = truncate4(settings.lon);
             const altitude = settings.altitude;
 
             // Use cached Last-Modified header for conditional request
@@ -331,8 +329,8 @@ module.exports = class YrDevice extends Homey.Device {
             this.clearFetchNowcast();
             this.clearUpdateNowcastDevice();
             const settings = this.getSettings();
-            const lat = math.round4(settings.lat);
-            const lon = math.round4(settings.lon);
+            const lat = truncate4(settings.lat);
+            const lon = truncate4(settings.lon);
             const altitude = settings.altitude;
 
             // Use cached Last-Modified header for conditional request
@@ -573,7 +571,7 @@ module.exports = class YrDevice extends Homey.Device {
             .filter(ts => moment(ts.time).isSameOrAfter(now)) : [];
 
         const settings = this.getSettings();
-        const expectedLocationKey = nowcastLocationKey(math.round4(settings.lat), math.round4(settings.lon));
+        const expectedLocationKey = nowcastLocationKey(truncate4(settings.lat), truncate4(settings.lon));
         if (!isNowcastValid(nowcast, this._nowcastLocationKey, expectedLocationKey) ||
             tsAfter.length === 0) {
             await this.removeNowcastCapabilities();
@@ -673,8 +671,8 @@ module.exports = class YrDevice extends Homey.Device {
 
     async nowcastAction(args: any, state: any): Promise<any> {
         const expectedLocationKey = nowcastLocationKey(
-            math.round4(this.getSetting('lat')),
-            math.round4(this.getSetting('lon')),
+            truncate4(this.getSetting('lat')),
+            truncate4(this.getSetting('lon')),
         );
         if (!isNowcastValid(this._nowcastData, this._nowcastLocationKey, expectedLocationKey)) {
             throw new Error(this.homey.__('errors.unable_to_send_nowcast'));

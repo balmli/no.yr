@@ -1,6 +1,6 @@
 export const round1 = (val: number) => Math.round(val * 10) / 10;
 export const round2 = (val: number) => Math.round(val * 100) / 100;
-export const round4 = (val: number) => Math.round(val * 10000) / 10000;
+export const truncate4 = (val: number) => Math.trunc(val * 10000) / 10000;
 
 export function guid() {
     function s4() {

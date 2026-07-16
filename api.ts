@@ -1,7 +1,7 @@
 import {YrTimeserie} from './lib/types';
 import {mapForecastInstant} from './lib/api_forecast';
 import {isNowcastValid, mapNowcastEntry, nowcastLocationKey} from './lib/nowcast';
-import {round4} from './lib/math';
+import {truncate4} from './lib/math';
 import {MET_ATTRIBUTION} from './lib/attribution';
 
 module.exports = {
@@ -114,8 +114,8 @@ module.exports = {
 
         // Add nowcast data if available (Nordic countries only)
         const expectedNowcastLocationKey = nowcastLocationKey(
-            round4(device.getSetting('lat')),
-            round4(device.getSetting('lon')),
+            truncate4(device.getSetting('lat')),
+            truncate4(device.getSetting('lon')),
         );
         if (isNowcastValid(nowcastData, cachedNowcastLocationKey, expectedNowcastLocationKey, now)) {
             const nowcastLimit = new Date(now.getTime() + Math.min(hoursAhead, 1) * 60 * 60 * 1000);
