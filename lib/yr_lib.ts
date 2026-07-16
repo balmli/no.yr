@@ -165,7 +165,7 @@ export interface FetchResult {
     data: any;
     lastModified?: string;
     expires?: string;
-    notModified?: boolean;
+    notModified: boolean;
 }
 
 const doFetch = async (
@@ -247,6 +247,7 @@ export interface WeatherResult {
     data: YrComplete | null;
     lastModified?: string;
     expires?: string;
+    notModified: boolean;
 }
 
 export const fetchWeather = async (
@@ -260,26 +261,15 @@ export const fetchWeather = async (
         (!clearAltitude && altitude !== -1 ? `&altitude=${Math.round(altitude)}` : '');
     const result = await doFetch(uri, appVersion, logger, ifModifiedSince);
     if (result === null) {
-        return { data: null };
+        return {data: null, notModified: false};
     }
-
-    // If data not modified (HTTP 304), return notModified flag
-    if (result.notModified) {
-        logger.info('Weather data not modified, using cached version');
-        return { data: null, lastModified: ifModifiedSince };
-    }
-
-    const wd = parseResult(result.data, logger);
+    const weatherResult = toWeatherResult(result, ifModifiedSince, logger);
     logger.info(`Got weather data!`, {
-        wd: wd?.properties.meta.updated_at,
-        lastModified: result.lastModified,
-        expires: result.expires
+        wd: weatherResult.data?.properties.meta.updated_at,
+        lastModified: weatherResult.lastModified,
+        expires: weatherResult.expires
     });
-    return {
-        data: wd,
-        lastModified: result.lastModified,
-        expires: result.expires
-    };
+    return weatherResult;
 };
 
 const parseResult = (json: any, logger: Logger): YrComplete | null => {
@@ -294,6 +284,27 @@ const parseResult = (json: any, logger: Logger): YrComplete | null => {
         logger.error(`Parse weather file failed.`, json);
     }
     return null;
+}
+
+export const toWeatherResult = (
+    result: FetchResult,
+    ifModifiedSince: string | undefined,
+    logger: Logger,
+): WeatherResult => {
+    if (result.notModified) {
+        return {
+            data: null,
+            lastModified: ifModifiedSince,
+            expires: result.expires,
+            notModified: true,
+        };
+    }
+    return {
+        data: parseResult(result.data, logger),
+        lastModified: result.lastModified,
+        expires: result.expires,
+        notModified: false,
+    };
 }
 
 export const getDateFromPeriod = (period: string): Moment => {
@@ -385,26 +396,15 @@ export const fetchNowcast = async (
         (!clearAltitude && altitude !== -1 ? `&altitude=${Math.round(altitude)}` : '');
     const result = await doFetch(uri, appVersion, logger, ifModifiedSince);
     if (result === null) {
-        return { data: null };
+        return {data: null, notModified: false};
     }
-
-    // If data not modified (HTTP 304), return notModified flag
-    if (result.notModified) {
-        logger.info('Nowcast data not modified, using cached version');
-        return { data: null, lastModified: ifModifiedSince };
-    }
-
-    const wd = parseResult(result.data, logger);
+    const weatherResult = toWeatherResult(result, ifModifiedSince, logger);
     logger.info(`Got nowcast data!`, {
-        wd: wd?.properties.meta.updated_at,
-        lastModified: result.lastModified,
-        expires: result.expires
+        wd: weatherResult.data?.properties.meta.updated_at,
+        lastModified: weatherResult.lastModified,
+        expires: weatherResult.expires
     });
-    return {
-        data: wd,
-        lastModified: result.lastModified,
-        expires: result.expires
-    };
+    return weatherResult;
 }
 
 /**

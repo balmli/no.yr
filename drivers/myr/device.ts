@@ -229,7 +229,7 @@ module.exports = class YrDevice extends Homey.Device {
                 if (this._forceUpdateDevice === true) {
                     await this.updateDevice(this._weatherData);
                 }
-            } else if (weatherResult.lastModified) {
+            } else if (weatherResult.notModified) {
                 // HTTP 304 - data not modified, use existing cache
                 this.logger.info('Using cached weather data (HTTP 304)');
                 await this.setDeviceAvailable();
@@ -344,7 +344,7 @@ module.exports = class YrDevice extends Homey.Device {
                         await this.clearNowcastState();
                     }
                 }
-            } else if (nowcastResult.lastModified) {
+            } else if (nowcastResult.notModified) {
                 // HTTP 304 - data not modified, use existing cache
                 this.logger.info('Using cached nowcast data (HTTP 304)');
                 if (this._forceUpdateNowcastDevice && this._nowcastData) {
