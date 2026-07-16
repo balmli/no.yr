@@ -62,9 +62,12 @@ const getEndTimePeriod = (forDate: any, args: any): any => {
 const xComparer = (args: any,
                    startTime: any,
                    endTime: any,
-                   tss: YrTimeseries,
+                   tss: YrTimeseries | undefined,
                    compareFunc: (ts: YrTimeserie, value: number) => boolean
 ): boolean => {
+    if (!tss || tss.length === 0) {
+        return false;
+    }
     const vals = tss
         .filter(ts => compareFunc(ts, args.value))
         .map(ts => moment(ts.time))
@@ -75,10 +78,13 @@ const xComparer = (args: any,
 const xSum = (args: any,
               startTime: any,
               endTime: any,
-              tss: YrTimeseries,
+              tss: YrTimeseries | undefined,
               sumSelector: (ts: YrTimeserie) => number,
               compareFunc: (sum: number | undefined, value: number) => boolean
 ): boolean => {
+    if (!tss || tss.length === 0) {
+        return false;
+    }
     return compareFunc(math.round2(tss
         .map(ts => ({time: moment(ts.time), val: sumSelector(ts)}))
         .filter(t => t.time.isSameOrAfter(startTime) && t.time.isBefore(endTime))
@@ -88,7 +94,7 @@ const xSum = (args: any,
 
 export const nextHoursComparer = (forDate: any,
                                   args: any,
-                                  tss: YrTimeseries,
+                                  tss: YrTimeseries | undefined,
                                   compareFunc: (ts: YrTimeserie, value: number) => boolean
 ): boolean => {
     return xComparer(args, getStartTimeNextHours(forDate, args), getEndTimeNextHours(forDate, args), tss, compareFunc);
@@ -96,7 +102,7 @@ export const nextHoursComparer = (forDate: any,
 
 export const periodComparer = (forDate: any,
                                args: any,
-                               tss: YrTimeseries,
+                               tss: YrTimeseries | undefined,
                                compareFunc: (ts: YrTimeserie, value: number) => boolean
 ): boolean => {
     return xComparer(args, getStartTimePeriod(forDate, args), getEndTimePeriod(forDate, args), tss, compareFunc);
@@ -105,7 +111,7 @@ export const periodComparer = (forDate: any,
 
 export const nextHoursSum = (forDate: any,
                              args: any,
-                             tss: YrTimeseries,
+                             tss: YrTimeseries | undefined,
                              sumSelector: (ts: YrTimeserie) => number,
                              compareFunc: (sum: number | undefined, value: number) => boolean
 ): boolean => {
@@ -114,7 +120,7 @@ export const nextHoursSum = (forDate: any,
 
 export const periodSum = (forDate: any,
                           args: any,
-                          tss: YrTimeseries,
+                          tss: YrTimeseries | undefined,
                           sumSelector: (ts: YrTimeserie) => number,
                           compareFunc: (sum: number | undefined, value: number) => boolean
 ): boolean => {
