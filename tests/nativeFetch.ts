@@ -62,7 +62,12 @@ describe('native MET fetch transport', () => {
     });
 
     it('preserves explicit status handling', async () => {
-        expect((await doFetch(`${origin}/203`, '1', logger, undefined, 500))?.data).to.equal('{"deprecated":true}');
+        const warnings: any[] = [];
+        const warningLogger = {...logger, warn: (...args: any[]) => warnings.push(args)};
+        expect((await doFetch(`${origin}/203`, '1', warningLogger, undefined, 500))?.data).to.equal('{"deprecated":true}');
+        expect(warnings).to.have.length(1);
+        expect(warnings[0][0]).to.include('deprecated');
+        expect(warnings[0][1]).to.deep.include({statusCode: 203, endpoint: '/203'});
         expect(await doFetch(`${origin}/304`, '1', logger, undefined, 500)).to.deep.include({notModified: true});
         expect(await doFetch(`${origin}/422`, '1', logger, undefined, 500)).to.equal(null);
         expect(await doFetch(`${origin}/429`, '1', logger, undefined, 500, new RateLimitBackoff())).to.equal(null);

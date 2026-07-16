@@ -231,6 +231,11 @@ export const doFetch = async (
             statusMessage,
         });
         return null;
+    } else if (statusCode === 203) {
+        logger.warn(`MET endpoint returned deprecated HTTP 203 response`, {
+            statusCode,
+            endpoint: new URL(uri).pathname,
+        });
     } else {
         logger.debug(`Fetched "${uri}" OK, in ${Date.now() - start} ms:`, {
             statusCode,
