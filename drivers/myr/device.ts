@@ -8,7 +8,7 @@ import {WeatherLegends} from "../../lib/legends";
 import * as yrlib from "../../lib/yr_lib";
 import {round2} from "../../lib/math";
 import {invalidateLocationCaches} from '../../lib/location_cache';
-import {NOWCAST_CAPABILITIES, shouldContinueNowcastPolling} from '../../lib/nowcast';
+import {minutesUntilRain, NOWCAST_CAPABILITIES, shouldContinueNowcastPolling} from '../../lib/nowcast';
 import {attemptTrackedFetch} from '../../lib/tracked_fetch';
 import {
     dailyResourceCacheKey,
@@ -560,13 +560,11 @@ module.exports = class YrDevice extends Homey.Device {
         }
     }
 
-    updateDeviceNowcast = async (wd: YrComplete | null, nowcast: YrComplete | null): Promise<boolean> => {
+    updateDeviceNowcast = async (_wd: YrComplete | null, nowcast: YrComplete | null): Promise<boolean> => {
         const period = this.getSetting('period');
         const rainingThreshold = this.getSetting('raining_threshold') || 0.1;
 
         const now = yrlib.getDateAddPeriod(period);
-        const tsBefore = nowcast ? nowcast.properties.timeseries
-            .filter(ts => moment(ts.time).isBefore(now)) : [];
         const tsAfter = nowcast ? nowcast.properties.timeseries
             .filter(ts => moment(ts.time).isSameOrAfter(now)) : [];
 
@@ -591,36 +589,11 @@ module.exports = class YrDevice extends Homey.Device {
             }, 0));
         this.logger.debug('Rain next 30 minutes: ', next30Minutes.map(ts => ts.data.instant.details.precipitation_rate), rainNext30Minutes);
 
-        const tsLastBefore = tsBefore.length > 0 ? tsBefore[tsBefore.length - 1] : undefined;
-        const isRaining = tsLastBefore !== undefined &&
-            tsLastBefore.data.instant.details.precipitation_rate !== undefined &&
-            tsLastBefore.data.instant.details.precipitation_rate > rainingThreshold;
-
-        const tsFirstRainingAfter = tsAfter
-            .find(ts => ts.data.instant.details.precipitation_rate !== undefined &&
-                ts.data.instant.details.precipitation_rate > rainingThreshold);
-
-        let minutesUntilStartsRaining: number | undefined = 99999;
-
-        if (isRaining) {
-            minutesUntilStartsRaining = 0;
-        } else if (!!tsFirstRainingAfter) {
-            minutesUntilStartsRaining = moment(tsFirstRainingAfter.time).diff(moment(), 'minutes');
-        } else if (!!wd) {
-            const tsAfter2 = wd.properties.timeseries
-                .filter(ts => moment(ts.time).isSameOrAfter(now));
-
-            const tsFirstRainingAfter2 = tsAfter2
-                .find(ts => ts.data?.next_1_hours?.details?.precipitation_amount !== undefined &&
-                    ts.data?.next_1_hours?.details?.precipitation_amount > rainingThreshold ||
-                    ts.data?.next_1_hours?.details?.precipitation_amount === undefined &&
-                    ts.data?.next_6_hours?.details?.precipitation_amount !== undefined &&
-                    ts.data?.next_6_hours?.details?.precipitation_amount > rainingThreshold);
-
-            if (!!tsFirstRainingAfter2) {
-                minutesUntilStartsRaining = moment(tsFirstRainingAfter2.time).diff(moment(), 'minutes');
-            }
-        }
+        const minutesUntilStartsRaining = minutesUntilRain(
+            nowcast.properties.timeseries,
+            now.toDate(),
+            rainingThreshold,
+        );
 
         await this.updateCapability('measure_minutes_raining', minutesUntilStartsRaining);
         await this.updateCapability('measure_rain.next_30_minutes', rainNext30Minutes);
