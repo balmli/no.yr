@@ -1,7 +1,7 @@
 ---
 id: TASK-017
 title: "cache expiry is not respected and several endpoints are never cached"
-status: open
+status: done
 priority: high
 type: compliance
 source: MET_API_TERMS_REVIEW.md
@@ -38,3 +38,15 @@ related: [TASK-007]
 4. Cache textforecast areas and landoverview at app scope, not device scope, and respect their cache headers.
 5. Persist response data and cache metadata across restarts where practical.
 6. Deduplicate in-flight requests for identical rounded coordinates.
+
+## Resolution
+
+- Added an app-wide `HttpResourceCache` keyed by exact request URI and routed locationforecast, nowcast, sunrise, textforecast areas, and landoverview through it.
+- Unexpired responses are reused without a network request. Expired entries revalidate with their cached `Last-Modified`; HTTP 304 merges refreshed `Last-Modified`/`Expires` headers while retaining the cached body.
+- Sunrise cache identity naturally includes rounded coordinates, date, and UTC offset in its URI. Textforecast `/areas` and `/landoverview` are shared across every device instead of downloaded per device.
+- Identical concurrent requests share one in-flight promise, covering same-coordinate weather/nowcast calls and location-independent textual documents.
+- Device scheduling continues to use TASK-007's future-`Expires` guard and now also retains cache headers received with 304 responses. The earlier daily-only auxiliary guard was replaced by the stronger response-header cache.
+- Added `tests/httpResourceCache.ts`. The focused test first failed because the cache module was absent, then passed with `2 passing` for expiry/revalidation/304 metadata and concurrent deduplication. Existing scheduling and malformed/304 tests passed alongside it (`6 passing`).
+- Verification on Node.js 22: `npx tsc -p tsconfig.test.json` passed; `npm run build` passed; `npm test` passed with `74 passing`, and the Homey publish validation passed.
+- Large response bodies are intentionally not copied into Homey's persistent device store: validators without their matching body are unsafe, while persisting ten-day forecasts per device would create significant storage/write amplification. The cache persists for the app process lifetime and is rebuilt safely after restart.
+- The cited local `MET_API_TERMS_REVIEW.md` was unavailable in this checkout; the task record supplied the compliance evidence.

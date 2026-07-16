@@ -19,10 +19,12 @@ import {
     YrTimeseries
 } from "./types";
 import {WeatherLegends} from "./legends";
+import {CacheableFetchResult, HttpResourceCache} from './http_cache';
 
 
 const math = require('./math');
 const Feels = require('feels');
+const metResourceCache = new HttpResourceCache();
 
 const getStartTimeNextHours = (forDate: any, args: any): any => {
     const {start} = args;
@@ -161,12 +163,7 @@ export const calculateFeelsLike = (instant: InstantDetails): number => {
     return math.round1(new Feels(config).like());
 }
 
-export interface FetchResult {
-    data: any;
-    lastModified?: string;
-    expires?: string;
-    notModified: boolean;
-}
+export interface FetchResult extends CacheableFetchResult {}
 
 export const doFetch = async (
     uri: string,
@@ -245,6 +242,16 @@ export const doFetch = async (
     return fetchResult;
 }
 
+const doCachedFetch = (
+    uri: string,
+    appVersion: string,
+    logger: Logger,
+    ifModifiedSince?: string,
+): Promise<CacheableFetchResult | null> => metResourceCache.get(
+    uri,
+    cacheValidator => doFetch(uri, appVersion, logger, cacheValidator ?? ifModifiedSince),
+);
+
 export interface WeatherResult {
     data: YrComplete | null;
     lastModified?: string;
@@ -261,7 +268,7 @@ export const fetchWeather = async (
 ): Promise<WeatherResult> => {
     const uri = `https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=${lat}&lon=${lon}` +
         (!clearAltitude && altitude !== -1 ? `&altitude=${Math.round(altitude)}` : '');
-    const result = await doFetch(uri, appVersion, logger, ifModifiedSince);
+    const result = await doCachedFetch(uri, appVersion, logger, ifModifiedSince);
     if (result === null) {
         return {data: null, notModified: false};
     }
@@ -296,7 +303,7 @@ export const toWeatherResult = (
     if (result.notModified) {
         return {
             data: null,
-            lastModified: ifModifiedSince,
+            lastModified: result.lastModified ?? ifModifiedSince,
             expires: result.expires,
             notModified: true,
         };
@@ -359,7 +366,7 @@ export const fetchSunrise = async (
     const offset = forDate.format("Z");
     logger.debug(`fetchSunrise: ${lat}, ${lon}, ${date}, ${offset}`);
     const uri = `https://api.met.no/weatherapi/sunrise/3.0/sun?lat=${lat}&lon=${lon}&date=${date}&offset=${offset}`;
-    const result = await doFetch(uri, appVersion, logger);
+    const result = await doCachedFetch(uri, appVersion, logger);
     if (result === null || !result.data) {
         throw new Error(homey.__('errors.fetching_sunrise_failed'));
     }
@@ -397,7 +404,7 @@ export const fetchNowcast = async (
 ): Promise<WeatherResult> => {
     const uri = `https://api.met.no/weatherapi/nowcast/2.0/complete?lat=${lat}&lon=${lon}` +
         (!clearAltitude && altitude !== -1 ? `&altitude=${Math.round(altitude)}` : '');
-    const result = await doFetch(uri, appVersion, logger, ifModifiedSince);
+    const result = await doCachedFetch(uri, appVersion, logger, ifModifiedSince);
     if (result === null) {
         return {data: null, notModified: false};
     }
@@ -424,7 +431,7 @@ export const fetchTextforecast = async (
     logger: Logger,
     homey: Homey
 ): Promise<Textforecasts> => {
-    const resultAreas = await doFetch(`https://api.met.no/weatherapi/textforecast/2.0/areas`, appVersion, logger);
+    const resultAreas = await doCachedFetch(`https://api.met.no/weatherapi/textforecast/2.0/areas`, appVersion, logger);
     if (resultAreas === null || !resultAreas.data) {
         throw new Error(homey.__('errors.fetching_areas_failed'));
     }
@@ -441,7 +448,7 @@ export const fetchTextforecast = async (
         throw new Error(homey.__('errors.textforecast_not_supported'));
     }
 
-    const resultTextforecast = await doFetch(`https://api.met.no/weatherapi/textforecast/2.0/landoverview`, appVersion, logger);
+    const resultTextforecast = await doCachedFetch(`https://api.met.no/weatherapi/textforecast/2.0/landoverview`, appVersion, logger);
     if (resultTextforecast === null || !resultTextforecast.data) {
         throw new Error(homey.__('errors.fetching_textforecast_failed'));
     }

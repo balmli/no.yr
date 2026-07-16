@@ -17,11 +17,7 @@ import {
     shouldContinueNowcastPolling,
 } from '../../lib/nowcast';
 import {attemptTrackedFetch} from '../../lib/tracked_fetch';
-import {
-    dailyResourceCacheKey,
-    honorCacheExpiry,
-    shouldRefreshDailyResource,
-} from '../../lib/cache_schedule';
+import {honorCacheExpiry} from '../../lib/cache_schedule';
 import {hasCapabilityValue} from '../../lib/capability_value';
 
 const math = require('../../lib/math');
@@ -44,8 +40,6 @@ module.exports = class YrDevice extends Homey.Device {
     _updateNowcastDeviceTimeout?: NodeJS.Timeout;
     _forceUpdateNowcastDevice?: boolean;
     _textualForecast!: Textforecasts | null;
-    _sunriseCacheKey?: string;
-    _textForecastCacheKey?: string;
     _nowcastLocationKey?: string;
 
     async onInit(): Promise<void> {
@@ -233,7 +227,7 @@ module.exports = class YrDevice extends Homey.Device {
                 return;
             }
             const weatherResult = fetchAttempt.value;
-            const receivedFreshWeather = !!weatherResult.data;
+            const weatherFetchSucceeded = !!weatherResult.data || weatherResult.notModified;
 
             // If data was fetched (not 304 response)
             if (weatherResult.data) {
@@ -249,6 +243,8 @@ module.exports = class YrDevice extends Homey.Device {
                 }
             } else if (weatherResult.notModified) {
                 // HTTP 304 - data not modified, use existing cache
+                this._weatherLastModified = weatherResult.lastModified ?? this._weatherLastModified;
+                this._weatherExpires = weatherResult.expires ?? this._weatherExpires;
                 this.logger.info('Using cached weather data (HTTP 304)');
                 await this.setDeviceAvailable();
                 if (this._forceUpdateDevice === true && this._weatherData) {
@@ -260,10 +256,8 @@ module.exports = class YrDevice extends Homey.Device {
             }
 
             // Only fetch sunrise/sunset and textual forecast if we have valid weather data
-            if (this._weatherData && receivedFreshWeather) {
-                const forecastDate = yrlib.getDateFromPeriod(settings.period).format('YYYY-MM-DD');
-                const sunriseCacheKey = dailyResourceCacheKey('sunrise', lat, lon, forecastDate);
-                if (shouldRefreshDailyResource(this._sunriseCacheKey, sunriseCacheKey)) try {
+            if (this._weatherData && weatherFetchSucceeded) {
+                try {
                     const sunrise = await yrlib.fetchSunrise(
                         lat, lon,
                         settings.period,
@@ -273,7 +267,6 @@ module.exports = class YrDevice extends Homey.Device {
                         this.homey
                     );
                     if (sunrise) {
-                        this._sunriseCacheKey = sunriseCacheKey;
                         await this.setCapabilityValue('sunrise_time', moment(sunrise.sunrise).format("DD.MM.YYYY HH:mm")).catch(err => this.logger.error(err));
                         await this.setCapabilityValue('sunset_time', moment(sunrise.sunset).format("DD.MM.YYYY HH:mm")).catch(err => this.logger.error(err));
                     }
@@ -282,15 +275,13 @@ module.exports = class YrDevice extends Homey.Device {
                     await this.setCapabilityValue('sunset_time', '-').catch(err => this.logger.error(err));
                     this.logger.error(err1);
                 }
-                const textForecastCacheKey = dailyResourceCacheKey('textforecast', lat, lon, moment().format('YYYY-MM-DD'));
-                if (shouldRefreshDailyResource(this._textForecastCacheKey, textForecastCacheKey)) try {
+                try {
                     this._textualForecast = await yrlib.fetchTextforecast(
                         lat, lon,
                         this.homey.manifest.version,
                         this.logger,
                         this.homey
                     );
-                    this._textForecastCacheKey = textForecastCacheKey;
                 } catch (err2) {
                     // TODO ikke logg hvis lat/lon ikke er støttet
                     this.logger.error(err2);
@@ -371,6 +362,8 @@ module.exports = class YrDevice extends Homey.Device {
                 }
             } else if (nowcastResult.notModified) {
                 // HTTP 304 - data not modified, use existing cache
+                this._nowcastLastModified = nowcastResult.lastModified ?? this._nowcastLastModified;
+                this._nowcastExpires = nowcastResult.expires ?? this._nowcastExpires;
                 this.logger.info('Using cached nowcast data (HTTP 304)');
                 if (this._forceUpdateNowcastDevice && this._nowcastData) {
                     const updated = await this.updateDeviceNowcast(this._weatherData, this._nowcastData);
