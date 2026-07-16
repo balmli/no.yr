@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {honorCacheExpiry} from '../lib/cache_schedule';
 

@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {calculateFeelsLike} from '../lib/yr_lib';
 import {InstantDetails} from "../lib/types";

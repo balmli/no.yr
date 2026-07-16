@@ -79,33 +79,33 @@ class YrApp extends Homey.App {
 
         this.homey.flow.getConditionCard('03_rain_mm_next_hours_above')
             .registerRunListener((args, state) => args.device.nextHoursComparer(args, state,
-                (ts: YrTimeserie, value: number) => (!!ts.data.next_1_hours && (ts.data.next_1_hours.details.precipitation_amount as number)) > value))
+                (ts: YrTimeserie, value: number) => ((!!ts.data.next_1_hours && (ts.data.next_1_hours.details.precipitation_amount as number)) as number) > value))
             .getArgument('start')
             .registerAutocompleteListener((query, args) => args.device.onTimeStartAutocomplete(query, args));
 
         this.homey.flow.getConditionCard('03_rain_mm_next_hours_below')
             .registerRunListener((args, state) => args.device.nextHoursComparer(args, state,
-                (ts: YrTimeserie, value: number) => (!!ts.data.next_1_hours && (ts.data.next_1_hours.details.precipitation_amount as number)) < value))
+                (ts: YrTimeserie, value: number) => ((!!ts.data.next_1_hours && (ts.data.next_1_hours.details.precipitation_amount as number)) as number) < value))
             .getArgument('start')
             .registerAutocompleteListener((query, args) => args.device.onTimeStartAutocomplete(query, args));
 
         this.homey.flow.getConditionCard('03_rain_mm_period_above')
             .registerRunListener((args, state) => args.device.periodComparer(args, state,
-                (ts: YrTimeserie, value: number) => (!!ts.data.next_1_hours && (ts.data.next_1_hours.details.precipitation_amount as number)) > value));
+                (ts: YrTimeserie, value: number) => ((!!ts.data.next_1_hours && (ts.data.next_1_hours.details.precipitation_amount as number)) as number) > value));
 
         this.homey.flow.getConditionCard('03_rain_mm_period_below')
             .registerRunListener((args, state) => args.device.periodComparer(args, state,
-                (ts: YrTimeserie, value: number) => (!!ts.data.next_1_hours && (ts.data.next_1_hours.details.precipitation_amount as number)) < value));
+                (ts: YrTimeserie, value: number) => ((!!ts.data.next_1_hours && (ts.data.next_1_hours.details.precipitation_amount as number)) as number) < value));
 
         this.homey.flow.getConditionCard('03_rain_probability_next_hours_above')
             .registerRunListener((args, state) => args.device.nextHoursComparer(args, state,
-                (ts: YrTimeserie, value: number) => (!!ts.data.next_1_hours && (ts.data.next_1_hours.details.probability_of_precipitation as number)) > value))
+                (ts: YrTimeserie, value: number) => ((!!ts.data.next_1_hours && (ts.data.next_1_hours.details.probability_of_precipitation as number)) as number) > value))
             .getArgument('start')
             .registerAutocompleteListener((query, args) => args.device.onTimeStartAutocomplete(query, args));
 
         this.homey.flow.getConditionCard('03_rain_probability_period_above')
             .registerRunListener((args, state) => args.device.periodComparer(args, state,
-                (ts: YrTimeserie, value: number) => (!!ts.data.next_1_hours && (ts.data.next_1_hours.details.probability_of_precipitation as number)) > value));
+                (ts: YrTimeserie, value: number) => ((!!ts.data.next_1_hours && (ts.data.next_1_hours.details.probability_of_precipitation as number)) as number) > value));
 
         this.homey.flow.getConditionCard('03_rain_sum_next_hours_above')
             .registerRunListener((args, _state) => args.device.nextHoursSum(args,
@@ -175,13 +175,13 @@ class YrApp extends Homey.App {
 
         this.homey.flow.getConditionCard('60_thunder_next_hours_above')
             .registerRunListener((args, state) => args.device.nextHoursComparer(args, state,
-                (ts: YrTimeserie, value: number) => (!!ts.data.next_1_hours && (ts.data.next_1_hours.details.probability_of_thunder as number)) > value))
+                (ts: YrTimeserie, value: number) => ((!!ts.data.next_1_hours && (ts.data.next_1_hours.details.probability_of_thunder as number)) as number) > value))
             .getArgument('start')
             .registerAutocompleteListener((query, args) => args.device.onTimeStartAutocomplete(query, args));
 
         this.homey.flow.getConditionCard('60_thunder_period_above')
             .registerRunListener((args, state) => args.device.periodComparer(args, state,
-                (ts: YrTimeserie, value: number) => (!!ts.data.next_1_hours && (ts.data.next_1_hours.details.probability_of_thunder as number)) > value));
+                (ts: YrTimeserie, value: number) => ((!!ts.data.next_1_hours && (ts.data.next_1_hours.details.probability_of_thunder as number)) as number) > value));
 
         this.homey.flow.getConditionCard('70_measure_ultraviolet_below')
             .registerRunListener(args => args.device.getCapabilityValue(`measure_ultraviolet`) < args.value);

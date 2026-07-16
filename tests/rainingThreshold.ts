@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {getRainingThreshold} from '../lib/nowcast';
 

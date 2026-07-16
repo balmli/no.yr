@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {weatherLegend} from '../lib/yr_lib';
 

@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {toWeatherResult} from '../lib/yr_lib';
 

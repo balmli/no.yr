@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {minutesUntilRain} from '../lib/nowcast';
 

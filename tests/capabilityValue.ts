@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {hasCapabilityValue} from '../lib/capability_value';
 

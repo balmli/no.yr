@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {nextHoursSum} from '../lib/yr_lib';
 

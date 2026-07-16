@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 import {createServer, Server} from 'http';
 import {deflateSync, gzipSync} from 'zlib';
 

@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {mapForecastInstant} from '../lib/api_forecast';
 import {InstantDetails} from '../lib/types';

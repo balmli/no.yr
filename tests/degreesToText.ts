@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {degreesToText} from '../lib/yr_lib';
 

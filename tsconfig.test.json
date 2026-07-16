@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "Node16",
     "noEmit": true,
     "types": [
       "mocha",

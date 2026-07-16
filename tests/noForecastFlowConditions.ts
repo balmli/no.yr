@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {nextHoursComparer, nextHoursSum, periodComparer, periodSum} from '../lib/yr_lib';
 

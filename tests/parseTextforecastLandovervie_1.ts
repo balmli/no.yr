@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 import {findAreasIds, findTextforecastFromAreaIds, parseAreasFile, parseTextforecastFile} from "../lib/yr_lib";
 
 const fs = require('fs/promises');

@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import moment from '../lib/moment-timezone-with-data';
 import {getDateAddPeriod} from '../lib/yr_lib';

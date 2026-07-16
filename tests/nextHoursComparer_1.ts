@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {nextHoursComparer} from '../lib/yr_lib';
 

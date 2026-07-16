@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {attemptTrackedFetch} from '../lib/tracked_fetch';
 

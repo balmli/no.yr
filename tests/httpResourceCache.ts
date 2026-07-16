@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {HttpResourceCache} from '../lib/http_cache';
 

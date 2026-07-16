@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {periodSum} from '../lib/yr_lib';
 

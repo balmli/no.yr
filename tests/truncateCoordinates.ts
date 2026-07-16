@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {truncate4} from '../lib/math';
 

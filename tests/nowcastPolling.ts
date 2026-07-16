@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {NOWCAST_CAPABILITIES, shouldContinueNowcastPolling} from '../lib/nowcast';
 import {RadarCoverage} from '../lib/types';

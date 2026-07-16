@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {RateLimitBackoff} from '../lib/rate_limit';
 

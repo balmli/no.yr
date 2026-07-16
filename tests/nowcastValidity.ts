@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 
 import {isNowcastValid, mapNowcastEntry, nowcastLocationKey} from '../lib/nowcast';
 import {RadarCoverage} from '../lib/types';

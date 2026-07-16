@@ -1,4 +1,3 @@
-import {expect} from 'chai';
 import Homey from "homey/lib/Homey";
 
 import Logger from "@balmli/homey-logger";
