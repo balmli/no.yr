@@ -10,6 +10,7 @@ import {round2} from "../../lib/math";
 import {invalidateLocationCaches} from '../../lib/location_cache';
 import {
     isNowcastValid,
+    getRainingThreshold,
     minutesUntilRain,
     NOWCAST_CAPABILITIES,
     nowcastLocationKey,
@@ -572,7 +573,7 @@ module.exports = class YrDevice extends Homey.Device {
 
     updateDeviceNowcast = async (_wd: YrComplete | null, nowcast: YrComplete | null): Promise<boolean> => {
         const period = this.getSetting('period');
-        const rainingThreshold = this.getSetting('raining_threshold') || 0.1;
+        const rainingThreshold = getRainingThreshold(this.getSetting('raining_threshold'));
 
         const now = yrlib.getDateAddPeriod(period);
         const tsAfter = nowcast ? nowcast.properties.timeseries

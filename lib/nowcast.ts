@@ -6,6 +6,10 @@ export const NOWCAST_CAPABILITIES = [
     'measure_rain.next_30_minutes',
 ] as const;
 
+export function getRainingThreshold(value: number | null | undefined): number {
+    return value ?? 0.1;
+}
+
 export function shouldContinueNowcastPolling(nowcast: YrComplete | null): boolean {
     return nowcast?.properties.meta.radar_coverage !== RadarCoverage.no_coverage;
 }
