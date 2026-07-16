@@ -19,7 +19,7 @@ import {
 import {attemptTrackedFetch} from '../../lib/tracked_fetch';
 import {honorCacheExpiry} from '../../lib/cache_schedule';
 import {hasCapabilityValue} from '../../lib/capability_value';
-import {formatSunEvent} from '../../lib/sunrise';
+import {clearSunEventCapabilities, formatSunEvent, shouldRefreshSunEvents} from '../../lib/sunrise';
 
 module.exports = class YrDevice extends Homey.Device {
 
@@ -99,7 +99,7 @@ module.exports = class YrDevice extends Homey.Device {
         this.logger.verbose(this.getName() + ' -> device deleted');
     }
 
-    async onSettings({changedKeys}: {
+    async onSettings({oldSettings, newSettings, changedKeys}: {
         oldSettings: any;
         newSettings: any;
         changedKeys: string[];
@@ -112,7 +112,12 @@ module.exports = class YrDevice extends Homey.Device {
             this.scheduleFetchData(1);
             this.scheduleFetchNowcast(2);
         } else if (changedKeys.includes('period')) {
-            this.scheduleUpdateDevice(1);
+            if (shouldRefreshSunEvents(oldSettings.period, newSettings.period)) {
+                await clearSunEventCapabilities(this);
+                this.scheduleFetchData(1);
+            } else {
+                this.scheduleUpdateDevice(1);
+            }
             this.scheduleUpdateNowcastDevice(2);
         }
     }
