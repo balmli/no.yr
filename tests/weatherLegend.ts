@@ -1,4 +1,3 @@
-
 import {weatherLegend} from '../lib/yr_lib';
 
 describe('weatherLegend', () => {

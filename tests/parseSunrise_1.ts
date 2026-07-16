@@ -1,4 +1,4 @@
-import {parseSunrise} from "../lib/yr_lib";
+import {parseSunrise} from '../lib/yr_lib';
 const fs = require('fs/promises');
 
 describe('parseSunrise', function () {

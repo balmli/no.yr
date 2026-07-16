@@ -1,4 +1,3 @@
-
 import {toWeatherResult} from '../lib/yr_lib';
 
 const logger: any = {
@@ -9,12 +8,16 @@ const logger: any = {
 
 describe('weather fetch result', () => {
     it('does not classify malformed HTTP 200 data as not modified', () => {
-        const result = toWeatherResult({
-            data: '{invalid json',
-            lastModified: 'Thu, 16 Jul 2026 10:00:00 GMT',
-            expires: 'Thu, 16 Jul 2026 11:00:00 GMT',
-            notModified: false,
-        }, undefined, logger);
+        const result = toWeatherResult(
+            {
+                data: '{invalid json',
+                lastModified: 'Thu, 16 Jul 2026 10:00:00 GMT',
+                expires: 'Thu, 16 Jul 2026 11:00:00 GMT',
+                notModified: false,
+            },
+            undefined,
+            logger,
+        );
 
         expect(result.data).to.equal(null);
         expect(result.notModified).to.equal(false);
@@ -22,10 +25,14 @@ describe('weather fetch result', () => {
     });
 
     it('preserves an explicit HTTP 304 result', () => {
-        const result = toWeatherResult({
-            data: null,
-            notModified: true,
-        }, 'cached-validator', logger);
+        const result = toWeatherResult(
+            {
+                data: null,
+                notModified: true,
+            },
+            'cached-validator',
+            logger,
+        );
 
         expect(result).to.deep.equal({
             data: null,
@@ -38,11 +45,15 @@ describe('weather fetch result', () => {
     });
 
     it('preserves an explicit throttled result', () => {
-        const result = toWeatherResult({
-            data: null,
-            notModified: false,
-            throttled: true,
-        }, undefined, logger);
+        const result = toWeatherResult(
+            {
+                data: null,
+                notModified: false,
+                throttled: true,
+            },
+            undefined,
+            logger,
+        );
 
         expect(result).to.deep.equal({
             data: null,

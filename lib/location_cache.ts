@@ -28,6 +28,5 @@ export function invalidateLocationCaches(cache: LocationBoundCache): void {
 }
 
 export async function clearLocationCapabilityValues(device: LocationCapabilityState): Promise<void> {
-    await Promise.all(device.getCapabilities()
-        .map(capabilityId => device.setCapabilityValue(capabilityId, null)));
+    await Promise.all(device.getCapabilities().map(capabilityId => device.setCapabilityValue(capabilityId, null)));
 }

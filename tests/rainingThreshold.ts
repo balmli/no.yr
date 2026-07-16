@@ -1,4 +1,3 @@
-
 import {getRainingThreshold} from '../lib/nowcast';
 
 describe('raining threshold', () => {

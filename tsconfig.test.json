@@ -3,13 +3,7 @@
   "compilerOptions": {
     "module": "Node16",
     "noEmit": true,
-    "types": [
-      "mocha",
-      "node"
-    ]
+    "types": ["mocha", "node"]
   },
-  "include": [
-    "tests/**/*.ts",
-    "lib/**/*.ts"
-  ]
+  "include": ["tests/**/*.ts", "lib/**/*.ts"]
 }

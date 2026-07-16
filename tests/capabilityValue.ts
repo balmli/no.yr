@@ -1,4 +1,3 @@
-
 import {hasCapabilityValue} from '../lib/capability_value';
 
 describe('capability value availability', () => {

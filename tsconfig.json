@@ -5,9 +5,6 @@
     "outDir": ".homeybuild/",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "types": [
-      "mocha",
-      "node"
-    ]
+    "types": ["mocha", "node"]
   }
 }

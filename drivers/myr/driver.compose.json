@@ -3,13 +3,9 @@
   "name": {
     "en": "Weather"
   },
-  "$extends": [
-    "defaults"
-  ],
+  "$extends": ["defaults"],
   "class": "sensor",
-  "connectivity": [
-    "cloud"
-  ],
+  "connectivity": ["cloud"],
   "capabilities": [
     "forecast_time",
     "weather_description",

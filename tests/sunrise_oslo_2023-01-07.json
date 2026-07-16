@@ -4,16 +4,10 @@
   "type": "Feature",
   "geometry": {
     "type": "Point",
-    "coordinates": [
-      10.7,
-      59.9
-    ]
+    "coordinates": [10.7, 59.9]
   },
   "when": {
-    "interval": [
-      "2023-01-06T23:17:00Z",
-      "2023-01-07T23:23:00Z"
-    ]
+    "interval": ["2023-01-06T23:17:00Z", "2023-01-07T23:23:00Z"]
   },
   "properties": {
     "body": "Sun",

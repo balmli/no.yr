@@ -1,4 +1,3 @@
-
 import {HttpResourceCache} from '../lib/http_cache';
 
 describe('HTTP resource cache', () => {
@@ -34,7 +33,9 @@ describe('HTTP resource cache', () => {
         let resolveFetch: (value: any) => void = () => undefined;
         const fetcher = async () => {
             calls++;
-            return new Promise<any>(resolve => { resolveFetch = resolve; });
+            return new Promise<any>(resolve => {
+                resolveFetch = resolve;
+            });
         };
 
         const first = cache.get('shared', fetcher);

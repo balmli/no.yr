@@ -1,4 +1,3 @@
-
 import {honorCacheExpiry} from '../lib/cache_schedule';
 
 describe('cache scheduling', () => {

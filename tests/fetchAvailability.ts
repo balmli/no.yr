@@ -13,19 +13,11 @@ describe('weather fetch availability', () => {
             unavailable = failures >= 5;
         };
 
-        await applyFetchAvailability(
-            {data: null, notModified: false, throttled: true},
-            recordSuccess,
-            recordFailure,
-        );
+        await applyFetchAvailability({data: null, notModified: false, throttled: true}, recordSuccess, recordFailure);
         expect(failures).to.equal(4);
         expect(unavailable).to.equal(false);
 
-        await applyFetchAvailability(
-            {data: null, notModified: false, throttled: false},
-            recordSuccess,
-            recordFailure,
-        );
+        await applyFetchAvailability({data: null, notModified: false, throttled: false}, recordSuccess, recordFailure);
         expect(failures).to.equal(5);
         expect(unavailable).to.equal(true);
 

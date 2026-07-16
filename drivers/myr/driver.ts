@@ -1,9 +1,8 @@
-import Homey from "homey";
+import Homey from 'homey';
 
 const math = require('../../lib/math');
 
 module.exports = class YrDriver extends Homey.Driver {
-
     async onInit() {
         this.log(`Driver onInit`);
     }
@@ -17,17 +16,16 @@ module.exports = class YrDriver extends Homey.Driver {
             {
                 name: this.homey.__('device.name'),
                 data: {
-                    id: math.guid()
+                    id: math.guid(),
                 },
                 settings: {
                     lon,
-                    lat
+                    lat,
                 },
                 store: {
-                    syncTime
-                }
-            }
+                    syncTime,
+                },
+            },
         ];
     }
-
-}
+};

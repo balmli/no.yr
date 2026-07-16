@@ -1,8 +1,4 @@
-import {
-    applyFetchedDataIfDue,
-    isFetchUpdateDue,
-    millisecondsUntilUpdateDeadline,
-} from '../lib/update_schedule';
+import {applyFetchedDataIfDue, isFetchUpdateDue, millisecondsUntilUpdateDeadline} from '../lib/update_schedule';
 
 describe('fetch/update deadline coordination', () => {
     it('waits for the pending boundary when a fetch completes before it', () => {
@@ -36,9 +32,14 @@ describe('fetch/update deadline coordination', () => {
     it('applies a delayed fetch result at most once after it crosses the deadline', async () => {
         let applyCount = 0;
 
-        const applied = await applyFetchedDataIfDue(false, 3_000, async () => {
-            applyCount += 1;
-        }, 3_001);
+        const applied = await applyFetchedDataIfDue(
+            false,
+            3_000,
+            async () => {
+                applyCount += 1;
+            },
+            3_001,
+        );
 
         expect(applied).to.equal(true);
         expect(applyCount).to.equal(1);

@@ -1,8 +1,4 @@
-export function honorCacheExpiry(
-    scheduledSeconds: number,
-    expires: string | undefined,
-    now = new Date(),
-): number {
+export function honorCacheExpiry(scheduledSeconds: number, expires: string | undefined, now = new Date()): number {
     if (!expires) {
         return scheduledSeconds;
     }

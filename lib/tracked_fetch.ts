@@ -1,6 +1,4 @@
-export type TrackedFetchResult<T> =
-    {ok: true; value: T} |
-    {ok: false; error: unknown};
+export type TrackedFetchResult<T> = {ok: true; value: T} | {ok: false; error: unknown};
 
 export async function attemptTrackedFetch<T>(
     fetcher: () => Promise<T>,

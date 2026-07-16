@@ -1,4 +1,3 @@
-
 import {minutesUntilRain} from '../lib/nowcast';
 
 const reference = new Date('2026-07-16T10:00:00Z');

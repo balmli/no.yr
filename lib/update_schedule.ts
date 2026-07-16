@@ -3,13 +3,10 @@ export function isFetchUpdateDue(
     updateDeadline: number | undefined,
     completedAt = Date.now(),
 ): boolean {
-    return forceUpdate || updateDeadline !== undefined && completedAt >= updateDeadline;
+    return forceUpdate || (updateDeadline !== undefined && completedAt >= updateDeadline);
 }
 
-export function millisecondsUntilUpdateDeadline(
-    updateDeadline: number,
-    now = Date.now(),
-): number {
+export function millisecondsUntilUpdateDeadline(updateDeadline: number, now = Date.now()): number {
     return Math.max(0, updateDeadline - now);
 }
 

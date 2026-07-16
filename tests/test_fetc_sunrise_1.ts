@@ -1,14 +1,14 @@
-import Homey from "homey/lib/Homey";
+import Homey from 'homey/lib/Homey';
 
-import Logger from "@balmli/homey-logger";
+import Logger from '@balmli/homey-logger';
 
-import moment from "../lib/moment-timezone-with-data";
-import {fetchSunrise} from "../lib/yr_lib";
+import moment from '../lib/moment-timezone-with-data';
+import {fetchSunrise} from '../lib/yr_lib';
 
 describe('fetchSunrise', function () {
     describe('fetchSunrise 1', function () {
         it('Check fetchSunrise 2023-01-07', async function () {
-            moment.tz.setDefault("Europe/Oslo");
+            moment.tz.setDefault('Europe/Oslo');
             const sunrise = await fetchSunrise(
                 59.933333,
                 10.716667,
@@ -21,7 +21,7 @@ describe('fetchSunrise', function () {
                     logFunc: this.log,
                     errorFunc: this.error,
                 }),
-                {} as Homey
+                {} as Homey,
             );
             //console.log(sunrise);
             expect(sunrise?.sunrise?.format()).eq('2023-01-07T09:14:00+01:00');
@@ -29,7 +29,7 @@ describe('fetchSunrise', function () {
         });
 
         it('Check fetchSunrise - today ', async function () {
-            moment.tz.setDefault("Europe/Oslo");
+            moment.tz.setDefault('Europe/Oslo');
             await fetchSunrise(
                 59.933333,
                 10.716667,
@@ -42,7 +42,7 @@ describe('fetchSunrise', function () {
                     logFunc: this.log,
                     errorFunc: this.error,
                 }),
-                {} as Homey
+                {} as Homey,
             );
             //console.log(sunrise);
             //expect(sunrise?.sunrise.format()).eq('2023-01-07T09:14:27+01:00');
@@ -50,7 +50,7 @@ describe('fetchSunrise', function () {
         });
 
         it('Check fetchSunrise - tomorrow ', async function () {
-            moment.tz.setDefault("Europe/Oslo");
+            moment.tz.setDefault('Europe/Oslo');
             await fetchSunrise(
                 59.933333,
                 10.716667,
@@ -63,7 +63,7 @@ describe('fetchSunrise', function () {
                     logFunc: this.log,
                     errorFunc: this.error,
                 }),
-                {} as Homey
+                {} as Homey,
             );
             //console.log(sunrise);
             //expect(sunrise?.sunrise.format()).eq('2023-01-07T09:14:27+01:00');
@@ -71,7 +71,7 @@ describe('fetchSunrise', function () {
         });
 
         it('Check fetchSunrise - +4 days, 12:00 UTC', async function () {
-            moment.tz.setDefault("Europe/Oslo");
+            moment.tz.setDefault('Europe/Oslo');
             await fetchSunrise(
                 59.933333,
                 10.716667,
@@ -84,7 +84,7 @@ describe('fetchSunrise', function () {
                     logFunc: this.log,
                     errorFunc: this.error,
                 }),
-                {} as Homey
+                {} as Homey,
             );
             //console.log(sunrise);
             //expect(sunrise?.sunrise.format()).eq('2023-01-07T09:14:27+01:00');
@@ -92,7 +92,7 @@ describe('fetchSunrise', function () {
         });
 
         it('Check fetchSunrise - today Tromsøe', async function () {
-            moment.tz.setDefault("Europe/Oslo");
+            moment.tz.setDefault('Europe/Oslo');
             try {
                 await fetchSunrise(
                     69.647506,
@@ -107,10 +107,10 @@ describe('fetchSunrise', function () {
                         errorFunc: this.error,
                     }),
                     {
-                        "__": (key: string) => {
+                        __: (key: string) => {
                             console.log('Homey messaage: ', key);
-                        }
-                    } as Homey
+                        },
+                    } as Homey,
                 );
                 //console.log(sunrise);
             } catch (err) {

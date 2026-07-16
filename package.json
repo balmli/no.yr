@@ -9,7 +9,9 @@
     "build": "tsc",
     "test": "env TS_NODE_PROJECT=tsconfig.test.json TS_NODE_FILES=true mocha --require ts-node/register --require ./tests/setup.mjs 'tests/**/*.ts'",
     "posttest": "homey app validate",
-    "lint": "eslint --ext .ts app.ts api.ts drivers lib tests"
+    "format": "prettier --write --ignore-unknown .",
+    "format:check": "prettier --check --ignore-unknown .",
+    "lint": "npm run format:check && eslint --ext .ts app.ts api.ts drivers lib tests"
   },
   "dependencies": {
     "@balmli/homey-logger": "^1.0.0",
@@ -27,6 +29,7 @@
     "eslint": "^10.7.0",
     "globals": "^17.7.0",
     "mocha": "^11.7.6",
+    "prettier": "^3.9.5",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.64.0"

@@ -1,4 +1,3 @@
-
 import {clearLocationCapabilityValues, invalidateLocationCaches} from '../lib/location_cache';
 
 describe('location cache invalidation', () => {

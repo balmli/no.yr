@@ -1,4 +1,4 @@
-import {findAreasIds, parseAreasFile} from "../lib/yr_lib";
+import {findAreasIds, parseAreasFile} from '../lib/yr_lib';
 
 const fs = require('fs/promises');
 

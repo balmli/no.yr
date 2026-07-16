@@ -19,12 +19,14 @@ describe('native MET fetch transport', () => {
             if (request.url === '/redirect') {
                 response.writeHead(302, {location: '/gzip'}).end();
             } else if (request.url === '/gzip') {
-                response.writeHead(200, {
-                    'content-encoding': 'gzip',
-                    'content-type': 'application/json',
-                    'last-modified': 'Thu, 16 Jul 2026 10:00:00 GMT',
-                    expires: 'Thu, 16 Jul 2026 11:00:00 GMT',
-                }).end(gzipSync('{"ok":true}'));
+                response
+                    .writeHead(200, {
+                        'content-encoding': 'gzip',
+                        'content-type': 'application/json',
+                        'last-modified': 'Thu, 16 Jul 2026 10:00:00 GMT',
+                        expires: 'Thu, 16 Jul 2026 11:00:00 GMT',
+                    })
+                    .end(gzipSync('{"ok":true}'));
             } else if (request.url === '/deflate') {
                 response.writeHead(200, {'content-encoding': 'deflate'}).end(deflateSync('<weather>ok</weather>'));
             } else if (request.url === '/slow') {
@@ -50,27 +52,36 @@ describe('native MET fetch transport', () => {
         expect(result).to.deep.include({data: '{"ok":true}', notModified: false});
         expect(result?.lastModified).to.equal('Thu, 16 Jul 2026 10:00:00 GMT');
         expect(result?.expires).to.equal('Thu, 16 Jul 2026 11:00:00 GMT');
-        expect(receivedHeaders['user-agent']).to.equal('WeatherForecastHomeyApp/1.2.3 github.com/balmli/weather.forecast');
+        expect(receivedHeaders['user-agent']).to.equal(
+            'WeatherForecastHomeyApp/1.2.3 github.com/balmli/weather.forecast',
+        );
         expect(receivedHeaders['if-modified-since']).to.equal('cached-validator');
         expect(receivedHeaders['accept-encoding']).to.include('gzip');
         expect(receivedHeaders['accept-encoding']).to.include('deflate');
     });
 
     it('decompresses deflate while preserving XML text', async () => {
-        expect((await doFetch(`${origin}/deflate`, '1', logger, undefined, 500))?.data).to.equal('<weather>ok</weather>');
+        expect((await doFetch(`${origin}/deflate`, '1', logger, undefined, 500))?.data).to.equal(
+            '<weather>ok</weather>',
+        );
     });
 
     it('preserves explicit status handling', async () => {
         const warnings: any[] = [];
         const warningLogger = {...logger, warn: (...args: any[]) => warnings.push(args)};
-        expect((await doFetch(`${origin}/203`, '1', warningLogger, undefined, 500))?.data).to.equal('{"deprecated":true}');
+        expect((await doFetch(`${origin}/203`, '1', warningLogger, undefined, 500))?.data).to.equal(
+            '{"deprecated":true}',
+        );
         expect(warnings).to.have.length(1);
         expect(warnings[0][0]).to.include('deprecated');
         expect(warnings[0][1]).to.deep.include({statusCode: 203, endpoint: '/203'});
         expect(await doFetch(`${origin}/304`, '1', logger, undefined, 500)).to.deep.include({notModified: true});
         expect(await doFetch(`${origin}/422`, '1', logger, undefined, 500)).to.equal(null);
-        expect(await doFetch(`${origin}/429`, '1', logger, undefined, 500, new RateLimitBackoff()))
-            .to.deep.equal({data: null, notModified: false, throttled: true});
+        expect(await doFetch(`${origin}/429`, '1', logger, undefined, 500, new RateLimitBackoff())).to.deep.equal({
+            data: null,
+            notModified: false,
+            throttled: true,
+        });
         expect(await doFetch(`${origin}/500`, '1', logger, undefined, 500)).to.equal(null);
     });
 
@@ -87,10 +98,16 @@ describe('native MET fetch transport', () => {
     it('suppresses all subsequent requests immediately after a 429', async () => {
         const limiter = new RateLimitBackoff();
         const before = requestCount;
-        expect(await doFetch(`${origin}/429`, '1', logger, undefined, 500, limiter))
-            .to.deep.equal({data: null, notModified: false, throttled: true});
-        expect(await doFetch(`${origin}/200`, '1', logger, undefined, 500, limiter))
-            .to.deep.equal({data: null, notModified: false, throttled: true});
+        expect(await doFetch(`${origin}/429`, '1', logger, undefined, 500, limiter)).to.deep.equal({
+            data: null,
+            notModified: false,
+            throttled: true,
+        });
+        expect(await doFetch(`${origin}/200`, '1', logger, undefined, 500, limiter)).to.deep.equal({
+            data: null,
+            notModified: false,
+            throttled: true,
+        });
         expect(requestCount).to.equal(before + 1);
     });
 

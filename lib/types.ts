@@ -1,4 +1,4 @@
-import {Moment} from "./moment";
+import {Moment} from './moment';
 
 type Pressure = number | undefined;
 type Humidity = number | undefined;
@@ -57,28 +57,28 @@ export interface YrTimeserie {
     localTime?: string;
     data: {
         instant: {
-            details: InstantDetails
-        },
-        next_1_hours?: NextHours,
-        next_6_hours?: NextHours,
-        next_12_hours?: NextHours
-    }
+            details: InstantDetails;
+        };
+        next_1_hours?: NextHours;
+        next_6_hours?: NextHours;
+        next_12_hours?: NextHours;
+    };
 }
 
 export type YrTimeseries = YrTimeserie[];
 
 export enum RadarCoverage {
-    ok = "ok",
-    temporarily_unavailable = "temporarily unavailable",
-    no_coverage = "no coverage",
+    ok = 'ok',
+    temporarily_unavailable = 'temporarily unavailable',
+    no_coverage = 'no coverage',
 }
 
 export interface YrComplete {
     type: string;
     geometry: {
-        type: string,
-        coordinates: number[],
-    },
+        type: string;
+        coordinates: number[];
+    };
     properties: {
         meta: {
             updated_at: string;
@@ -103,53 +103,53 @@ export interface YrComplete {
                 probability_of_precipitation?: string;
                 probability_of_thunder?: string;
                 relative_humidity: string;
-                ultraviolet_index_clear_sky: 1,
+                ultraviolet_index_clear_sky: 1;
                 wind_from_direction: string;
                 wind_speed: string;
                 wind_speed_of_gust?: string;
                 wind_speed_percentile_10?: string;
                 wind_speed_percentile_90?: string;
-            }
-        },
-        timeseries: YrTimeseries
-    }
+            };
+        };
+        timeseries: YrTimeseries;
+    };
 }
 
 export interface SunriseData {
     type: string;
     geometry: {
-        type: string,
-        coordinates: number[],
-    },
+        type: string;
+        coordinates: number[];
+    };
     when: {
-        interval: string[],
-    },
+        interval: string[];
+    };
     properties: {
         body: string;
         sunrise: {
             time: string | null;
             azimuth: number | null;
-        },
+        };
         sunset: {
             time: string | null;
             azimuth: number | null;
-        },
+        };
         solarnoon: {
             time: string;
             disc_centre_elevation: number;
             visible: boolean;
-        },
+        };
         solarmidnight: {
             time: string;
             disc_centre_elevation: number;
             visible: boolean;
-        }
-    }
+        };
+    };
 }
 
 export interface Sunrise {
-    sunrise?: Moment,
-    sunset?: Moment,
+    sunrise?: Moment;
+    sunset?: Moment;
 }
 
 export type Point = [number, number];

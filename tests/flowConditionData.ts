@@ -9,10 +9,8 @@ describe('Flow condition data availability', () => {
     it('rejects unknown direct capability values instead of coercing them', () => {
         const device = {getCapabilityValue: () => null};
 
-        expect(() => capabilityIsBelow(device, 'measure_temperature', 10))
-            .to.throw(WeatherDataUnavailableError);
-        expect(() => capabilityEquals(device, 'weather_description', 'Sunny'))
-            .to.throw(WeatherDataUnavailableError);
+        expect(() => capabilityIsBelow(device, 'measure_temperature', 10)).to.throw(WeatherDataUnavailableError);
+        expect(() => capabilityEquals(device, 'weather_description', 'Sunny')).to.throw(WeatherDataUnavailableError);
     });
 
     it('preserves valid zero measurements', () => {

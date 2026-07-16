@@ -1,4 +1,3 @@
-
 import {MET_ATTRIBUTION} from '../lib/attribution';
 
 describe('MET attribution metadata', () => {

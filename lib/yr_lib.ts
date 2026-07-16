@@ -1,11 +1,11 @@
-import Homey from "homey/lib/Homey";
+import Homey from 'homey/lib/Homey';
 
 const xml2js = require('xml2js');
 
 import Logger from '@balmli/homey-logger';
 
-import {Moment} from "./moment";
-import moment from "./moment-timezone-with-data";
+import {Moment} from './moment';
+import moment from './moment-timezone-with-data';
 import {
     Areas,
     InstantDetails,
@@ -16,13 +16,12 @@ import {
     Textforecasts,
     YrComplete,
     YrTimeserie,
-    YrTimeseries
-} from "./types";
-import {WeatherLegends} from "./legends";
+    YrTimeseries,
+} from './types';
+import {WeatherLegends} from './legends';
 import {CacheableFetchResult, HttpResourceCache} from './http_cache';
 import {RateLimitBackoff} from './rate_limit';
 import {requireForecastTimeseries, WeatherDataUnavailableError} from './flow_condition';
-
 
 const math = require('./math');
 const Feels = require('feels');
@@ -31,18 +30,13 @@ const metRateLimitBackoff = new RateLimitBackoff();
 
 const getStartTimeNextHours = (forDate: any, args: any): any => {
     const {start} = args;
-    return (!!forDate ? moment(forDate) : moment())
-        .startOf('hour')
-        .add(Number(start.id), 'hours');
-}
+    return (!!forDate ? moment(forDate) : moment()).startOf('hour').add(Number(start.id), 'hours');
+};
 
 const getEndTimeNextHours = (forDate: any, args: any): any => {
     const {start, hours} = args;
-    return (!!forDate ? moment(forDate) : moment())
-        .startOf('hour')
-        .add(Number(start.id), 'hours')
-        .add(hours, 'hours');
-}
+    return (!!forDate ? moment(forDate) : moment()).startOf('hour').add(Number(start.id), 'hours').add(hours, 'hours');
+};
 
 const getStartTimePeriod = (forDate: any, args: any): any => {
     const {start, day} = args;
@@ -51,7 +45,7 @@ const getStartTimePeriod = (forDate: any, args: any): any => {
         .add(Number(day), 'days')
         .add(Number(start.split(':')[0]), 'hour')
         .add(Number(start.split(':')[1]), 'minutes');
-}
+};
 
 const getEndTimePeriod = (forDate: any, args: any): any => {
     const {end, day} = args;
@@ -60,80 +54,94 @@ const getEndTimePeriod = (forDate: any, args: any): any => {
         .add(Number(day), 'days')
         .add(Number(end.split(':')[0]), 'hour')
         .add(Number(end.split(':')[1]), 'minutes');
-}
+};
 
-
-const xComparer = (args: any,
-                   startTime: any,
-                   endTime: any,
-                   tss: YrTimeseries | undefined,
-                   compareFunc: (ts: YrTimeserie, value: number) => boolean
+const xComparer = (
+    args: any,
+    startTime: any,
+    endTime: any,
+    tss: YrTimeseries | undefined,
+    compareFunc: (ts: YrTimeserie, value: number) => boolean,
 ): boolean => {
-    const selected = requireForecastTimeseries(tss)
-        .filter(ts => {
-            const time = moment(ts.time);
-            return time.isSameOrAfter(startTime) && time.isBefore(endTime);
-        });
+    const selected = requireForecastTimeseries(tss).filter(ts => {
+        const time = moment(ts.time);
+        return time.isSameOrAfter(startTime) && time.isBefore(endTime);
+    });
     if (selected.length === 0) {
         throw new WeatherDataUnavailableError('forecast data for the selected period');
     }
     return selected.some(ts => compareFunc(ts, args.value));
-}
+};
 
-const xSum = (args: any,
-              startTime: any,
-              endTime: any,
-              tss: YrTimeseries | undefined,
-              sumSelector: (ts: YrTimeserie) => number,
-              compareFunc: (sum: number | undefined, value: number) => boolean
+const xSum = (
+    args: any,
+    startTime: any,
+    endTime: any,
+    tss: YrTimeseries | undefined,
+    sumSelector: (ts: YrTimeserie) => number,
+    compareFunc: (sum: number | undefined, value: number) => boolean,
 ): boolean => {
-    const selected = requireForecastTimeseries(tss)
-        .filter(ts => {
-            const time = moment(ts.time);
-            return time.isSameOrAfter(startTime) && time.isBefore(endTime);
-        });
+    const selected = requireForecastTimeseries(tss).filter(ts => {
+        const time = moment(ts.time);
+        return time.isSameOrAfter(startTime) && time.isBefore(endTime);
+    });
     if (selected.length === 0) {
         throw new WeatherDataUnavailableError('forecast data for the selected period');
     }
-    return compareFunc(math.round2(selected
-        .map(sumSelector)
-        .reduce((acc, c) => acc + c, 0)), args.value);
-}
+    return compareFunc(math.round2(selected.map(sumSelector).reduce((acc, c) => acc + c, 0)), args.value);
+};
 
-export const nextHoursComparer = (forDate: any,
-                                  args: any,
-                                  tss: YrTimeseries | undefined,
-                                  compareFunc: (ts: YrTimeserie, value: number) => boolean
+export const nextHoursComparer = (
+    forDate: any,
+    args: any,
+    tss: YrTimeseries | undefined,
+    compareFunc: (ts: YrTimeserie, value: number) => boolean,
 ): boolean => {
     return xComparer(args, getStartTimeNextHours(forDate, args), getEndTimeNextHours(forDate, args), tss, compareFunc);
-}
+};
 
-export const periodComparer = (forDate: any,
-                               args: any,
-                               tss: YrTimeseries | undefined,
-                               compareFunc: (ts: YrTimeserie, value: number) => boolean
+export const periodComparer = (
+    forDate: any,
+    args: any,
+    tss: YrTimeseries | undefined,
+    compareFunc: (ts: YrTimeserie, value: number) => boolean,
 ): boolean => {
     return xComparer(args, getStartTimePeriod(forDate, args), getEndTimePeriod(forDate, args), tss, compareFunc);
-}
+};
 
-
-export const nextHoursSum = (forDate: any,
-                             args: any,
-                             tss: YrTimeseries | undefined,
-                             sumSelector: (ts: YrTimeserie) => number,
-                             compareFunc: (sum: number | undefined, value: number) => boolean
+export const nextHoursSum = (
+    forDate: any,
+    args: any,
+    tss: YrTimeseries | undefined,
+    sumSelector: (ts: YrTimeserie) => number,
+    compareFunc: (sum: number | undefined, value: number) => boolean,
 ): boolean => {
-    return xSum(args, getStartTimeNextHours(forDate, args), getEndTimeNextHours(forDate, args), tss, sumSelector, compareFunc);
-}
+    return xSum(
+        args,
+        getStartTimeNextHours(forDate, args),
+        getEndTimeNextHours(forDate, args),
+        tss,
+        sumSelector,
+        compareFunc,
+    );
+};
 
-export const periodSum = (forDate: any,
-                          args: any,
-                          tss: YrTimeseries | undefined,
-                          sumSelector: (ts: YrTimeserie) => number,
-                          compareFunc: (sum: number | undefined, value: number) => boolean
+export const periodSum = (
+    forDate: any,
+    args: any,
+    tss: YrTimeseries | undefined,
+    sumSelector: (ts: YrTimeserie) => number,
+    compareFunc: (sum: number | undefined, value: number) => boolean,
 ): boolean => {
-    return xSum(args, getStartTimePeriod(forDate, args), getEndTimePeriod(forDate, args), tss, sumSelector, compareFunc);
-}
+    return xSum(
+        args,
+        getStartTimePeriod(forDate, args),
+        getEndTimePeriod(forDate, args),
+        tss,
+        sumSelector,
+        compareFunc,
+    );
+};
 
 export const weatherLegend = (symbolCode: string, language: string): string => {
     const symbolCodeSplit = symbolCode.split('_');
@@ -142,27 +150,27 @@ export const weatherLegend = (symbolCode: string, language: string): string => {
     if (!wl) {
         return symbolCode;
     }
-    if (wl.variants === null && symbolCodeSplit.length > 1 ||
-        wl.variants !== null && symbolCodeSplit.length === 1) {
+    if (
+        (wl.variants === null && symbolCodeSplit.length > 1) ||
+        (wl.variants !== null && symbolCodeSplit.length === 1)
+    ) {
         // something's fishy
     }
     return language === 'no' ? wl.desc_nb : wl.desc_en;
-}
+};
 
-const degs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW", "N"];
+const degs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW', 'N'];
 
 export const degreesToText = (num: number): string => {
     const normalized = ((num % 360) + 360) % 360;
     const val = Math.round(normalized / 22.5);
     return degs[val];
-}
+};
 
 export const calculateFeelsLike = (instant: InstantDetails): number | undefined => {
-    const canCalculate = [
-        instant.air_temperature,
-        instant.relative_humidity,
-        instant.wind_speed,
-    ].every(value => typeof value === 'number');
+    const canCalculate = [instant.air_temperature, instant.relative_humidity, instant.wind_speed].every(
+        value => typeof value === 'number',
+    );
     if (!canCalculate) {
         return undefined;
     }
@@ -172,11 +180,11 @@ export const calculateFeelsLike = (instant: InstantDetails): number | undefined 
         speed: instant.wind_speed,
         units: {
             temp: 'c',
-            speed: 'mps'
-        }
+            speed: 'mps',
+        },
     };
     return math.round1(new Feels(config).like());
-}
+};
 
 export type FetchResult = CacheableFetchResult;
 
@@ -235,7 +243,7 @@ export const doFetch = async (
         logger.warn(`Rate limited by API for "${uri}":`, {
             statusCode,
             statusMessage,
-            message: 'Too many requests. Please reduce request frequency.'
+            message: 'Too many requests. Please reduce request frequency.',
         });
         return {data: null, notModified: false, throttled: true};
     } else if (statusCode !== 200 && statusCode !== 203) {
@@ -262,7 +270,7 @@ export const doFetch = async (
         lastModified,
         expires,
         retrievedAt: new Date().toISOString(),
-        notModified: false
+        notModified: false,
     };
 
     if (fetchResult.lastModified) {
@@ -270,17 +278,15 @@ export const doFetch = async (
     }
 
     return fetchResult;
-}
+};
 
 const doCachedFetch = (
     uri: string,
     appVersion: string,
     logger: Logger,
     ifModifiedSince?: string,
-): Promise<CacheableFetchResult | null> => metResourceCache.get(
-    uri,
-    cacheValidator => doFetch(uri, appVersion, logger, cacheValidator ?? ifModifiedSince),
-);
+): Promise<CacheableFetchResult | null> =>
+    metResourceCache.get(uri, cacheValidator => doFetch(uri, appVersion, logger, cacheValidator ?? ifModifiedSince));
 
 export interface WeatherResult {
     data: YrComplete | null;
@@ -292,13 +298,16 @@ export interface WeatherResult {
 }
 
 export const fetchWeather = async (
-    lat: number, lon: number, altitude: number,
+    lat: number,
+    lon: number,
+    altitude: number,
     clearAltitude: boolean | undefined,
     appVersion: string,
     logger: Logger,
-    ifModifiedSince?: string
+    ifModifiedSince?: string,
 ): Promise<WeatherResult> => {
-    const uri = `https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=${lat}&lon=${lon}` +
+    const uri =
+        `https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=${lat}&lon=${lon}` +
         (!clearAltitude && altitude !== -1 ? `&altitude=${Math.round(altitude)}` : '');
     const result = await doCachedFetch(uri, appVersion, logger, ifModifiedSince);
     if (result === null) {
@@ -308,7 +317,7 @@ export const fetchWeather = async (
     logger.info(`Got weather data!`, {
         wd: weatherResult.data?.properties.meta.updated_at,
         lastModified: weatherResult.lastModified,
-        expires: weatherResult.expires
+        expires: weatherResult.expires,
     });
     return weatherResult;
 };
@@ -317,7 +326,7 @@ const parseResult = (json: any, logger: Logger): YrComplete | null => {
     try {
         const wd = JSON.parse(json) as YrComplete;
         for (const ts of wd.properties.timeseries) {
-            ts.localTime = moment(ts.time).format("DD.MM.YYYY HH:mm");
+            ts.localTime = moment(ts.time).format('DD.MM.YYYY HH:mm');
             logger.debug(`Ts: ${ts.time} (${ts.localTime})`);
         }
         return wd;
@@ -325,7 +334,7 @@ const parseResult = (json: any, logger: Logger): YrComplete | null => {
         logger.error(`Parse weather file failed.`, json);
     }
     return null;
-}
+};
 
 export const toWeatherResult = (
     result: FetchResult,
@@ -360,30 +369,21 @@ export const toWeatherResult = (
         notModified: false,
         throttled: false,
     };
-}
+};
 
 export const getDateFromPeriod = (period: string): Moment => {
     const splitted = period.split(':');
     return period.includes(':')
-        ? moment().utc()
-            .startOf('day')
-            .add(Number(splitted[0]), 'days')
-            .hour(Number(splitted[1]))
-        : moment()
-            .startOf('hour')
-            .add(Number(period), 'hours');
-}
+        ? moment().utc().startOf('day').add(Number(splitted[0]), 'days').hour(Number(splitted[1]))
+        : moment().startOf('hour').add(Number(period), 'hours');
+};
 
 export const getDateAddPeriod = (period: string): Moment => {
     const splitted = period.split(':');
     return period.includes(':')
-        ? moment().utc()
-            .startOf('day')
-            .add(Number(splitted[0]), 'days')
-            .hour(Number(splitted[1]))
-        : moment()
-            .add(Number(period), 'hours');
-}
+        ? moment().utc().startOf('day').add(Number(splitted[0]), 'days').hour(Number(splitted[1]))
+        : moment().add(Number(period), 'hours');
+};
 
 export const getTimeSeries = (wd: YrComplete, period: string, logger: Logger): YrTimeserie | null => {
     const forDate = getDateFromPeriod(period);
@@ -397,19 +397,20 @@ export const getTimeSeries = (wd: YrComplete, period: string, logger: Logger): Y
         }
     }
     return null;
-}
+};
 
 export const fetchSunrise = async (
-    lat: number, lon: number,
+    lat: number,
+    lon: number,
     period: string,
     aDate: Moment | undefined,
     appVersion: string,
     logger: Logger,
-    homey: Homey
+    homey: Homey,
 ): Promise<Sunrise> => {
     const forDate = aDate ? aDate : getDateFromPeriod(period);
-    const date = forDate.format("yyyy-MM-DD");
-    const offset = forDate.format("Z");
+    const date = forDate.format('yyyy-MM-DD');
+    const offset = forDate.format('Z');
     logger.debug(`fetchSunrise: ${lat}, ${lon}, ${date}, ${offset}`);
     const uri = `https://api.met.no/weatherapi/sunrise/3.0/sun?lat=${lat}&lon=${lon}&date=${date}&offset=${offset}`;
     const result = await doCachedFetch(uri, appVersion, logger);
@@ -425,30 +426,35 @@ export const fetchSunrise = async (
 
     logger.info(`Got sunrise data!`, sunrise);
     return sunrise;
-}
+};
 
 export const parseSunrise = async (data1: string, logger?: Logger): Promise<Sunrise | undefined> => {
     try {
         const data = JSON.parse(data1) as SunriseData;
         const hasData = data && data.properties && data.properties.sunrise && data.properties.sunset;
-        return hasData ? {
-            sunrise: data.properties.sunrise.time ? moment(data.properties.sunrise.time) : undefined,
-            sunset: data.properties.sunset.time ? moment(data.properties.sunset.time) : undefined,
-        } : undefined;
+        return hasData
+            ? {
+                  sunrise: data.properties.sunrise.time ? moment(data.properties.sunrise.time) : undefined,
+                  sunset: data.properties.sunset.time ? moment(data.properties.sunset.time) : undefined,
+              }
+            : undefined;
     } catch (err) {
         logger?.error('parseSunrise error:', err);
     }
     return undefined;
-}
+};
 
 export const fetchNowcast = async (
-    lat: number, lon: number, altitude: number,
+    lat: number,
+    lon: number,
+    altitude: number,
     clearAltitude: boolean | undefined,
     appVersion: string,
     logger: Logger,
-    ifModifiedSince?: string
+    ifModifiedSince?: string,
 ): Promise<WeatherResult> => {
-    const uri = `https://api.met.no/weatherapi/nowcast/2.0/complete?lat=${lat}&lon=${lon}` +
+    const uri =
+        `https://api.met.no/weatherapi/nowcast/2.0/complete?lat=${lat}&lon=${lon}` +
         (!clearAltitude && altitude !== -1 ? `&altitude=${Math.round(altitude)}` : '');
     const result = await doCachedFetch(uri, appVersion, logger, ifModifiedSince);
     if (result === null) {
@@ -458,10 +464,10 @@ export const fetchNowcast = async (
     logger.info(`Got nowcast data!`, {
         wd: weatherResult.data?.properties.meta.updated_at,
         lastModified: weatherResult.lastModified,
-        expires: weatherResult.expires
+        expires: weatherResult.expires,
     });
     return weatherResult;
-}
+};
 
 /**
  * Fetch textual forecast for a location.
@@ -472,10 +478,11 @@ export const fetchNowcast = async (
  * @param homey
  */
 export const fetchTextforecast = async (
-    lat: number, lon: number,
+    lat: number,
+    lon: number,
     appVersion: string,
     logger: Logger,
-    homey: Homey
+    homey: Homey,
 ): Promise<Textforecasts> => {
     const resultAreas = await doCachedFetch(`https://api.met.no/weatherapi/textforecast/2.0/areas`, appVersion, logger);
     if (resultAreas === null || !resultAreas.data) {
@@ -494,7 +501,11 @@ export const fetchTextforecast = async (
         throw new Error(homey.__('errors.textforecast_not_supported'));
     }
 
-    const resultTextforecast = await doCachedFetch(`https://api.met.no/weatherapi/textforecast/2.0/landoverview`, appVersion, logger);
+    const resultTextforecast = await doCachedFetch(
+        `https://api.met.no/weatherapi/textforecast/2.0/landoverview`,
+        appVersion,
+        logger,
+    );
     if (resultTextforecast === null || !resultTextforecast.data) {
         throw new Error(homey.__('errors.fetching_textforecast_failed'));
     }
@@ -511,7 +522,7 @@ export const fetchTextforecast = async (
     logger.info(`Got textforecast data!`, {
         ids,
         textForecast,
-        foreCasts: textForecast.map(tfc => tfc.locations[0])
+        foreCasts: textForecast.map(tfc => tfc.locations[0]),
     });
 
     return textForecast;
@@ -522,9 +533,8 @@ export const fetchTextforecast = async (
  * @param polygon
  */
 export const transformToPolygon = (polygon: string): Points => {
-    return polygon.split(' ')
-        .map(p => [Number(p.split(',')[0]), Number(p.split(',')[1])] as Point);
-}
+    return polygon.split(' ').map(p => [Number(p.split(',')[0]), Number(p.split(',')[1])] as Point);
+};
 
 const xmlParser = new xml2js.Parser(/* options */);
 
@@ -539,12 +549,12 @@ export const parseAreasFile = async (xmlFile: string, logger?: Logger): Promise<
         return areasObj.areas.area.map((a: any) => ({
             id: a['$'].id,
             areaDesc: a.areaDesc[0],
-            polygon: transformToPolygon(a.polygon[0].trim())
+            polygon: transformToPolygon(a.polygon[0].trim()),
         }));
     } catch (err) {
         logger?.error('parseAreasFile error:', err);
     }
-}
+};
 
 /**
  * Checks if a location is in a polyogn.
@@ -563,15 +573,14 @@ export const isPointInPolygon = (latitude: number, longitude: number, polygon: P
         const xj = polygon[j][0];
         const yj = polygon[j][1];
 
-        const intersect = ((yi > y) !== (yj > y)) &&
-            (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        const intersect = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
         if (intersect) {
             inside = !inside;
         }
     }
 
     return inside;
-}
+};
 
 /**
  * List area Ids for a location.
@@ -580,9 +589,8 @@ export const isPointInPolygon = (latitude: number, longitude: number, polygon: P
  * @param areas
  */
 export const findAreasIds = (latitude: number, longitude: number, areas: Areas): string[] => {
-    return areas.filter(area => isPointInPolygon(latitude, longitude, area.polygon))
-        .map(area => area.id);
-}
+    return areas.filter(area => isPointInPolygon(latitude, longitude, area.polygon)).map(area => area.id);
+};
 
 /**
  * Parse textforecast xml file to Textforecasts object.
@@ -592,22 +600,20 @@ export const findAreasIds = (latitude: number, longitude: number, areas: Areas):
 export const parseTextforecastFile = async (xmlFile: string, logger?: Logger): Promise<Textforecasts | undefined> => {
     try {
         const forecastObj = await xmlParser.parseStringPromise(xmlFile);
-        return forecastObj.textforecast.time.map((f: any) => (
-            {
-                from: moment.tz(f['$'].from, "YYYY-MM-DDThh:mm:ss", 'Europe/Oslo').format(),
-                to: moment.tz(f['$'].to, "YYYY-MM-DDThh:mm:ss", 'Europe/Oslo').format(),
-                type: f.forecasttype[0]['$'].name,
-                locations: f.forecasttype[0].location.map((l: any) => ({
-                    id: l['$'].id,
-                    name: l['$'].name,
-                    forecast: l['_']
-                }))
-            }
-        ));
+        return forecastObj.textforecast.time.map((f: any) => ({
+            from: moment.tz(f['$'].from, 'YYYY-MM-DDThh:mm:ss', 'Europe/Oslo').format(),
+            to: moment.tz(f['$'].to, 'YYYY-MM-DDThh:mm:ss', 'Europe/Oslo').format(),
+            type: f.forecasttype[0]['$'].name,
+            locations: f.forecasttype[0].location.map((l: any) => ({
+                id: l['$'].id,
+                name: l['$'].name,
+                forecast: l['_'],
+            })),
+        }));
     } catch (err) {
         logger?.error('parseTextforecastFile error:', err);
     }
-}
+};
 
 /**
  * Fetch textual forecast for a list of area Ids
@@ -619,6 +625,6 @@ export const findTextforecastFromAreaIds = (textforecasts: Textforecasts, areaId
         from: tf.from,
         to: tf.to,
         type: tf.type,
-        locations: tf.locations.filter(tfl => areaIds.includes(tfl.id))
+        locations: tf.locations.filter(tfl => areaIds.includes(tfl.id)),
     }));
-}
+};

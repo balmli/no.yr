@@ -1,8 +1,5 @@
 import moment from '../lib/moment-timezone-with-data';
-import {
-    clearSunEventCapabilities,
-    shouldRefreshSunEvents,
-} from '../lib/sunrise';
+import {clearSunEventCapabilities, shouldRefreshSunEvents} from '../lib/sunrise';
 
 describe('sunrise period changes', () => {
     const originalNow = (moment as any).now;

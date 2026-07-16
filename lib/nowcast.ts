@@ -1,10 +1,7 @@
 import {RadarCoverage, YrComplete, YrTimeserie, YrTimeseries} from './types';
 import {round2} from './math';
 
-export const NOWCAST_CAPABILITIES = [
-    'measure_minutes_raining',
-    'measure_rain.next_30_minutes',
-] as const;
+export const NOWCAST_CAPABILITIES = ['measure_minutes_raining', 'measure_rain.next_30_minutes'] as const;
 
 export function getRainingThreshold(value: number | null | undefined): number {
     return value ?? 0.1;
@@ -21,9 +18,7 @@ export function minutesUntilRain(
     horizonMinutes = 90,
 ): number | null {
     const referenceTime = reference.getTime();
-    const lastObservation = timeseries
-        .filter(series => Date.parse(series.time) < referenceTime)
-        .pop();
+    const lastObservation = timeseries.filter(series => Date.parse(series.time) < referenceTime).pop();
     if ((lastObservation?.data.instant.details.precipitation_rate ?? 0) > threshold) {
         return 0;
     }
@@ -47,8 +42,11 @@ export function isNowcastValid(
     now = new Date(),
     maximumAgeMinutes = 15,
 ): boolean {
-    if (!nowcast || cachedLocationKey !== expectedLocationKey ||
-        nowcast.properties.meta.radar_coverage !== RadarCoverage.ok) {
+    if (
+        !nowcast ||
+        cachedLocationKey !== expectedLocationKey ||
+        nowcast.properties.meta.radar_coverage !== RadarCoverage.ok
+    ) {
         return false;
     }
     const updatedAt = Date.parse(nowcast.properties.meta.updated_at);
@@ -67,6 +65,6 @@ export function mapNowcastEntry(timeserie: YrTimeserie) {
     return {
         time: timeserie.time,
         precipitationRate,
-        precipitationAmount: precipitationRate === undefined ? undefined : round2(precipitationRate * 5 / 60),
+        precipitationAmount: precipitationRate === undefined ? undefined : round2((precipitationRate * 5) / 60),
     };
 }

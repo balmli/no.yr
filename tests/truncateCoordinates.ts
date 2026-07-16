@@ -1,4 +1,3 @@
-
 import {truncate4} from '../lib/math';
 
 describe('coordinate truncation', () => {

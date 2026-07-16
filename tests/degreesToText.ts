@@ -1,8 +1,6 @@
-
 import {degreesToText} from '../lib/yr_lib';
 
 describe('degreesToText', function () {
-
     describe('Check degreesToText', function () {
         it('Check north', function () {
             expect(degreesToText(-11)).eq('N');
@@ -43,7 +41,5 @@ describe('degreesToText', function () {
             expect(degreesToText(-180)).eq('S');
             expect(degreesToText(-270)).eq('E');
         });
-
     });
-
 });

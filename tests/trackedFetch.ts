@@ -1,4 +1,3 @@
-
 import {attemptTrackedFetch} from '../lib/tracked_fetch';
 
 describe('tracked fetch', () => {

@@ -1,4 +1,3 @@
-
 import {NOWCAST_CAPABILITIES, shouldContinueNowcastPolling} from '../lib/nowcast';
 import {RadarCoverage} from '../lib/types';
 
@@ -21,9 +20,6 @@ describe('nowcast polling', () => {
     });
 
     it('manages both nowcast capabilities together', () => {
-        expect(NOWCAST_CAPABILITIES).to.deep.equal([
-            'measure_minutes_raining',
-            'measure_rain.next_30_minutes',
-        ]);
+        expect(NOWCAST_CAPABILITIES).to.deep.equal(['measure_minutes_raining', 'measure_rain.next_30_minutes']);
     });
 });

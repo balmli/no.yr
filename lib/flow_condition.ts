@@ -12,8 +12,7 @@ export interface CapabilityReader {
 }
 
 export function requireConditionValue<T>(value: T | null | undefined, field?: string): T {
-    if (value === null || value === undefined ||
-        typeof value === 'number' && !Number.isFinite(value)) {
+    if (value === null || value === undefined || (typeof value === 'number' && !Number.isFinite(value))) {
         throw new WeatherDataUnavailableError(field);
     }
     return value;
@@ -42,18 +41,10 @@ export function requireForecastTimeseries(timeseries: YrTimeseries | undefined):
     return timeseries;
 }
 
-export function capabilityIsBelow(
-    device: CapabilityReader,
-    capabilityId: string,
-    threshold: number,
-): boolean {
+export function capabilityIsBelow(device: CapabilityReader, capabilityId: string, threshold: number): boolean {
     return requireConditionNumber(device.getCapabilityValue(capabilityId), capabilityId) < threshold;
 }
 
-export function capabilityEquals(
-    device: CapabilityReader,
-    capabilityId: string,
-    expected: string,
-): boolean {
+export function capabilityEquals(device: CapabilityReader, capabilityId: string, expected: string): boolean {
     return requireConditionString(device.getCapabilityValue(capabilityId), capabilityId) === expected;
 }

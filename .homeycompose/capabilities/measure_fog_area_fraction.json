@@ -1,15 +1,15 @@
 {
-    "type": "number",
-    "title": {
-        "en": "Fog",
-        "no": "Tåke"
-    },
-    "uiComponent": "sensor",
-    "getable": true,
-    "setable": false,
-    "insights": false,
-    "units": {
-        "en": "%"
-    },
-    "icon": "/assets/icon-partly-cloudy.svg"
+  "type": "number",
+  "title": {
+    "en": "Fog",
+    "no": "Tåke"
+  },
+  "uiComponent": "sensor",
+  "getable": true,
+  "setable": false,
+  "insights": false,
+  "units": {
+    "en": "%"
+  },
+  "icon": "/assets/icon-partly-cloudy.svg"
 }

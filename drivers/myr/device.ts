@@ -1,12 +1,12 @@
-import Homey from "homey";
+import Homey from 'homey';
 
 import Logger from '@balmli/homey-logger';
 
-import moment from "../../lib/moment-timezone-with-data";
+import moment from '../../lib/moment-timezone-with-data';
 import {RadarCoverage, Textforecasts, YrComplete, YrTimeserie, YrTimeseries} from '../../lib/types';
-import {WeatherLegends} from "../../lib/legends";
-import * as yrlib from "../../lib/yr_lib";
-import {round2, truncate4} from "../../lib/math";
+import {WeatherLegends} from '../../lib/legends';
+import * as yrlib from '../../lib/yr_lib';
+import {round2, truncate4} from '../../lib/math';
 import {clearLocationCapabilityValues, invalidateLocationCaches} from '../../lib/location_cache';
 import {
     isNowcastValid,
@@ -24,7 +24,6 @@ import {applyFetchedDataIfDue, millisecondsUntilUpdateDeadline} from '../../lib/
 import {applyFetchAvailability} from '../../lib/fetch_availability';
 
 module.exports = class YrDevice extends Homey.Device {
-
     logger!: Logger;
     _deleted?: boolean;
     _weatherData!: YrComplete | null;
@@ -66,33 +65,31 @@ module.exports = class YrDevice extends Homey.Device {
     async migrate(): Promise<void> {
         try {
             if (!this.hasCapability('sunrise_time')) {
-                await this.addCapability('sunrise_time')
+                await this.addCapability('sunrise_time');
             }
             if (!this.hasCapability('sunset_time')) {
-                await this.addCapability('sunset_time')
+                await this.addCapability('sunset_time');
             }
             if (this.hasCapability('measure_wind_strength')) {
-                await this.removeCapability('measure_wind_strength')
+                await this.removeCapability('measure_wind_strength');
             }
             if (this.hasCapability('measure_gust_strength')) {
-                await this.removeCapability('measure_gust_strength')
+                await this.removeCapability('measure_gust_strength');
             }
             if (!this.hasCapability('measure_wind_strength1')) {
-                await this.addCapability('measure_wind_strength1')
+                await this.addCapability('measure_wind_strength1');
             }
             if (!this.hasCapability('measure_gust_strength1')) {
-                await this.addCapability('measure_gust_strength1')
+                await this.addCapability('measure_gust_strength1');
             }
         } catch (err) {
             this.logger.error('migration failed', err);
         }
     }
 
-    async initialize(): Promise<void> {
-    }
+    async initialize(): Promise<void> {}
 
-    onAdded(): void {
-    }
+    onAdded(): void {}
 
     onDeleted() {
         this._deleted = true;
@@ -103,7 +100,11 @@ module.exports = class YrDevice extends Homey.Device {
         this.logger.verbose(this.getName() + ' -> device deleted');
     }
 
-    async onSettings({oldSettings, newSettings, changedKeys}: {
+    async onSettings({
+        oldSettings,
+        newSettings,
+        changedKeys,
+    }: {
         oldSettings: any;
         newSettings: any;
         changedKeys: string[];
@@ -227,12 +228,16 @@ module.exports = class YrDevice extends Homey.Device {
 
             // Use cached Last-Modified header for conditional request
             const fetchAttempt = await attemptTrackedFetch(
-                () => yrlib.fetchWeather(
-                    lat, lon, altitude,
-                    this._clearAltitude,
-                    this.homey.manifest.version,
-                    this.logger,
-                    this._weatherLastModified),
+                () =>
+                    yrlib.fetchWeather(
+                        lat,
+                        lon,
+                        altitude,
+                        this._clearAltitude,
+                        this.homey.manifest.version,
+                        this.logger,
+                        this._weatherLastModified,
+                    ),
                 this.setDeviceUnavailable.bind(this),
             );
             if (!fetchAttempt.ok) {
@@ -270,16 +275,21 @@ module.exports = class YrDevice extends Homey.Device {
             if (this._weatherData && weatherFetchSucceeded) {
                 try {
                     const sunrise = await yrlib.fetchSunrise(
-                        lat, lon,
+                        lat,
+                        lon,
                         settings.period,
                         undefined,
                         this.homey.manifest.version,
                         this.logger,
-                        this.homey
+                        this.homey,
                     );
                     if (sunrise) {
-                        await this.setCapabilityValue('sunrise_time', formatSunEvent(sunrise.sunrise)).catch(err => this.logger.error(err));
-                        await this.setCapabilityValue('sunset_time', formatSunEvent(sunrise.sunset)).catch(err => this.logger.error(err));
+                        await this.setCapabilityValue('sunrise_time', formatSunEvent(sunrise.sunrise)).catch(err =>
+                            this.logger.error(err),
+                        );
+                        await this.setCapabilityValue('sunset_time', formatSunEvent(sunrise.sunset)).catch(err =>
+                            this.logger.error(err),
+                        );
                     }
                 } catch (err1) {
                     await this.setCapabilityValue('sunrise_time', '-').catch(err => this.logger.error(err));
@@ -288,10 +298,11 @@ module.exports = class YrDevice extends Homey.Device {
                 }
                 try {
                     this._textualForecast = await yrlib.fetchTextforecast(
-                        lat, lon,
+                        lat,
+                        lon,
                         this.homey.manifest.version,
                         this.logger,
-                        this.homey
+                        this.homey,
                     );
                 } catch (err2) {
                     // TODO ikke logg hvis lat/lon ikke er støttet
@@ -340,7 +351,7 @@ module.exports = class YrDevice extends Homey.Device {
         if (seconds === undefined) {
             const syncTime = this.getStoreValue('syncTime') % 300;
             const now = new Date();
-            seconds = syncTime - (now.getMinutes() * 60 + now.getSeconds()) % 300;
+            seconds = syncTime - ((now.getMinutes() * 60 + now.getSeconds()) % 300);
             seconds = seconds <= 0 ? seconds + 300 : seconds;
             seconds = honorCacheExpiry(seconds, this._nowcastExpires, now);
         } else {
@@ -368,11 +379,14 @@ module.exports = class YrDevice extends Homey.Device {
 
             // Use cached Last-Modified header for conditional request
             const nowcastResult = await yrlib.fetchNowcast(
-                lat, lon, altitude,
+                lat,
+                lon,
+                altitude,
                 this._clearAltitude,
                 this.homey.manifest.version,
                 this.logger,
-                this._nowcastLastModified);
+                this._nowcastLastModified,
+            );
 
             // If data was fetched (not 304 response)
             if (nowcastResult.data) {
@@ -530,7 +544,10 @@ module.exports = class YrDevice extends Homey.Device {
         const delayMilliseconds = millisecondsUntilUpdateDeadline(deadline);
         this._updateNowcastDeviceDeadline = deadline;
         this.logger.debug(`Next update device with nowcast data in ${delayMilliseconds / 1000} seconds`);
-        this._updateNowcastDeviceTimeout = this.homey.setTimeout(this.doUpdateNowcastDevice.bind(this), delayMilliseconds);
+        this._updateNowcastDeviceTimeout = this.homey.setTimeout(
+            this.doUpdateNowcastDevice.bind(this),
+            delayMilliseconds,
+        );
     }
 
     scheduleUpdateNowcastDevice(seconds?: number) {
@@ -563,50 +580,79 @@ module.exports = class YrDevice extends Homey.Device {
 
     updateLocation = async (wd: YrComplete): Promise<void> => {
         const coords = wd.geometry.coordinates;
-        if (this._clearAltitude === true || this.getSetting('altitude') === -1 &&
-            coords &&
-            coords.length > 2) {
+        if (this._clearAltitude === true || (this.getSetting('altitude') === -1 && coords && coords.length > 2)) {
             const lon = coords[0];
             const lat = coords[1];
             const altitude = Math.round(coords[2]);
             await this.setSettings({
                 lon,
                 lat,
-                altitude
+                altitude,
             });
         }
-    }
+    };
 
     updateDevice = async (wd: YrComplete): Promise<void> => {
         const ts = yrlib.getTimeSeries(wd, this.getSetting('period'), this.logger);
         if (ts) {
             await this.setCapabilityValue('forecast_time', ts.localTime).catch(err => this.logger.error(err));
 
-            const symbolCode = ts.data.next_1_hours ? ts.data.next_1_hours?.summary.symbol_code :
-                ts.data.next_6_hours ? ts.data.next_6_hours?.summary.symbol_code :
-                    ts.data.next_12_hours ? ts.data.next_12_hours?.summary.symbol_code : undefined;
+            const symbolCode = ts.data.next_1_hours
+                ? ts.data.next_1_hours?.summary.symbol_code
+                : ts.data.next_6_hours
+                  ? ts.data.next_6_hours?.summary.symbol_code
+                  : ts.data.next_12_hours
+                    ? ts.data.next_12_hours?.summary.symbol_code
+                    : undefined;
 
             if (symbolCode) {
-                await this.setCapabilityValue('weather_description', yrlib.weatherLegend(symbolCode, this.homey.i18n.getLanguage())).catch(err => this.logger.error(err));
+                await this.setCapabilityValue(
+                    'weather_description',
+                    yrlib.weatherLegend(symbolCode, this.homey.i18n.getLanguage()),
+                ).catch(err => this.logger.error(err));
             }
 
             await this.updateCapability('measure_temperature', ts.data.instant.details.air_temperature);
-            await this.updateCapability('measure_temperature.feels_like', yrlib.calculateFeelsLike(ts.data.instant.details));
-            await this.updateCapability('measure_temperature.min_next_6_hours', ts.data.next_6_hours?.details.air_temperature_min);
-            await this.updateCapability('measure_temperature.max_next_6_hours', ts.data.next_6_hours?.details.air_temperature_max);
+            await this.updateCapability(
+                'measure_temperature.feels_like',
+                yrlib.calculateFeelsLike(ts.data.instant.details),
+            );
+            await this.updateCapability(
+                'measure_temperature.min_next_6_hours',
+                ts.data.next_6_hours?.details.air_temperature_min,
+            );
+            await this.updateCapability(
+                'measure_temperature.max_next_6_hours',
+                ts.data.next_6_hours?.details.air_temperature_max,
+            );
             await this.updateCapability('measure_pressure', ts.data.instant.details.air_pressure_at_sea_level);
             await this.updateCapability('measure_humidity', ts.data.instant.details.relative_humidity);
             await this.updateCapability('measure_rain.next_1_hour', ts.data.next_1_hours?.details.precipitation_amount);
-            await this.updateCapability('measure_rain_next_1_hour', ts.data.next_1_hours?.details.probability_of_precipitation); // Not supported for all places
-            await this.updateCapability('measure_rain.next_6_hours', ts.data.next_6_hours?.details.precipitation_amount);
-            await this.updateCapability('measure_rain_next_6_hours', ts.data.next_6_hours?.details.probability_of_precipitation); // Not supported for all places
+            await this.updateCapability(
+                'measure_rain_next_1_hour',
+                ts.data.next_1_hours?.details.probability_of_precipitation,
+            ); // Not supported for all places
+            await this.updateCapability(
+                'measure_rain.next_6_hours',
+                ts.data.next_6_hours?.details.precipitation_amount,
+            );
+            await this.updateCapability(
+                'measure_rain_next_6_hours',
+                ts.data.next_6_hours?.details.probability_of_precipitation,
+            ); // Not supported for all places
             await this.updateCapability('measure_cloud_area_fraction', ts.data.instant.details.cloud_area_fraction);
             await this.updateCapability('measure_fog_area_fraction', ts.data.instant.details.fog_area_fraction);
             await this.updateCapability('measure_wind_strength1', ts.data.instant.details.wind_speed);
-            await this.updateCapability('measure_wind_direction', yrlib.degreesToText(ts.data.instant.details.wind_from_direction as number));
+            await this.updateCapability(
+                'measure_wind_direction',
+                yrlib.degreesToText(ts.data.instant.details.wind_from_direction as number),
+            );
             await this.updateCapability('measure_gust_strength1', ts.data.instant.details.wind_speed_of_gust); // Not supported for all places
             await this.updateCapability('measure_wind_angle', ts.data.instant.details.wind_from_direction);
-            await this.updateCapability('measure_thunder_next_1_hour', ts.data.next_1_hours?.details.probability_of_thunder); // Not supported for all places
+            await this.updateCapability(
+                'measure_thunder_next_1_hour',
+                ts.data.next_1_hours?.details.probability_of_thunder,
+            ); // Not supported for all places
             await this.updateCapability('measure_ultraviolet', ts.data.instant.details.ultraviolet_index_clear_sky);
 
             if (symbolCode) {
@@ -616,29 +662,30 @@ module.exports = class YrDevice extends Homey.Device {
                     all_data: JSON.stringify({
                         time: ts.time,
                         localTime: ts.localTime,
-                        ...ts.data
-                    })
+                        ...ts.data,
+                    }),
                 };
                 this.logger.info('Updated device: ', tokens);
-                await this.homey.flow.getDeviceTriggerCard('01_weather_changed').trigger(this, tokens).catch(err => this.logger.error(err));
+                await this.homey.flow
+                    .getDeviceTriggerCard('01_weather_changed')
+                    .trigger(this, tokens)
+                    .catch(err => this.logger.error(err));
             } else {
                 this.logger.info('Updated device: ', ts.localTime);
             }
         }
-    }
+    };
 
     updateDeviceNowcast = async (_wd: YrComplete | null, nowcast: YrComplete | null): Promise<boolean> => {
         const period = this.getSetting('period');
         const rainingThreshold = getRainingThreshold(this.getSetting('raining_threshold'));
 
         const now = yrlib.getDateAddPeriod(period);
-        const tsAfter = nowcast ? nowcast.properties.timeseries
-            .filter(ts => moment(ts.time).isSameOrAfter(now)) : [];
+        const tsAfter = nowcast ? nowcast.properties.timeseries.filter(ts => moment(ts.time).isSameOrAfter(now)) : [];
 
         const settings = this.getSettings();
         const expectedLocationKey = nowcastLocationKey(truncate4(settings.lat), truncate4(settings.lon));
-        if (!isNowcastValid(nowcast, this._nowcastLocationKey, expectedLocationKey) ||
-            tsAfter.length === 0) {
+        if (!isNowcastValid(nowcast, this._nowcastLocationKey, expectedLocationKey) || tsAfter.length === 0) {
             await this.removeNowcastCapabilities();
             return false;
         }
@@ -650,12 +697,17 @@ module.exports = class YrDevice extends Homey.Device {
         }
 
         const next30Minutes = tsAfter.slice(0, 6);
-        const rainNext30Minutes = round2(next30Minutes
-            .reduce((acc, ts) => {
+        const rainNext30Minutes = round2(
+            next30Minutes.reduce((acc, ts) => {
                 const rate = ts.data?.instant?.details?.precipitation_rate || 0;
-                return acc + rate * 5 / 60;
-            }, 0));
-        this.logger.debug('Rain next 30 minutes: ', next30Minutes.map(ts => ts.data.instant.details.precipitation_rate), rainNext30Minutes);
+                return acc + (rate * 5) / 60;
+            }, 0),
+        );
+        this.logger.debug(
+            'Rain next 30 minutes: ',
+            next30Minutes.map(ts => ts.data.instant.details.precipitation_rate),
+            rainNext30Minutes,
+        );
 
         const minutesUntilStartsRaining = minutesUntilRain(
             nowcast!.properties.timeseries,
@@ -666,22 +718,23 @@ module.exports = class YrDevice extends Homey.Device {
         await this.updateCapability('measure_minutes_raining', minutesUntilStartsRaining);
         await this.updateCapability('measure_rain.next_30_minutes', rainNext30Minutes);
         return true;
-    }
+    };
 
     updateCapability = async (capabilityId: string, value: any): Promise<void> => {
         if (this.hasCapability(capabilityId) && hasCapabilityValue(value)) {
             await this.setCapabilityValue(capabilityId, value).catch(err => this.logger.error(err));
         }
-    }
+    };
 
     async onWeatherAutocomplete(query: any, _args: any) {
         const lang = this.homey.i18n.getLanguage();
-        return Object.entries(WeatherLegends).map((wl: any) => {
-            return {
-                id: wl[0],
-                name: lang === 'no' ? wl[1].desc_nb : wl[1].desc_en
-            };
-        })
+        return Object.entries(WeatherLegends)
+            .map((wl: any) => {
+                return {
+                    id: wl[0],
+                    name: lang === 'no' ? wl[1].desc_nb : wl[1].desc_en,
+                };
+            })
             .sort((a, b) => a.name.localeCompare(b.name, lang))
             .filter((result: any) => {
                 return result.name.toLowerCase().indexOf(query.toLowerCase()) > -1;
@@ -692,27 +745,70 @@ module.exports = class YrDevice extends Homey.Device {
         return [...Array(24).keys()]
             .map(hour => ({
                 id: `${hour}`,
-                name: hour === 0 ? this.homey.__('time.now') : hour === 1 ? this.homey.__('time.hour') : this.homey.__('time.hours', {hour}),
+                name:
+                    hour === 0
+                        ? this.homey.__('time.now')
+                        : hour === 1
+                          ? this.homey.__('time.hour')
+                          : this.homey.__('time.hours', {hour}),
             }))
             .filter((result: any) => {
                 return result.name.toLowerCase().indexOf(query.toLowerCase()) > -1;
             });
     }
 
-    async nextHoursComparer(args: any, _state: any, compareFunc: (ts: YrTimeserie, value: number) => boolean): Promise<any> {
-        return yrlib.nextHoursComparer(undefined, args, this._weatherData?.properties.timeseries as YrTimeseries, compareFunc);
+    async nextHoursComparer(
+        args: any,
+        _state: any,
+        compareFunc: (ts: YrTimeserie, value: number) => boolean,
+    ): Promise<any> {
+        return yrlib.nextHoursComparer(
+            undefined,
+            args,
+            this._weatherData?.properties.timeseries as YrTimeseries,
+            compareFunc,
+        );
     }
 
-    async periodComparer(args: any, _state: any, compareFunc: (ts: YrTimeserie, value: number) => boolean): Promise<any> {
-        return yrlib.periodComparer(undefined, args, this._weatherData?.properties.timeseries as YrTimeseries, compareFunc);
+    async periodComparer(
+        args: any,
+        _state: any,
+        compareFunc: (ts: YrTimeserie, value: number) => boolean,
+    ): Promise<any> {
+        return yrlib.periodComparer(
+            undefined,
+            args,
+            this._weatherData?.properties.timeseries as YrTimeseries,
+            compareFunc,
+        );
     }
 
-    nextHoursSum(args: any, sumSelector: (ts: YrTimeserie) => number, compareFunc: (sum: number | undefined, value: number) => boolean): any {
-        return yrlib.nextHoursSum(undefined, args, this._weatherData?.properties.timeseries as YrTimeseries, sumSelector, compareFunc);
+    nextHoursSum(
+        args: any,
+        sumSelector: (ts: YrTimeserie) => number,
+        compareFunc: (sum: number | undefined, value: number) => boolean,
+    ): any {
+        return yrlib.nextHoursSum(
+            undefined,
+            args,
+            this._weatherData?.properties.timeseries as YrTimeseries,
+            sumSelector,
+            compareFunc,
+        );
     }
 
-    periodSum(args: any, sumSelector: (ts: YrTimeserie) => number, compareFunc: (sum: number | undefined, value: number) => boolean): any {
-        return yrlib.periodSum(undefined, args, this._weatherData?.properties.timeseries as YrTimeseries, sumSelector, compareFunc);
+    periodSum(
+        args: any,
+        sumSelector: (ts: YrTimeserie) => number,
+        compareFunc: (sum: number | undefined, value: number) => boolean,
+    ): any {
+        return yrlib.periodSum(
+            undefined,
+            args,
+            this._weatherData?.properties.timeseries as YrTimeseries,
+            sumSelector,
+            compareFunc,
+        );
     }
 
     async textforecastAction(args: any, _state: any): Promise<any> {
@@ -726,7 +822,7 @@ module.exports = class YrDevice extends Homey.Device {
                 from: forecast.from,
                 to: forecast.to,
                 location: forecast.locations[0].name,
-                forecast: forecast.locations[0].forecast
+                forecast: forecast.locations[0].forecast,
             };
         } catch (err) {
             this.logger.error('Unable send forecast data', err);
@@ -745,12 +841,11 @@ module.exports = class YrDevice extends Homey.Device {
         try {
             const forecast = JSON.stringify(this._nowcastData!.properties.timeseries);
             return {
-                forecast
+                forecast,
             };
         } catch (err) {
             this.logger.error('Unable send nowcast data', err);
             throw new Error(this.homey.__('errors.unable_to_send_nowcast'));
         }
     }
-
-}
+};

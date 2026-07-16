@@ -7,7 +7,7 @@ import {getSourceTiming} from './lib/api_metadata';
 import {parseForecastHours} from './lib/api_query';
 
 module.exports = {
-    async getWeather({homey, params}: { homey: any, params: { deviceId: string } }) {
+    async getWeather({homey, params}: {homey: any; params: {deviceId: string}}) {
         const device = homey.drivers.getDriver('myr').getDevice({id: params.deviceId});
 
         if (!device) {
@@ -33,7 +33,7 @@ module.exports = {
             generatedAt,
             ...getSourceTiming(weatherData, (device as any)._weatherRetrievedAt, (device as any)._weatherExpires),
             attribution: MET_ATTRIBUTION,
-            current: {}
+            current: {},
         };
 
         // Read all capability values
@@ -47,11 +47,7 @@ module.exports = {
         return currentWeather;
     },
 
-    async getForecast({homey, params, query}: {
-        homey: any,
-        params: { deviceId: string },
-        query: { hours?: string }
-    }) {
+    async getForecast({homey, params, query}: {homey: any; params: {deviceId: string}; query: {hours?: string}}) {
         const device = homey.drivers.getDriver('myr').getDevice({id: params.deviceId});
 
         if (!device) {
@@ -97,28 +93,34 @@ module.exports = {
             forecast: filteredTimeseries.map((ts: YrTimeserie) => ({
                 time: ts.time,
                 instant: mapForecastInstant(ts.data.instant.details),
-                next1Hour: ts.data.next_1_hours ? {
-                    symbolCode: ts.data.next_1_hours.summary.symbol_code,
-                    precipitationAmount: ts.data.next_1_hours.details.precipitation_amount,
-                    precipitationAmountMin: ts.data.next_1_hours.details.precipitation_amount_min,
-                    precipitationAmountMax: ts.data.next_1_hours.details.precipitation_amount_max,
-                    probabilityOfPrecipitation: ts.data.next_1_hours.details.probability_of_precipitation,
-                    probabilityOfThunder: ts.data.next_1_hours.details.probability_of_thunder,
-                } : undefined,
-                next6Hours: ts.data.next_6_hours ? {
-                    symbolCode: ts.data.next_6_hours.summary.symbol_code,
-                    airTemperatureMin: ts.data.next_6_hours.details.air_temperature_min,
-                    airTemperatureMax: ts.data.next_6_hours.details.air_temperature_max,
-                    precipitationAmount: ts.data.next_6_hours.details.precipitation_amount,
-                    precipitationAmountMin: ts.data.next_6_hours.details.precipitation_amount_min,
-                    precipitationAmountMax: ts.data.next_6_hours.details.precipitation_amount_max,
-                    probabilityOfPrecipitation: ts.data.next_6_hours.details.probability_of_precipitation,
-                } : undefined,
-                next12Hours: ts.data.next_12_hours ? {
-                    symbolCode: ts.data.next_12_hours.summary.symbol_code,
-                    probabilityOfPrecipitation: ts.data.next_12_hours.details.probability_of_precipitation,
-                } : undefined,
-            }))
+                next1Hour: ts.data.next_1_hours
+                    ? {
+                          symbolCode: ts.data.next_1_hours.summary.symbol_code,
+                          precipitationAmount: ts.data.next_1_hours.details.precipitation_amount,
+                          precipitationAmountMin: ts.data.next_1_hours.details.precipitation_amount_min,
+                          precipitationAmountMax: ts.data.next_1_hours.details.precipitation_amount_max,
+                          probabilityOfPrecipitation: ts.data.next_1_hours.details.probability_of_precipitation,
+                          probabilityOfThunder: ts.data.next_1_hours.details.probability_of_thunder,
+                      }
+                    : undefined,
+                next6Hours: ts.data.next_6_hours
+                    ? {
+                          symbolCode: ts.data.next_6_hours.summary.symbol_code,
+                          airTemperatureMin: ts.data.next_6_hours.details.air_temperature_min,
+                          airTemperatureMax: ts.data.next_6_hours.details.air_temperature_max,
+                          precipitationAmount: ts.data.next_6_hours.details.precipitation_amount,
+                          precipitationAmountMin: ts.data.next_6_hours.details.precipitation_amount_min,
+                          precipitationAmountMax: ts.data.next_6_hours.details.precipitation_amount_max,
+                          probabilityOfPrecipitation: ts.data.next_6_hours.details.probability_of_precipitation,
+                      }
+                    : undefined,
+                next12Hours: ts.data.next_12_hours
+                    ? {
+                          symbolCode: ts.data.next_12_hours.summary.symbol_code,
+                          probabilityOfPrecipitation: ts.data.next_12_hours.details.probability_of_precipitation,
+                      }
+                    : undefined,
+            })),
         };
 
         // Add nowcast data if available (Nordic countries only)
@@ -135,19 +137,19 @@ module.exports = {
 
             forecastResponse.nowcast = {
                 available: true,
-                data: filteredNowcast.map(mapNowcastEntry)
+                data: filteredNowcast.map(mapNowcastEntry),
             };
         } else {
             forecastResponse.nowcast = {
                 available: false,
-                reason: 'Nowcast is unavailable, stale, or outside radar coverage'
+                reason: 'Nowcast is unavailable, stale, or outside radar coverage',
             };
         }
 
         return forecastResponse;
     },
 
-    async getDevices({homey}: { homey: any }) {
+    async getDevices({homey}: {homey: any}) {
         const driver = homey.drivers.getDriver('myr');
         const devices = driver.getDevices();
 
@@ -159,7 +161,7 @@ module.exports = {
                 latitude: device.getSetting('lat'),
                 longitude: device.getSetting('lon'),
                 altitude: device.getSetting('altitude'),
-            }
+            },
         }));
-    }
+    },
 };
