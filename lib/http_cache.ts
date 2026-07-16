@@ -4,6 +4,7 @@ export interface CacheableFetchResult {
     expires?: string;
     retrievedAt?: string;
     notModified: boolean;
+    throttled?: boolean;
 }
 
 type Fetcher = (ifModifiedSince?: string) => Promise<CacheableFetchResult | null>;

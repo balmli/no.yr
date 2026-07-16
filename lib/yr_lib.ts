@@ -193,7 +193,7 @@ export const doFetch = async (
         logger.warn(`MET request suppressed by application-wide rate-limit backoff`, {
             retryInSeconds: Math.ceil(remainingBackoff / 1000),
         });
-        return null;
+        return {data: null, notModified: false, throttled: true};
     }
     const start = Date.now();
     const userAgent = `WeatherForecastHomeyApp/${appVersion} github.com/balmli/weather.forecast`;
@@ -237,7 +237,7 @@ export const doFetch = async (
             statusMessage,
             message: 'Too many requests. Please reduce request frequency.'
         });
-        return null;
+        return {data: null, notModified: false, throttled: true};
     } else if (statusCode !== 200 && statusCode !== 203) {
         logger.error(`Fetching "${uri}" failed:`, {
             statusCode,
@@ -288,6 +288,7 @@ export interface WeatherResult {
     expires?: string;
     retrievedAt?: string;
     notModified: boolean;
+    throttled: boolean;
 }
 
 export const fetchWeather = async (
@@ -301,7 +302,7 @@ export const fetchWeather = async (
         (!clearAltitude && altitude !== -1 ? `&altitude=${Math.round(altitude)}` : '');
     const result = await doCachedFetch(uri, appVersion, logger, ifModifiedSince);
     if (result === null) {
-        return {data: null, notModified: false};
+        return {data: null, notModified: false, throttled: false};
     }
     const weatherResult = toWeatherResult(result, ifModifiedSince, logger);
     logger.info(`Got weather data!`, {
@@ -331,6 +332,16 @@ export const toWeatherResult = (
     ifModifiedSince: string | undefined,
     logger: Logger,
 ): WeatherResult => {
+    if (result.throttled) {
+        return {
+            data: null,
+            lastModified: result.lastModified,
+            expires: result.expires,
+            retrievedAt: result.retrievedAt,
+            notModified: false,
+            throttled: true,
+        };
+    }
     if (result.notModified) {
         return {
             data: null,
@@ -338,6 +349,7 @@ export const toWeatherResult = (
             expires: result.expires,
             retrievedAt: result.retrievedAt,
             notModified: true,
+            throttled: false,
         };
     }
     return {
@@ -346,6 +358,7 @@ export const toWeatherResult = (
         expires: result.expires,
         retrievedAt: result.retrievedAt,
         notModified: false,
+        throttled: false,
     };
 }
 
@@ -439,7 +452,7 @@ export const fetchNowcast = async (
         (!clearAltitude && altitude !== -1 ? `&altitude=${Math.round(altitude)}` : '');
     const result = await doCachedFetch(uri, appVersion, logger, ifModifiedSince);
     if (result === null) {
-        return {data: null, notModified: false};
+        return {data: null, notModified: false, throttled: false};
     }
     const weatherResult = toWeatherResult(result, ifModifiedSince, logger);
     logger.info(`Got nowcast data!`, {

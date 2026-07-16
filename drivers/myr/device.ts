@@ -21,6 +21,7 @@ import {honorCacheExpiry} from '../../lib/cache_schedule';
 import {hasCapabilityValue} from '../../lib/capability_value';
 import {clearSunEventCapabilities, formatSunEvent, shouldRefreshSunEvents} from '../../lib/sunrise';
 import {applyFetchedDataIfDue, millisecondsUntilUpdateDeadline} from '../../lib/update_schedule';
+import {applyFetchAvailability} from '../../lib/fetch_availability';
 
 module.exports = class YrDevice extends Homey.Device {
 
@@ -240,6 +241,11 @@ module.exports = class YrDevice extends Homey.Device {
             }
             const weatherResult = fetchAttempt.value;
             weatherFetchSucceeded = !!weatherResult.data || weatherResult.notModified;
+            await applyFetchAvailability(
+                weatherResult,
+                this.setDeviceAvailable.bind(this),
+                this.setDeviceUnavailable.bind(this),
+            );
 
             // If data was fetched (not 304 response)
             if (weatherResult.data) {
@@ -248,7 +254,6 @@ module.exports = class YrDevice extends Homey.Device {
                 this._weatherExpires = weatherResult.expires;
                 this._weatherRetrievedAt = weatherResult.retrievedAt;
 
-                await this.setDeviceAvailable();
                 await this.updateLocation(this._weatherData);
                 await this.updateCapabilities(this._weatherData);
             } else if (weatherResult.notModified) {
@@ -257,10 +262,8 @@ module.exports = class YrDevice extends Homey.Device {
                 this._weatherExpires = weatherResult.expires ?? this._weatherExpires;
                 this._weatherRetrievedAt = weatherResult.retrievedAt ?? this._weatherRetrievedAt;
                 this.logger.info('Using cached weather data (HTTP 304)');
-                await this.setDeviceAvailable();
-            } else {
-                // Fetch failed (null response)
-                await this.setDeviceUnavailable();
+            } else if (weatherResult.throttled) {
+                this.logger.info('Weather fetch skipped due to application-wide rate-limit backoff');
             }
 
             // Only fetch sunrise/sunset and textual forecast if we have valid weather data
@@ -390,6 +393,8 @@ module.exports = class YrDevice extends Homey.Device {
                 this._nowcastExpires = nowcastResult.expires ?? this._nowcastExpires;
                 this.logger.info('Using cached nowcast data (HTTP 304)');
                 nowcastFetchSucceeded = this._nowcastData !== null;
+            } else if (nowcastResult.throttled) {
+                this.logger.info('Nowcast fetch skipped due to application-wide rate-limit backoff');
             } else {
                 // A null result can be a transient HTTP or parsing failure. Clear stale
                 // values and keep polling until the API confirms permanent no-coverage.

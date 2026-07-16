@@ -69,7 +69,8 @@ describe('native MET fetch transport', () => {
         expect(warnings[0][1]).to.deep.include({statusCode: 203, endpoint: '/203'});
         expect(await doFetch(`${origin}/304`, '1', logger, undefined, 500)).to.deep.include({notModified: true});
         expect(await doFetch(`${origin}/422`, '1', logger, undefined, 500)).to.equal(null);
-        expect(await doFetch(`${origin}/429`, '1', logger, undefined, 500, new RateLimitBackoff())).to.equal(null);
+        expect(await doFetch(`${origin}/429`, '1', logger, undefined, 500, new RateLimitBackoff()))
+            .to.deep.equal({data: null, notModified: false, throttled: true});
         expect(await doFetch(`${origin}/500`, '1', logger, undefined, 500)).to.equal(null);
     });
 
@@ -86,8 +87,10 @@ describe('native MET fetch transport', () => {
     it('suppresses all subsequent requests immediately after a 429', async () => {
         const limiter = new RateLimitBackoff();
         const before = requestCount;
-        expect(await doFetch(`${origin}/429`, '1', logger, undefined, 500, limiter)).to.equal(null);
-        expect(await doFetch(`${origin}/200`, '1', logger, undefined, 500, limiter)).to.equal(null);
+        expect(await doFetch(`${origin}/429`, '1', logger, undefined, 500, limiter))
+            .to.deep.equal({data: null, notModified: false, throttled: true});
+        expect(await doFetch(`${origin}/200`, '1', logger, undefined, 500, limiter))
+            .to.deep.equal({data: null, notModified: false, throttled: true});
         expect(requestCount).to.equal(before + 1);
     });
 

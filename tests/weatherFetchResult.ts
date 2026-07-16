@@ -33,6 +33,24 @@ describe('weather fetch result', () => {
             expires: undefined,
             retrievedAt: undefined,
             notModified: true,
+            throttled: false,
+        });
+    });
+
+    it('preserves an explicit throttled result', () => {
+        const result = toWeatherResult({
+            data: null,
+            notModified: false,
+            throttled: true,
+        }, undefined, logger);
+
+        expect(result).to.deep.equal({
+            data: null,
+            lastModified: undefined,
+            expires: undefined,
+            retrievedAt: undefined,
+            notModified: false,
+            throttled: true,
         });
     });
 });
