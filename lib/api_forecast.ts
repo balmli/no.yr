@@ -2,15 +2,9 @@ import {InstantDetails} from './types';
 import {calculateFeelsLike} from './yr_lib';
 
 export function mapForecastInstant(details: InstantDetails) {
-    const canCalculateFeelsLike = [
-        details.air_temperature,
-        details.relative_humidity,
-        details.wind_speed,
-    ].every(value => typeof value === 'number');
-
     return {
         temperature: details.air_temperature,
-        feelsLike: canCalculateFeelsLike ? calculateFeelsLike(details) : undefined,
+        feelsLike: calculateFeelsLike(details),
         windSpeed: details.wind_speed,
         windFromDirection: details.wind_from_direction,
         windSpeedOfGust: details.wind_speed_of_gust,

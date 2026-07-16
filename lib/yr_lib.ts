@@ -157,7 +157,15 @@ export const degreesToText = (num: number): string => {
     return degs[val];
 }
 
-export const calculateFeelsLike = (instant: InstantDetails): number => {
+export const calculateFeelsLike = (instant: InstantDetails): number | undefined => {
+    const canCalculate = [
+        instant.air_temperature,
+        instant.relative_humidity,
+        instant.wind_speed,
+    ].every(value => typeof value === 'number');
+    if (!canCalculate) {
+        return undefined;
+    }
     const config = {
         temp: instant.air_temperature,
         humidity: instant.relative_humidity,

@@ -22,5 +22,11 @@ describe('calculateFeelsLike', function () {
             expect(calculateFeelsLike({ air_temperature: 20, relative_humidity: 95, wind_speed: 10 } as InstantDetails)).eq(22.4);
             expect(calculateFeelsLike({ air_temperature: 20, relative_humidity: 100, wind_speed: 10 } as InstantDetails)).eq(22.7);
         });
+        it('omits feels-like when any required input is missing', function () {
+            expect(calculateFeelsLike({ air_temperature: 20 } as InstantDetails)).eq(undefined);
+            expect(calculateFeelsLike({ air_temperature: 20, wind_speed: 3 } as InstantDetails)).eq(undefined);
+            expect(calculateFeelsLike({ air_temperature: 0, wind_speed: 3 } as InstantDetails)).eq(undefined);
+            expect(calculateFeelsLike({ relative_humidity: 50, wind_speed: 3 } as InstantDetails)).eq(undefined);
+        });
     });
 });
