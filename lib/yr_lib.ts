@@ -125,11 +125,14 @@ export const weatherLegend = (symbolCode: string, language: string): string => {
     const symbolCodeSplit = symbolCode.split('_');
     // @ts-ignore
     const wl = WeatherLegends[symbolCodeSplit[0]];
+    if (!wl) {
+        return symbolCode;
+    }
     if (wl.variants === null && symbolCodeSplit.length > 1 ||
         wl.variants !== null && symbolCodeSplit.length === 1) {
         // something's fishy
     }
-    return wl ? (language === 'no' ? wl.desc_nb : wl.desc_en) : symbolCode;
+    return language === 'no' ? wl.desc_nb : wl.desc_en;
 }
 
 const degs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW", "N"];
