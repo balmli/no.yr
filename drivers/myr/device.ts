@@ -20,6 +20,7 @@ import {attemptTrackedFetch} from '../../lib/tracked_fetch';
 import {honorCacheExpiry} from '../../lib/cache_schedule';
 import {hasCapabilityValue} from '../../lib/capability_value';
 import {clearSunEventCapabilities, formatSunEvent, shouldRefreshSunEvents} from '../../lib/sunrise';
+import {applyFetchedDataIfDue, millisecondsUntilUpdateDeadline} from '../../lib/update_schedule';
 
 module.exports = class YrDevice extends Homey.Device {
 
@@ -31,6 +32,7 @@ module.exports = class YrDevice extends Homey.Device {
     _weatherRetrievedAt?: string;
     _fetchDataTimeout?: NodeJS.Timeout;
     _updateDeviceTimeout?: NodeJS.Timeout;
+    _updateDeviceDeadline?: number;
     _clearAltitude?: boolean;
     _forceUpdateDevice?: boolean;
     _nowcastData!: YrComplete | null;
@@ -38,6 +40,7 @@ module.exports = class YrDevice extends Homey.Device {
     _nowcastExpires?: string;
     _fetchNowcastTimeout?: NodeJS.Timeout;
     _updateNowcastDeviceTimeout?: NodeJS.Timeout;
+    _updateNowcastDeviceDeadline?: number;
     _forceUpdateNowcastDevice?: boolean;
     _textualForecast!: Textforecasts | null;
     _nowcastLocationKey?: string;
@@ -211,6 +214,8 @@ module.exports = class YrDevice extends Homey.Device {
         if (this._deleted) {
             return;
         }
+        const updateDeadline = this._updateDeviceDeadline;
+        let weatherFetchSucceeded = false;
         try {
             this.clearFetchData();
             this.clearUpdateDevice();
@@ -234,7 +239,7 @@ module.exports = class YrDevice extends Homey.Device {
                 return;
             }
             const weatherResult = fetchAttempt.value;
-            const weatherFetchSucceeded = !!weatherResult.data || weatherResult.notModified;
+            weatherFetchSucceeded = !!weatherResult.data || weatherResult.notModified;
 
             // If data was fetched (not 304 response)
             if (weatherResult.data) {
@@ -246,9 +251,6 @@ module.exports = class YrDevice extends Homey.Device {
                 await this.setDeviceAvailable();
                 await this.updateLocation(this._weatherData);
                 await this.updateCapabilities(this._weatherData);
-                if (this._forceUpdateDevice === true) {
-                    await this.updateDevice(this._weatherData);
-                }
             } else if (weatherResult.notModified) {
                 // HTTP 304 - data not modified, use existing cache
                 this._weatherLastModified = weatherResult.lastModified ?? this._weatherLastModified;
@@ -256,9 +258,6 @@ module.exports = class YrDevice extends Homey.Device {
                 this._weatherRetrievedAt = weatherResult.retrievedAt ?? this._weatherRetrievedAt;
                 this.logger.info('Using cached weather data (HTTP 304)');
                 await this.setDeviceAvailable();
-                if (this._forceUpdateDevice === true && this._weatherData) {
-                    await this.updateDevice(this._weatherData);
-                }
             } else {
                 // Fetch failed (null response)
                 await this.setDeviceUnavailable();
@@ -300,9 +299,26 @@ module.exports = class YrDevice extends Homey.Device {
             this.logger.error(err);
         } finally {
             this._clearAltitude = false;
+            let appliedFetchedData = false;
+            try {
+                if (weatherFetchSucceeded && this._weatherData) {
+                    const weatherData = this._weatherData;
+                    appliedFetchedData = await applyFetchedDataIfDue(
+                        this._forceUpdateDevice === true,
+                        updateDeadline,
+                        () => this.updateDevice(weatherData),
+                    );
+                }
+            } catch (err) {
+                this.logger.error(err);
+            }
             this._forceUpdateDevice = false;
             this.scheduleFetchData();
-            this.scheduleUpdateDevice();
+            if (!appliedFetchedData && weatherFetchSucceeded && this._weatherData && updateDeadline !== undefined) {
+                this.scheduleUpdateDeviceAt(updateDeadline);
+            } else {
+                this.scheduleUpdateDevice();
+            }
         }
     }
 
@@ -335,7 +351,10 @@ module.exports = class YrDevice extends Homey.Device {
         if (this._deleted) {
             return;
         }
+        const updateDeadline = this._updateNowcastDeviceDeadline;
         let newSchedule = true;
+        let nowcastFetchSucceeded = false;
+        let appliedFetchedData = false;
         try {
             this.clearFetchNowcast();
             this.clearUpdateNowcastDevice();
@@ -362,30 +381,36 @@ module.exports = class YrDevice extends Homey.Device {
                 if (this._nowcastData.properties.meta.radar_coverage !== RadarCoverage.ok) {
                     newSchedule = shouldContinueNowcastPolling(this._nowcastData);
                     await this.clearNowcastState();
-                } else if (this._forceUpdateNowcastDevice) {
-                    const updated = await this.updateDeviceNowcast(this._weatherData, this._nowcastData);
-                    if (!updated) {
-                        newSchedule = shouldContinueNowcastPolling(this._nowcastData);
-                        await this.clearNowcastState();
-                    }
+                } else {
+                    nowcastFetchSucceeded = true;
                 }
             } else if (nowcastResult.notModified) {
                 // HTTP 304 - data not modified, use existing cache
                 this._nowcastLastModified = nowcastResult.lastModified ?? this._nowcastLastModified;
                 this._nowcastExpires = nowcastResult.expires ?? this._nowcastExpires;
                 this.logger.info('Using cached nowcast data (HTTP 304)');
-                if (this._forceUpdateNowcastDevice && this._nowcastData) {
-                    const updated = await this.updateDeviceNowcast(this._weatherData, this._nowcastData);
-                    if (!updated) {
-                        newSchedule = shouldContinueNowcastPolling(this._nowcastData);
-                        await this.clearNowcastState();
-                    }
-                }
+                nowcastFetchSucceeded = this._nowcastData !== null;
             } else {
                 // A null result can be a transient HTTP or parsing failure. Clear stale
                 // values and keep polling until the API confirms permanent no-coverage.
                 await this.clearNowcastState();
                 this.logger.warn(`Nowcast unavailable for location ${lat}, ${lon}; retrying`);
+            }
+
+            if (nowcastFetchSucceeded && this._nowcastData) {
+                const nowcast = this._nowcastData;
+                let updateSucceeded = false;
+                appliedFetchedData = await applyFetchedDataIfDue(
+                    this._forceUpdateNowcastDevice === true,
+                    updateDeadline,
+                    async () => {
+                        updateSucceeded = await this.updateDeviceNowcast(this._weatherData, nowcast);
+                    },
+                );
+                if (appliedFetchedData && !updateSucceeded) {
+                    newSchedule = shouldContinueNowcastPolling(nowcast);
+                    await this.clearNowcastState();
+                }
             }
         } catch (err) {
             await this.clearNowcastState();
@@ -394,7 +419,11 @@ module.exports = class YrDevice extends Homey.Device {
             this._forceUpdateNowcastDevice = false;
             if (newSchedule) {
                 this.scheduleFetchNowcast();
-                this.scheduleUpdateNowcastDevice();
+                if (!appliedFetchedData && nowcastFetchSucceeded && this._nowcastData && updateDeadline !== undefined) {
+                    this.scheduleUpdateNowcastDeviceAt(updateDeadline);
+                } else {
+                    this.scheduleUpdateNowcastDevice();
+                }
             }
         }
     }
@@ -438,20 +467,30 @@ module.exports = class YrDevice extends Homey.Device {
             this.homey.clearTimeout(this._updateDeviceTimeout);
             this._updateDeviceTimeout = undefined;
         }
+        this._updateDeviceDeadline = undefined;
+    }
+
+    scheduleUpdateDeviceAt(deadline: number) {
+        if (this._deleted) {
+            return;
+        }
+        this.clearUpdateDevice();
+        const delayMilliseconds = millisecondsUntilUpdateDeadline(deadline);
+        this._updateDeviceDeadline = deadline;
+        this.logger.info(`Next update device in ${delayMilliseconds / 1000} seconds`);
+        this._updateDeviceTimeout = this.homey.setTimeout(this.doUpdateDevice.bind(this), delayMilliseconds);
     }
 
     scheduleUpdateDevice(seconds?: number) {
         if (this._deleted) {
             return;
         }
-        this.clearUpdateDevice();
         if (seconds == undefined) {
             const now = new Date();
             seconds = 3 - (now.getMinutes() * 60 + now.getSeconds()); // 3 seconds after top of the hour
             seconds = seconds <= 0 ? seconds + 3600 : seconds;
         }
-        this.logger.info(`Next update device in ${seconds} seconds`);
-        this._updateDeviceTimeout = this.homey.setTimeout(this.doUpdateDevice.bind(this), seconds * 1000);
+        this.scheduleUpdateDeviceAt(Date.now() + seconds * 1000);
     }
 
     async doUpdateDevice() {
@@ -475,20 +514,30 @@ module.exports = class YrDevice extends Homey.Device {
             this.homey.clearTimeout(this._updateNowcastDeviceTimeout);
             this._updateNowcastDeviceTimeout = undefined;
         }
+        this._updateNowcastDeviceDeadline = undefined;
+    }
+
+    scheduleUpdateNowcastDeviceAt(deadline: number) {
+        if (this._deleted) {
+            return;
+        }
+        this.clearUpdateNowcastDevice();
+        const delayMilliseconds = millisecondsUntilUpdateDeadline(deadline);
+        this._updateNowcastDeviceDeadline = deadline;
+        this.logger.debug(`Next update device with nowcast data in ${delayMilliseconds / 1000} seconds`);
+        this._updateNowcastDeviceTimeout = this.homey.setTimeout(this.doUpdateNowcastDevice.bind(this), delayMilliseconds);
     }
 
     scheduleUpdateNowcastDevice(seconds?: number) {
         if (this._deleted) {
             return;
         }
-        this.clearUpdateNowcastDevice();
         if (seconds == undefined) {
             const now = new Date();
             seconds = 2 - now.getSeconds(); // 2 seconds after top of each minute
             seconds = seconds <= 0 ? seconds + 60 : seconds;
         }
-        this.logger.debug(`Next update device with nowcast data in ${seconds} seconds`);
-        this._updateNowcastDeviceTimeout = this.homey.setTimeout(this.doUpdateNowcastDevice.bind(this), seconds * 1000);
+        this.scheduleUpdateNowcastDeviceAt(Date.now() + seconds * 1000);
     }
 
     async doUpdateNowcastDevice() {
