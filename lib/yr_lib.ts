@@ -165,7 +165,7 @@ export const calculateFeelsLike = (instant: InstantDetails): number => {
     return math.round1(new Feels(config).like());
 }
 
-export interface FetchResult extends CacheableFetchResult {}
+export type FetchResult = CacheableFetchResult;
 
 export const doFetch = async (
     uri: string,
@@ -568,8 +568,8 @@ export const parseTextforecastFile = async (xmlFile: string, logger?: Logger): P
         const forecastObj = await xmlParser.parseStringPromise(xmlFile);
         return forecastObj.textforecast.time.map((f: any) => (
             {
-                from: moment.tz(f['$'].from, "YYYY-MM-DD\Thh:mm:ss", 'Europe/Oslo').format(),
-                to: moment.tz(f['$'].to, "YYYY-MM-DD\Thh:mm:ss", 'Europe/Oslo').format(),
+                from: moment.tz(f['$'].from, "YYYY-MM-DDThh:mm:ss", 'Europe/Oslo').format(),
+                to: moment.tz(f['$'].to, "YYYY-MM-DDThh:mm:ss", 'Europe/Oslo').format(),
                 type: f.forecasttype[0]['$'].name,
                 locations: f.forecasttype[0].location.map((l: any) => ({
                     id: l['$'].id,

@@ -98,7 +98,7 @@ module.exports = class YrDevice extends Homey.Device {
         this.logger.verbose(this.getName() + ' -> device deleted');
     }
 
-    async onSettings({oldSettings, newSettings, changedKeys}: {
+    async onSettings({changedKeys}: {
         oldSettings: any;
         newSettings: any;
         changedKeys: string[];
@@ -517,7 +517,7 @@ module.exports = class YrDevice extends Homey.Device {
 
     updateDevice = async (wd: YrComplete): Promise<void> => {
         const ts = yrlib.getTimeSeries(wd, this.getSetting('period'), this.logger);
-        if (!!ts) {
+        if (ts) {
             await this.setCapabilityValue('forecast_time', ts.localTime).catch(err => this.logger.error(err));
 
             const symbolCode = ts.data.next_1_hours ? ts.data.next_1_hours?.summary.symbol_code :
@@ -612,7 +612,7 @@ module.exports = class YrDevice extends Homey.Device {
         }
     }
 
-    async onWeatherAutocomplete(query: any, args: any) {
+    async onWeatherAutocomplete(query: any, _args: any) {
         const lang = this.homey.i18n.getLanguage();
         return Object.entries(WeatherLegends).map((wl: any) => {
             return {
@@ -626,7 +626,7 @@ module.exports = class YrDevice extends Homey.Device {
             });
     }
 
-    async onTimeStartAutocomplete(query: any, args: any) {
+    async onTimeStartAutocomplete(query: any, _args: any) {
         return [...Array(24).keys()]
             .map(hour => ({
                 id: `${hour}`,
@@ -637,11 +637,11 @@ module.exports = class YrDevice extends Homey.Device {
             });
     }
 
-    async nextHoursComparer(args: any, state: any, compareFunc: (ts: YrTimeserie, value: number) => boolean): Promise<any> {
+    async nextHoursComparer(args: any, _state: any, compareFunc: (ts: YrTimeserie, value: number) => boolean): Promise<any> {
         return yrlib.nextHoursComparer(undefined, args, this._weatherData?.properties.timeseries as YrTimeseries, compareFunc);
     }
 
-    async periodComparer(args: any, state: any, compareFunc: (ts: YrTimeserie, value: number) => boolean): Promise<any> {
+    async periodComparer(args: any, _state: any, compareFunc: (ts: YrTimeserie, value: number) => boolean): Promise<any> {
         return yrlib.periodComparer(undefined, args, this._weatherData?.properties.timeseries as YrTimeseries, compareFunc);
     }
 
@@ -653,7 +653,7 @@ module.exports = class YrDevice extends Homey.Device {
         return yrlib.periodSum(undefined, args, this._weatherData?.properties.timeseries as YrTimeseries, sumSelector, compareFunc);
     }
 
-    async textforecastAction(args: any, state: any): Promise<any> {
+    async textforecastAction(args: any, _state: any): Promise<any> {
         if (!this._textualForecast) {
             throw new Error(this.homey.__('errors.unable_to_send_forecast'));
         }
@@ -672,7 +672,7 @@ module.exports = class YrDevice extends Homey.Device {
         }
     }
 
-    async nowcastAction(args: any, state: any): Promise<any> {
+    async nowcastAction(_args: any, _state: any): Promise<any> {
         const expectedLocationKey = nowcastLocationKey(
             truncate4(this.getSetting('lat')),
             truncate4(this.getSetting('lon')),

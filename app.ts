@@ -18,7 +18,7 @@ class YrApp extends Homey.App {
 
         this.homey.flow.getConditionCard('01_weather_next_hours')
             .registerRunListener((args, state) => args.device.nextHoursComparer(args, state,
-                (ts: YrTimeserie, value: number) => {
+                (ts: YrTimeserie, _value: number) => {
                     const symbolCode = !!ts.data.next_1_hours && (ts.data.next_1_hours.summary.symbol_code as string);
                     return !!symbolCode && symbolCode.split('_')[0] === args.code.id;
                 }))
@@ -27,7 +27,7 @@ class YrApp extends Homey.App {
 
         this.homey.flow.getConditionCard('01_weather_period')
             .registerRunListener((args, state) => args.device.periodComparer(args, state,
-                (ts: YrTimeserie, value: number) => {
+                (ts: YrTimeserie, _value: number) => {
                     const symbolCode = !!ts.data.next_1_hours && (ts.data.next_1_hours.summary.symbol_code as string);
                     return !!symbolCode && symbolCode.split('_')[0] === args.code.id;
                 }))
@@ -108,14 +108,14 @@ class YrApp extends Homey.App {
                 (ts: YrTimeserie, value: number) => (!!ts.data.next_1_hours && (ts.data.next_1_hours.details.probability_of_precipitation as number)) > value));
 
         this.homey.flow.getConditionCard('03_rain_sum_next_hours_above')
-            .registerRunListener((args, state) => args.device.nextHoursSum(args,
+            .registerRunListener((args, _state) => args.device.nextHoursSum(args,
                 (ts: YrTimeserie) => !!ts.data.next_1_hours ? ts.data.next_1_hours.details.precipitation_amount as number : 0,
                 (sum: number | undefined, value: number) => !!sum && sum > value))
             .getArgument('start')
             .registerAutocompleteListener((query, args) => args.device.onTimeStartAutocomplete(query, args));
 
         this.homey.flow.getConditionCard('03_rain_sum_period_above')
-            .registerRunListener((args, state) => args.device.periodSum(args,
+            .registerRunListener((args, _state) => args.device.periodSum(args,
                 (ts: YrTimeserie) => !!ts.data.next_1_hours ? ts.data.next_1_hours.details.precipitation_amount as number : 0,
                 (sum: number | undefined, value: number) => !!sum && sum > value));
 

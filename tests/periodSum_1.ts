@@ -2,7 +2,6 @@ import {expect} from 'chai';
 
 import {periodSum} from '../lib/yr_lib';
 
-import yrData1 from './yr_data.json';
 import yrData2 from './yr_data_2.json';
 
 import {YrTimeserie, YrTimeseries} from "../lib/types";

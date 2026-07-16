@@ -1,7 +1,5 @@
 import {expect} from 'chai';
 import {parseSunrise} from "../lib/yr_lib";
-import moment from "../lib/moment-timezone-with-data";
-
 const fs = require('fs/promises');
 
 describe('parseSunrise', function () {

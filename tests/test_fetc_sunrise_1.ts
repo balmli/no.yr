@@ -3,7 +3,6 @@ import Homey from "homey/lib/Homey";
 
 import Logger from "@balmli/homey-logger";
 
-import {Moment} from "../lib/moment";
 import moment from "../lib/moment-timezone-with-data";
 import {fetchSunrise} from "../lib/yr_lib";
 
@@ -32,7 +31,7 @@ describe('fetchSunrise', function () {
 
         it('Check fetchSunrise - today ', async function () {
             moment.tz.setDefault("Europe/Oslo");
-            const sunrise = await fetchSunrise(
+            await fetchSunrise(
                 59.933333,
                 10.716667,
                 '0',
@@ -53,7 +52,7 @@ describe('fetchSunrise', function () {
 
         it('Check fetchSunrise - tomorrow ', async function () {
             moment.tz.setDefault("Europe/Oslo");
-            const sunrise = await fetchSunrise(
+            await fetchSunrise(
                 59.933333,
                 10.716667,
                 '1:0',
@@ -74,7 +73,7 @@ describe('fetchSunrise', function () {
 
         it('Check fetchSunrise - +4 days, 12:00 UTC', async function () {
             moment.tz.setDefault("Europe/Oslo");
-            const sunrise = await fetchSunrise(
+            await fetchSunrise(
                 59.933333,
                 10.716667,
                 '4:12',
@@ -96,7 +95,7 @@ describe('fetchSunrise', function () {
         it('Check fetchSunrise - today Tromsøe', async function () {
             moment.tz.setDefault("Europe/Oslo");
             try {
-                const sunrise = await fetchSunrise(
+                await fetchSunrise(
                     69.647506,
                     18.955627,
                     '0',

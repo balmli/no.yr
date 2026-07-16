@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.test.json",
+  "include": [
+    "app.ts",
+    "api.ts",
+    "drivers/**/*.ts",
+    "lib/**/*.ts",
+    "tests/**/*.ts"
+  ]
+}
