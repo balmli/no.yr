@@ -1,7 +1,7 @@
 ---
 id: TASK-003
 title: "Transport exceptions do not count toward device unavailability"
-status: open
+status: done
 priority: high
 type: bug
 source: BUG_REPORT.md
@@ -21,3 +21,11 @@ Normal null fetch results call `setDeviceUnavailable()`, but a rejected HTTP req
 **Recommended fix:** Count fetch-specific exceptions through the same failure path. Keep update/parsing/programming errors distinct if they should not affect connectivity health.
 
 **Regression test:** Reject `fetchWeather()` five consecutive times and assert that `fetchFailures` increments and the device becomes unavailable; then return valid data and assert recovery.
+
+## Resolution
+
+- Wrapped only the location-forecast transport call in `attemptTrackedFetch()`. A rejected request now invokes the device's existing `setDeviceUnavailable()` path before logging and returning, while update/parsing/programming exceptions remain handled by the outer catch without being misclassified as connectivity failures.
+- Successful fetch results continue through the existing `setDeviceAvailable()` recovery path, which resets `fetchFailures` and restores availability.
+- Added `tests/trackedFetch.ts`. It first failed because the tracked-fetch helper was absent, then passed after implementation; the regression rejects five consecutive attempts, observes five failure callbacks/the unavailable threshold, and verifies a later success does not add another failure.
+- Verification: focused test `1 passing`; `npm run build` passed; Node.js 22 `npm test` passed with `46 passing`, and the Homey publish validation passed.
+- The cited local `BUG_REPORT.md` was unavailable in this checkout; the task record supplied the actionable evidence.

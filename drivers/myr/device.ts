@@ -9,6 +9,7 @@ import * as yrlib from "../../lib/yr_lib";
 import {round2} from "../../lib/math";
 import {invalidateLocationCaches} from '../../lib/location_cache';
 import {NOWCAST_CAPABILITIES, shouldContinueNowcastPolling} from '../../lib/nowcast';
+import {attemptTrackedFetch} from '../../lib/tracked_fetch';
 
 const math = require('../../lib/math');
 
@@ -201,12 +202,20 @@ module.exports = class YrDevice extends Homey.Device {
             const altitude = settings.altitude;
 
             // Use cached Last-Modified header for conditional request
-            const weatherResult = await yrlib.fetchWeather(
-                lat, lon, altitude,
-                this._clearAltitude,
-                this.homey.manifest.version,
-                this.logger,
-                this._weatherLastModified);
+            const fetchAttempt = await attemptTrackedFetch(
+                () => yrlib.fetchWeather(
+                    lat, lon, altitude,
+                    this._clearAltitude,
+                    this.homey.manifest.version,
+                    this.logger,
+                    this._weatherLastModified),
+                this.setDeviceUnavailable.bind(this),
+            );
+            if (!fetchAttempt.ok) {
+                this.logger.error(fetchAttempt.error);
+                return;
+            }
+            const weatherResult = fetchAttempt.value;
 
             // If data was fetched (not 304 response)
             if (weatherResult.data) {
