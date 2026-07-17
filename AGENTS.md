@@ -69,9 +69,9 @@ Working directly on the main branch is allowed. A feature branch is optional unl
 For every release, complete these versioning steps before publishing:
 
 1. Increment the semantic version in [.homeycompose/app.json](.homeycompose/app.json). This is the source manifest; never change the version only in the generated root `app.json`.
-2. Add a matching version entry under “Release Notes” in [README.md](README.md), summarizing the user-visible changes.
+2. Add matching version entries to both [README.md](README.md) under “Release Notes” and [.homeychangelog.json](.homeychangelog.json), summarizing the user-visible changes.
 3. Run `npm test` so Homey Compose regenerates and validates the root `app.json`.
-4. Confirm that `.homeycompose/app.json`, the generated `app.json`, and the latest `README.md` release-note heading all contain the same version.
+4. Confirm that `.homeycompose/app.json`, the generated `app.json`, the latest `README.md` release-note heading, and the latest `.homeychangelog.json` entry all contain the same version.
 
 ## Architecture Overview
 
