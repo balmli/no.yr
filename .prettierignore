@@ -18,6 +18,5 @@ lib/moment-timezone-with-data.js
 assets/
 drivers/*/assets/
 
-# Local agent state and task records are not application source
+# Local agent state is not application source
 .claude/
-.tasks/
