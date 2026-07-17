@@ -1,7 +1,8 @@
 {
   "id": "myr",
   "name": {
-    "en": "Weather"
+    "en": "Weather",
+    "no": "Vær"
   },
   "$extends": ["defaults"],
   "class": "sensor",

@@ -4,9 +4,9 @@ Weather Forecast from MET Norway.
 
 ### Installation
 
-- Install the Weather device. The default location will be the location of the Homey.
-- Go to settings to set the Period (now, +1 hour, +2 hours, etc..)
-- If necessary the location can be updated (longitude, latitude). The altitude will be set automatically, and can be fine-tuned afterwards.
+- Install the Weather device. The default location will be Homey’s location.
+- Go to the device settings to select the forecast period (now, +1 hour, +2 hours, etc.).
+- If necessary, the location can be changed by adjusting the longitude and latitude. The altitude is set automatically but can be adjusted to provide more accurate temperature readings.
 
 ### Data source and license
 
@@ -25,7 +25,7 @@ The source data is parsed, selected and presented for use in Homey. This indepen
 
 #### 1.4.3
 
-- Improvements for 'Starts raining in' capability
+- Improvements to 'Starts raining in' capability
 
 #### 1.4.2
 
