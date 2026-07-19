@@ -1,7 +1,7 @@
-import {CacheableFetchResult} from './http_cache';
+import type {CacheableFetchResult} from './http_cache';
 
 type Fetcher = (ifModifiedSince?: string) => Promise<CacheableFetchResult | null>;
-type Parser<T> = (data: string) => T | undefined;
+type Parser<T> = (data: string) => T | undefined | Promise<T | undefined>;
 
 interface ParsedCacheEntry<T> {
     value: T;
@@ -10,55 +10,111 @@ interface ParsedCacheEntry<T> {
 }
 
 export class ParsedSingleResourceCache<T> {
-    private cached?: ParsedCacheEntry<T>;
-    private inFlight?: Promise<T | null>;
+    private readonly cache = new ParsedResourceCache<T>(1);
 
     async get(fetcher: Fetcher, parser: Parser<T>, now = new Date()): Promise<T | null> {
-        const expiresAt = this.cached?.expires ? Date.parse(this.cached.expires) : NaN;
-        if (this.cached && Number.isFinite(expiresAt) && expiresAt > now.getTime()) {
-            return this.cached.value;
+        return this.cache.get('resource', fetcher, parser, now);
+    }
+}
+
+export class ParsedResourceCache<T> {
+    private readonly cache = new Map<string, ParsedCacheEntry<T>>();
+    private readonly inFlight = new Map<string, Promise<T | null>>();
+
+    constructor(private readonly maxEntries = 64) {
+        if (!Number.isSafeInteger(maxEntries) || maxEntries < 1) {
+            throw new Error('Parsed resource cache maxEntries must be a positive integer');
         }
-        if (this.inFlight) {
-            return this.inFlight;
+    }
+
+    get size(): number {
+        return this.cache.size;
+    }
+
+    async get(key: string, fetcher: Fetcher, parser: Parser<T>, now = new Date()): Promise<T | null> {
+        this.pruneExpired(now, key);
+        const cached = this.cache.get(key);
+        const expiresAt = cached?.expires ? Date.parse(cached.expires) : NaN;
+        if (cached && Number.isFinite(expiresAt) && expiresAt > now.getTime()) {
+            this.touch(key, cached);
+            return cached.value;
+        }
+        const pending = this.inFlight.get(key);
+        if (pending) {
+            return pending;
         }
 
-        const request = this.load(fetcher, parser);
-        this.inFlight = request;
+        const request = this.load(key, cached, fetcher, parser);
+        this.inFlight.set(key, request);
         try {
             return await request;
         } finally {
-            if (this.inFlight === request) {
-                this.inFlight = undefined;
+            if (this.inFlight.get(key) === request) {
+                this.inFlight.delete(key);
             }
         }
     }
 
-    private async load(fetcher: Fetcher, parser: Parser<T>): Promise<T | null> {
-        const result = await fetcher(this.cached?.lastModified);
+    private async load(
+        key: string,
+        cached: ParsedCacheEntry<T> | undefined,
+        fetcher: Fetcher,
+        parser: Parser<T>,
+    ): Promise<T | null> {
+        const result = await fetcher(cached?.lastModified);
         if (!result) {
             return null;
         }
-        if (result.notModified && this.cached) {
-            this.cached = {
-                value: this.cached.value,
-                lastModified: result.lastModified ?? this.cached.lastModified,
-                expires: result.expires ?? this.cached.expires,
+        if (result.notModified && cached) {
+            const revalidated = {
+                value: cached.value,
+                lastModified: result.lastModified ?? cached.lastModified,
+                expires: result.expires ?? cached.expires,
             };
-            return this.cached.value;
+            this.set(key, revalidated);
+            return revalidated.value;
         }
         if (result.data === null) {
             return null;
         }
 
-        const parsed = parser(result.data);
+        const parsed = await parser(result.data);
         if (parsed === undefined) {
             return null;
         }
-        this.cached = {
+        this.set(key, {
             value: parsed,
             lastModified: result.lastModified,
             expires: result.expires,
-        };
+        });
         return parsed;
+    }
+
+    private pruneExpired(now: Date, currentKey: string): void {
+        for (const [key, cached] of this.cache) {
+            if (key === currentKey || !cached.expires) {
+                continue;
+            }
+            const expiresAt = Date.parse(cached.expires);
+            if (Number.isFinite(expiresAt) && expiresAt <= now.getTime()) {
+                this.cache.delete(key);
+            }
+        }
+    }
+
+    private touch(key: string, value: ParsedCacheEntry<T>): void {
+        this.cache.delete(key);
+        this.cache.set(key, value);
+    }
+
+    private set(key: string, value: ParsedCacheEntry<T>): void {
+        this.touch(key, value);
+        while (this.cache.size > this.maxEntries) {
+            const oldestKey = this.cache.keys().next().value;
+            if (oldestKey === undefined) {
+                break;
+            }
+            this.cache.delete(oldestKey);
+        }
     }
 }

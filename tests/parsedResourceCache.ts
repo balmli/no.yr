@@ -1,4 +1,4 @@
-import {ParsedSingleResourceCache} from '../lib/parsed_resource_cache';
+import {ParsedResourceCache, ParsedSingleResourceCache} from '../lib/parsed_resource_cache';
 
 describe('parsed single-resource cache', () => {
     it('retains parsed data instead of the raw body across revalidation', async () => {
@@ -58,5 +58,24 @@ describe('parsed single-resource cache', () => {
         expect(await first).to.equal(null);
         expect(await second).to.equal(null);
         expect(fetchCount).to.equal(1);
+    });
+
+    it('bounds keyed parsed resources by recency', async () => {
+        const cache = new ParsedResourceCache<{key: string}>(2);
+        const now = new Date('2026-07-16T10:00:00Z');
+        const load = (key: string) =>
+            cache.get(
+                key,
+                async () => ({data: key, expires: '2026-07-16T11:00:00Z', notModified: false}),
+                data => ({key: data}),
+                now,
+            );
+
+        await load('first');
+        await load('second');
+        await load('first');
+        await load('third');
+
+        expect(cache.size).to.equal(2);
     });
 });

@@ -27,15 +27,15 @@ import {
     YrTimeseries,
 } from './types';
 import {WeatherLegends} from './legends';
-import {CacheableFetchResult, HttpResourceCache} from './http_cache';
-import {ParsedSingleResourceCache} from './parsed_resource_cache';
+import type {CacheableFetchResult} from './http_cache';
+import {ParsedResourceCache, ParsedSingleResourceCache} from './parsed_resource_cache';
 import {RateLimitBackoff} from './rate_limit';
 import {requireForecastTimeseries, WeatherDataUnavailableError} from './flow_condition';
 
 const math = require('./math');
 const Feels = require('feels');
-const metResourceCache = new HttpResourceCache();
 const metRateLimitBackoff = new RateLimitBackoff();
+const sunriseCache = new ParsedResourceCache<Sunrise>();
 const textforecastCache = new ParsedSingleResourceCache<TextforecastGeoJson>();
 
 const getStartTimeNextHours = (forDate: DateInput | undefined, args: any): Date => {
@@ -295,14 +295,6 @@ export const doFetch = async (
     return fetchResult;
 };
 
-const doCachedFetch = (
-    uri: string,
-    appVersion: string,
-    logger: Logger,
-    ifModifiedSince?: string,
-): Promise<CacheableFetchResult | null> =>
-    metResourceCache.get(uri, cacheValidator => doFetch(uri, appVersion, logger, cacheValidator ?? ifModifiedSince));
-
 export interface WeatherResult {
     data: YrComplete | null;
     lastModified?: string;
@@ -424,13 +416,20 @@ export const fetchSunrise = async (
     const offset = formatOffset(forDate, timeZone);
     logger.debug(`fetchSunrise: ${lat}, ${lon}, ${date}, ${offset}`);
     const uri = `https://api.met.no/weatherapi/sunrise/3.0/sun?lat=${lat}&lon=${lon}&date=${date}&offset=${offset}`;
-    const result = await doCachedFetch(uri, appVersion, logger);
-    if (result === null || !result.data) {
-        throw new Error(homey.__('errors.fetching_sunrise_failed'));
-    }
-
-    const sunrise = await parseSunrise(result.data, logger);
+    let parseFailed = false;
+    const sunrise = await sunriseCache.get(
+        uri,
+        ifModifiedSince => doFetch(uri, appVersion, logger, ifModifiedSince),
+        async data => {
+            const parsed = await parseSunrise(data, logger);
+            parseFailed = !parsed;
+            return parsed;
+        },
+    );
     if (!sunrise) {
+        if (!parseFailed) {
+            throw new Error(homey.__('errors.fetching_sunrise_failed'));
+        }
         logger.error('Unable to parse sunrise file');
         throw new Error(homey.__('errors.parsing_sunrise_failed'));
     }
