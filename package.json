@@ -20,11 +20,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@tsconfig/node22": "^22.0.5",
+    "@tsconfig/node24": "^24.0.4",
     "@types/chai": "^5.2.3",
     "@types/homey": "npm:homey-apps-sdk-v3-types@^0.3.12",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.20.1",
+    "@types/node": "^24.12.0",
     "chai": "^6.2.2",
     "eslint": "^10.7.0",
     "globals": "^17.7.0",
