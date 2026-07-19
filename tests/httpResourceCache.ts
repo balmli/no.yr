@@ -45,4 +45,49 @@ describe('HTTP resource cache', () => {
         expect(await first).to.deep.equal(await second);
         expect(calls).to.equal(1);
     });
+
+    it('prunes expired resources other than the entry being revalidated', async () => {
+        const cache = new HttpResourceCache();
+        const fetcher = async () => ({
+            data: 'payload',
+            expires: '2026-07-16T10:10:00Z',
+            notModified: false,
+        });
+
+        await cache.get('old-resource', fetcher, new Date('2026-07-16T10:00:00Z'));
+        await cache.get('new-resource', fetcher, new Date('2026-07-16T10:11:00Z'));
+
+        expect(cache.size).to.equal(1);
+    });
+
+    it('keeps only the most recently used resources when capacity is reached', async () => {
+        const cache = new HttpResourceCache(2);
+        const fetcher = async () => ({
+            data: 'payload',
+            expires: '2026-07-16T11:00:00Z',
+            notModified: false,
+        });
+        const now = new Date('2026-07-16T10:00:00Z');
+
+        await cache.get('first', fetcher, now);
+        await cache.get('second', fetcher, now);
+        await cache.get('first', fetcher, now);
+        await cache.get('third', fetcher, now);
+
+        expect(cache.size).to.equal(2);
+        let secondCalls = 0;
+        await cache.get(
+            'second',
+            async () => {
+                secondCalls++;
+                return {data: 'reloaded', expires: '2026-07-16T11:00:00Z', notModified: false};
+            },
+            now,
+        );
+        expect(secondCalls).to.equal(1);
+    });
+
+    it('rejects invalid capacities', () => {
+        expect(() => new HttpResourceCache(0)).to.throw('positive integer');
+    });
 });

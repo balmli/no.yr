@@ -13,10 +13,22 @@ export class HttpResourceCache {
     private readonly cache = new Map<string, CacheableFetchResult>();
     private readonly inFlight = new Map<string, Promise<CacheableFetchResult | null>>();
 
+    constructor(private readonly maxEntries = 64) {
+        if (!Number.isSafeInteger(maxEntries) || maxEntries < 1) {
+            throw new Error('HTTP resource cache maxEntries must be a positive integer');
+        }
+    }
+
+    get size(): number {
+        return this.cache.size;
+    }
+
     async get(key: string, fetcher: Fetcher, now = new Date()): Promise<CacheableFetchResult | null> {
+        this.pruneExpired(now, key);
         const cached = this.cache.get(key);
         const expiresAt = cached?.expires ? Date.parse(cached.expires) : NaN;
         if (cached && Number.isFinite(expiresAt) && expiresAt > now.getTime()) {
+            this.touch(key, cached);
             return cached;
         }
 
@@ -53,12 +65,40 @@ export class HttpResourceCache {
                 retrievedAt: cached.retrievedAt,
                 notModified: false,
             };
-            this.cache.set(key, revalidated);
+            this.set(key, revalidated);
             return revalidated;
         }
         if (!result.notModified && result.data !== null) {
-            this.cache.set(key, result);
+            this.set(key, result);
         }
         return result;
+    }
+
+    private pruneExpired(now: Date, currentKey: string): void {
+        for (const [key, cached] of this.cache) {
+            if (key === currentKey || !cached.expires) {
+                continue;
+            }
+            const expiresAt = Date.parse(cached.expires);
+            if (Number.isFinite(expiresAt) && expiresAt <= now.getTime()) {
+                this.cache.delete(key);
+            }
+        }
+    }
+
+    private touch(key: string, value: CacheableFetchResult): void {
+        this.cache.delete(key);
+        this.cache.set(key, value);
+    }
+
+    private set(key: string, value: CacheableFetchResult): void {
+        this.touch(key, value);
+        while (this.cache.size > this.maxEntries) {
+            const oldestKey = this.cache.keys().next().value;
+            if (oldestKey === undefined) {
+                break;
+            }
+            this.cache.delete(oldestKey);
+        }
     }
 }
