@@ -6,7 +6,6 @@ import {
     addHours,
     DateInput,
     formatDate,
-    formatDateTime,
     formatIsoWithOffset,
     formatOffset,
     getDefaultTimeZone,
@@ -334,12 +333,7 @@ export const fetchWeather = async (
 
 const parseResult = (json: any, logger: Logger): YrComplete | null => {
     try {
-        const wd = JSON.parse(json) as YrComplete;
-        for (const ts of wd.properties.timeseries) {
-            ts.localTime = formatDateTime(ts.time);
-            logger.debug(`Ts: ${ts.time} (${ts.localTime})`);
-        }
-        return wd;
+        return JSON.parse(json) as YrComplete;
     } catch (err) {
         logger.error(`Parse weather file failed.`, json);
     }

@@ -52,7 +52,6 @@ export interface NextHours {
 
 export interface YrTimeserie {
     time: string;
-    localTime?: string;
     data: {
         instant: {
             details: InstantDetails;

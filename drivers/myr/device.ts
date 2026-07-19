@@ -23,6 +23,7 @@ import {applyFetchedDataIfDue} from '../../lib/update_schedule';
 import {applyFetchAvailability} from '../../lib/fetch_availability';
 import {ScheduledFetch, ScheduledUpdate, secondsUntilPeriodicOffset} from '../../lib/device_schedule';
 import {getCapabilityChanges, getWeatherCapabilityValues, selectSymbolCode} from '../../lib/weather_capabilities';
+import {formatDateTime} from '../../lib/date_time';
 
 module.exports = class YrDevice extends Homey.Device {
     logger!: Logger;
@@ -494,7 +495,8 @@ module.exports = class YrDevice extends Homey.Device {
     updateDevice = async (wd: YrComplete): Promise<void> => {
         const ts = yrlib.getTimeSeries(wd, this.getSetting('period'), this.logger);
         if (ts) {
-            await this.setCapabilityValue('forecast_time', ts.localTime).catch(err => this.logger.error(err));
+            const localTime = formatDateTime(ts.time);
+            await this.setCapabilityValue('forecast_time', localTime).catch(err => this.logger.error(err));
 
             const symbolCode = selectSymbolCode(ts);
 
@@ -515,7 +517,7 @@ module.exports = class YrDevice extends Homey.Device {
                     description: this.getCapabilityValue('weather_description'),
                     all_data: JSON.stringify({
                         time: ts.time,
-                        localTime: ts.localTime,
+                        localTime,
                         ...ts.data,
                     }),
                 };
@@ -525,7 +527,7 @@ module.exports = class YrDevice extends Homey.Device {
                     .trigger(this, tokens)
                     .catch(err => this.logger.error(err));
             } else {
-                this.logger.info('Updated device: ', ts.localTime);
+                this.logger.info('Updated device: ', localTime);
             }
         }
     };

@@ -30,6 +30,23 @@ describe('weather fetch result', () => {
         expect(result.lastModified).to.equal('Thu, 16 Jul 2026 10:00:00 GMT');
     });
 
+    it('does not retain derived display times on every forecast entry', () => {
+        const result = toWeatherResult(
+            {
+                data: JSON.stringify({
+                    properties: {
+                        timeseries: [{time: '2026-07-16T10:00:00Z', data: {instant: {details: {}}}}],
+                    },
+                }),
+                notModified: false,
+            },
+            undefined,
+            logger,
+        );
+
+        expect(result.data?.properties.timeseries[0]).not.to.have.property('localTime');
+    });
+
     it('preserves an explicit HTTP 304 result', () => {
         const result = toWeatherResult(
             {
