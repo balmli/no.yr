@@ -18,7 +18,7 @@ import {
 } from '../../lib/nowcast';
 import {attemptTrackedFetch} from '../../lib/tracked_fetch';
 import {honorCacheExpiry} from '../../lib/cache_schedule';
-import {hasCapabilityValue} from '../../lib/capability_value';
+import {normalizeCapabilityValue} from '../../lib/capability_value';
 import {clearSunEventCapabilities, formatSunEvent, shouldRefreshSunEvents} from '../../lib/sunrise';
 import {applyFetchedDataIfDue} from '../../lib/update_schedule';
 import {applyFetchAvailability} from '../../lib/fetch_availability';
@@ -576,8 +576,10 @@ module.exports = class YrDevice extends Homey.Device {
     };
 
     updateCapability = async (capabilityId: string, value: any): Promise<void> => {
-        if (this.hasCapability(capabilityId) && hasCapabilityValue(value)) {
-            await this.setCapabilityValue(capabilityId, value).catch(err => this.logger.error(err));
+        if (this.hasCapability(capabilityId)) {
+            await this.setCapabilityValue(capabilityId, normalizeCapabilityValue(value)).catch(err =>
+                this.logger.error(err),
+            );
         }
     };
 
