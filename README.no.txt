@@ -1,11 +1,3 @@
-Værinformasjon og prognoser fra MET Norway.
+Værvarsel gir deg lokale prognoser fra MET Norway i Homey, slik at du kan planlegge for endringer i temperatur, regn og vind. Legg til en Vær-enhet for posisjonen din, og bruk nåvær og prognoser i Homey og Flow.
 
-Kildedata © MET Norway, lisensiert under CC BY 4.0: https://creativecommons.org/licenses/by/4.0/. Appen velger, tolker, bearbeider og presenterer kildedataene. MET Norway står ikke bak denne appen.
-
-Installer Vær-enheten. Standardplasseringen hentes fra Homeys posisjon.
-
-Gå til enhetsinnstillinger for å sette periode (nå, +1 time, +2 timer, osv..)
-
-Locationforecast-verdiene oppdateres hver time. MET leverer éntimesverdier bare for korttidsvarselet; bruk «Regn neste 30 minutter» for Nowcast-oppdateringer hvert femte minutt der det finnes radardekning.
-
-Plasseringen kan endres (lengdegrad, breddegrad).  Høyde over havet settes automatisk, men kan justeres for å gi mer nøyaktige temperaturmålinger.
+Værdata leveres av MET Norway under CC BY 4.0. Appen velger, tolker, bearbeider og presenterer kildedataene, og er ikke godkjent eller anbefalt av MET Norway.
