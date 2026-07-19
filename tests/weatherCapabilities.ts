@@ -67,4 +67,15 @@ describe('weather device capabilities', () => {
             {capabilityId: 'measure_ultraviolet', value: 4.7},
         ]);
     });
+
+    it('keeps the one-hour and six-hour probability availability independent', () => {
+        const timeserie = structuredClone(weather.properties.timeseries[54]) as YrTimeserie;
+        const values = new Map(
+            getWeatherCapabilityValues(timeserie).map(({capabilityId, value}) => [capabilityId, value]),
+        );
+
+        expect(timeserie.data.next_1_hours).to.equal(undefined);
+        expect(values.get('measure_rain_next_1_hour')).to.equal(undefined);
+        expect(values.get('measure_rain_next_6_hours')).to.equal(0);
+    });
 });
