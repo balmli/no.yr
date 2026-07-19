@@ -286,18 +286,6 @@ module.exports = class YrDevice extends Homey.Device {
                     await this.setCapabilityValue('sunset_time', '-').catch(err => this.logger.error(err));
                     this.logger.error(err1);
                 }
-                try {
-                    this._textualForecast = await yrlib.fetchTextforecast(
-                        lat,
-                        lon,
-                        this.homey.manifest.version,
-                        this.logger,
-                        this.homey,
-                    );
-                } catch (err2) {
-                    // TODO ikke logg hvis lat/lon ikke er støttet
-                    this.logger.error(err2);
-                }
             }
         } catch (err) {
             this.logger.error(err);
@@ -667,7 +655,19 @@ module.exports = class YrDevice extends Homey.Device {
 
     async textforecastAction(args: any, _state: any): Promise<any> {
         if (!this._textualForecast) {
-            throw new Error(this.homey.__('errors.unable_to_send_forecast'));
+            try {
+                const settings = this.getSettings();
+                this._textualForecast = await yrlib.fetchTextforecast(
+                    truncate4(settings.lat),
+                    truncate4(settings.lon),
+                    this.homey.manifest.version,
+                    this.logger,
+                    this.homey,
+                );
+            } catch (err) {
+                this.logger.error('Unable to fetch text forecast data', err);
+                throw new Error(this.homey.__('errors.unable_to_send_forecast'));
+            }
         }
         const forecast = this._textualForecast[Number(args.day)];
         if (!forecast?.locations[0]) {
