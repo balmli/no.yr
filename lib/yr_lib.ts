@@ -28,6 +28,7 @@ import {
 } from './types';
 import {WeatherLegends} from './legends';
 import {CacheableFetchResult, HttpResourceCache} from './http_cache';
+import {ParsedSingleResourceCache} from './parsed_resource_cache';
 import {RateLimitBackoff} from './rate_limit';
 import {requireForecastTimeseries, WeatherDataUnavailableError} from './flow_condition';
 
@@ -35,13 +36,7 @@ const math = require('./math');
 const Feels = require('feels');
 const metResourceCache = new HttpResourceCache();
 const metRateLimitBackoff = new RateLimitBackoff();
-let parsedTextforecastCache:
-    | {
-          data: string;
-          lastModified?: string;
-          forecast: TextforecastGeoJson;
-      }
-    | undefined;
+const textforecastCache = new ParsedSingleResourceCache<TextforecastGeoJson>();
 
 const getStartTimeNextHours = (forDate: DateInput | undefined, args: any): Date => {
     const {start} = args;
@@ -489,44 +484,32 @@ export const fetchTextforecast = async (
     logger: Logger,
     homey: Homey,
 ): Promise<Textforecasts> => {
-    const resultTextforecast = await doCachedFetch(
-        `https://api.met.no/weatherapi/textforecast/3.0/landoverview`,
-        appVersion,
-        logger,
+    const uri = `https://api.met.no/weatherapi/textforecast/3.0/landoverview`;
+    let parseFailed = false;
+    const forecast = await textforecastCache.get(
+        ifModifiedSince => doFetch(uri, appVersion, logger, ifModifiedSince),
+        data => {
+            const parsed = parseTextforecastGeoJsonFile(data, logger);
+            parseFailed = !parsed;
+            return parsed;
+        },
     );
-    if (resultTextforecast === null || !resultTextforecast.data) {
-        throw new Error(homey.__('errors.fetching_textforecast_failed'));
-    }
-
-    const cacheMatches =
-        parsedTextforecastCache &&
-        ((resultTextforecast.lastModified &&
-            parsedTextforecastCache.lastModified === resultTextforecast.lastModified) ||
-            (!resultTextforecast.lastModified && parsedTextforecastCache.data === resultTextforecast.data));
-    if (!cacheMatches) {
-        parsedTextforecastCache = undefined;
-        const parsed = parseTextforecastGeoJsonFile(resultTextforecast.data, logger);
-        if (parsed) {
-            parsedTextforecastCache = {
-                data: resultTextforecast.data,
-                lastModified: resultTextforecast.lastModified,
-                forecast: parsed,
-            };
+    if (!forecast) {
+        if (parseFailed) {
+            logger.error('Unable to parse textforecast');
+            throw new Error(homey.__('errors.parsing_textareas_failed'));
         }
-    }
-    if (!parsedTextforecastCache) {
-        logger.error('Unable to parse textforecast');
-        throw new Error(homey.__('errors.parsing_textareas_failed'));
+        throw new Error(homey.__('errors.fetching_textforecast_failed'));
     }
     logger.debug('Got textforecast file');
 
-    const textForecast = findTextforecastForLocation(parsedTextforecastCache.forecast, lat, lon);
+    const textForecast = findTextforecastForLocation(forecast, lat, lon);
     if (textForecast.length === 0) {
         throw new Error(homey.__('errors.textforecast_not_supported'));
     }
 
     logger.info(`Got textforecast data!`, {
-        lastChange: parsedTextforecastCache.forecast.lastChange,
+        lastChange: forecast.lastChange,
         periods: textForecast.length,
         areas: textForecast.map(period => period.locations.map(location => location.name)),
     });
