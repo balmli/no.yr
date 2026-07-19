@@ -670,9 +670,11 @@ module.exports = class YrDevice extends Homey.Device {
         if (!this._textualForecast) {
             throw new Error(this.homey.__('errors.unable_to_send_forecast'));
         }
+        const forecast = this._textualForecast[Number(args.day)];
+        if (!forecast?.locations[0]) {
+            throw new Error(this.homey.__('errors.forecast_day_unavailable'));
+        }
         try {
-            const day = Number(args.day);
-            const forecast = this._textualForecast[day];
             return {
                 from: forecast.from,
                 to: forecast.to,

@@ -177,3 +177,26 @@ export interface Textforecast {
 }
 
 export type Textforecasts = Textforecast[];
+
+export interface TextforecastGeoJsonFeature {
+    type: 'Feature';
+    geometry: {
+        type: 'Polygon';
+        coordinates: Points[];
+    };
+    when: {
+        interval: [string, string];
+    };
+    properties: {
+        area: string;
+        text: string;
+        title: string;
+    };
+}
+
+export interface TextforecastGeoJson {
+    type: 'FeatureCollection';
+    lang: string;
+    lastChange: string;
+    features: TextforecastGeoJsonFeature[];
+}
