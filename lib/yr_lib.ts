@@ -13,6 +13,8 @@ import {
     Points,
     Sunrise,
     SunriseData,
+    TextforecastGeoJson,
+    TextforecastGeoJsonFeature,
     Textforecasts,
     YrComplete,
     YrTimeserie,
@@ -27,6 +29,13 @@ const math = require('./math');
 const Feels = require('feels');
 const metResourceCache = new HttpResourceCache();
 const metRateLimitBackoff = new RateLimitBackoff();
+let parsedTextforecastCache:
+    | {
+          data: string;
+          lastModified?: string;
+          forecast: TextforecastGeoJson;
+      }
+    | undefined;
 
 const getStartTimeNextHours = (forDate: any, args: any): any => {
     const {start} = args;
@@ -484,25 +493,8 @@ export const fetchTextforecast = async (
     logger: Logger,
     homey: Homey,
 ): Promise<Textforecasts> => {
-    const resultAreas = await doCachedFetch(`https://api.met.no/weatherapi/textforecast/2.0/areas`, appVersion, logger);
-    if (resultAreas === null || !resultAreas.data) {
-        throw new Error(homey.__('errors.fetching_areas_failed'));
-    }
-
-    const areasObj = await parseAreasFile(resultAreas.data, logger);
-    if (!areasObj) {
-        logger.error('Unable to parse areas file');
-        throw new Error(homey.__('errors.parsing_areas_failed'));
-    }
-    logger.debug('Got areas file');
-
-    const ids = findAreasIds(lat, lon, areasObj);
-    if (!ids || ids.length === 0) {
-        throw new Error(homey.__('errors.textforecast_not_supported'));
-    }
-
     const resultTextforecast = await doCachedFetch(
-        `https://api.met.no/weatherapi/textforecast/2.0/landoverview`,
+        `https://api.met.no/weatherapi/textforecast/3.0/landoverview`,
         appVersion,
         logger,
     );
@@ -510,22 +502,131 @@ export const fetchTextforecast = async (
         throw new Error(homey.__('errors.fetching_textforecast_failed'));
     }
 
-    const forecastObj = await parseTextforecastFile(resultTextforecast.data, logger);
-    if (!forecastObj) {
+    const cacheMatches =
+        parsedTextforecastCache &&
+        ((resultTextforecast.lastModified &&
+            parsedTextforecastCache.lastModified === resultTextforecast.lastModified) ||
+            (!resultTextforecast.lastModified && parsedTextforecastCache.data === resultTextforecast.data));
+    if (!cacheMatches) {
+        parsedTextforecastCache = undefined;
+        const parsed = parseTextforecastGeoJsonFile(resultTextforecast.data, logger);
+        if (parsed) {
+            parsedTextforecastCache = {
+                data: resultTextforecast.data,
+                lastModified: resultTextforecast.lastModified,
+                forecast: parsed,
+            };
+        }
+    }
+    if (!parsedTextforecastCache) {
         logger.error('Unable to parse textforecast');
         throw new Error(homey.__('errors.parsing_textareas_failed'));
     }
     logger.debug('Got textforecast file');
 
-    const textForecast = findTextforecastFromAreaIds(forecastObj, ids);
+    const textForecast = findTextforecastForLocation(parsedTextforecastCache.forecast, lat, lon);
+    if (textForecast.length === 0) {
+        throw new Error(homey.__('errors.textforecast_not_supported'));
+    }
 
     logger.info(`Got textforecast data!`, {
-        ids,
-        textForecast,
-        foreCasts: textForecast.map(tfc => tfc.locations[0]),
+        lastChange: parsedTextforecastCache.forecast.lastChange,
+        periods: textForecast.length,
+        areas: textForecast.map(period => period.locations.map(location => location.name)),
     });
 
     return textForecast;
+};
+
+const isGeoJsonPoint = (value: unknown): value is Point =>
+    Array.isArray(value) &&
+    value.length >= 2 &&
+    typeof value[0] === 'number' &&
+    Number.isFinite(value[0]) &&
+    typeof value[1] === 'number' &&
+    Number.isFinite(value[1]);
+
+const isTextforecastGeoJsonFeature = (value: unknown): value is TextforecastGeoJsonFeature => {
+    if (!value || typeof value !== 'object') {
+        return false;
+    }
+    const feature = value as any;
+    const interval = feature.when?.interval;
+    const coordinates = feature.geometry?.coordinates;
+    return (
+        feature.type === 'Feature' &&
+        feature.geometry?.type === 'Polygon' &&
+        Array.isArray(coordinates) &&
+        coordinates.length > 0 &&
+        coordinates.every((ring: unknown) => Array.isArray(ring) && ring.length >= 3 && ring.every(isGeoJsonPoint)) &&
+        Array.isArray(interval) &&
+        interval.length === 2 &&
+        interval.every(
+            (timestamp: unknown) => typeof timestamp === 'string' && Number.isFinite(Date.parse(timestamp)),
+        ) &&
+        typeof feature.properties?.area === 'string' &&
+        typeof feature.properties?.text === 'string' &&
+        typeof feature.properties?.title === 'string'
+    );
+};
+
+/**
+ * Parse and validate a Textforecast 3.0 GeoJSON response.
+ */
+export const parseTextforecastGeoJsonFile = (jsonFile: string, logger?: Logger): TextforecastGeoJson | undefined => {
+    try {
+        const forecast = JSON.parse(jsonFile) as any;
+        if (
+            forecast?.type !== 'FeatureCollection' ||
+            typeof forecast.lang !== 'string' ||
+            typeof forecast.lastChange !== 'string' ||
+            !Number.isFinite(Date.parse(forecast.lastChange)) ||
+            !Array.isArray(forecast.features) ||
+            !forecast.features.every(isTextforecastGeoJsonFeature)
+        ) {
+            throw new Error('Invalid Textforecast GeoJSON response');
+        }
+        return forecast as TextforecastGeoJson;
+    } catch (err) {
+        logger?.error('parseTextforecastGeoJsonFile error:', err);
+    }
+};
+
+/**
+ * Find and group Textforecast 3.0 features for a location.
+ */
+export const findTextforecastForLocation = (
+    forecast: TextforecastGeoJson,
+    latitude: number,
+    longitude: number,
+): Textforecasts => {
+    const periods = new Map<string, Textforecasts[number]>();
+
+    for (const feature of forecast.features) {
+        // GeoJSON coordinates use longitude, latitude order.
+        if (!isPointInPolygon(longitude, latitude, feature.geometry.coordinates[0])) {
+            continue;
+        }
+        const [from, to] = feature.when.interval;
+        const key = `${from}\u0000${to}`;
+        let period = periods.get(key);
+        if (!period) {
+            period = {
+                from: moment(from).tz('Europe/Oslo').format(),
+                to: moment(to).tz('Europe/Oslo').format(),
+                type: 'normal',
+                locations: [],
+            };
+            periods.set(key, period);
+        }
+        period.locations.push({
+            id: feature.properties.area,
+            name: feature.properties.area,
+            forecast: feature.properties.text,
+        });
+    }
+
+    return [...periods.values()].sort((left, right) => Date.parse(left.from) - Date.parse(right.from));
 };
 
 /**

@@ -10,8 +10,8 @@
     "no": "Hent tekstlig værvarsel for [[day]]"
   },
   "hint": {
-    "en": "Fetch textual forecast for today, tomorrow or the day after tomorrow. Only Norway is supported.",
-    "no": "Hent tekstlig værvarsel for i dag, i morgen eller i overmorgen."
+    "en": "Fetch textual forecast for today or tomorrow. Only Norway is supported.",
+    "no": "Hent tekstlig værvarsel for i dag eller i morgen."
   },
   "tokens": [
     {
