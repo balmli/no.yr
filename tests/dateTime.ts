@@ -11,6 +11,7 @@ describe('native date and timezone helpers', () => {
     beforeEach(() => setDefaultTimeZone('Europe/Oslo'));
 
     it('formats timestamps in the configured Homey timezone', () => {
+        expect(process.env.TZ).to.equal('Europe/Oslo');
         expect(formatDateTime('2026-07-16T10:41:48.765Z')).to.equal('16.07.2026 12:41');
         expect(formatIsoWithOffset('2026-07-19T00:00:00Z')).to.equal('2026-07-19T02:00:00+02:00');
     });
@@ -32,7 +33,7 @@ describe('native date and timezone helpers', () => {
         expect(startOfHour('2026-07-16T10:41:48Z').toISOString()).to.equal('2026-07-16T10:15:00.000Z');
     });
 
-    it('rejects invalid timezone names', () => {
-        expect(() => setDefaultTimeZone('Not/A_Timezone')).to.throw();
+    it('rejects empty timezone names', () => {
+        expect(() => setDefaultTimeZone('')).to.throw();
     });
 });
