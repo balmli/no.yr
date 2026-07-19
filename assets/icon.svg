@@ -1,25 +1,37 @@
-<?xml version="1.0" encoding="utf-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <g fill="#ffffff">
-    <!-- Sun rays -->
-    <g stroke="#ffffff" stroke-width="14" stroke-linecap="round">
-      <line x1="180" y1="104" x2="180" y2="80"/>
-      <line x1="132" y1="124" x2="115" y2="107"/>
-      <line x1="112" y1="172" x2="86" y2="172"/>
-      <line x1="228" y1="124" x2="245" y2="107"/>
-      <line x1="132" y1="220" x2="115" y2="237"/>
+<svg width="960" height="960" viewBox="0 0 960 960" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(7,4) scale(1.08)">
+    <g fill="none" stroke="#000000" stroke-width="30" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Sun rays -->
+      <line x1="144" y1="326" x2="92"  y2="345"/>
+      <line x1="144" y1="224" x2="92"  y2="205"/>
+      <line x1="210" y1="145" x2="182" y2="97"/>
+      <line x1="311" y1="127" x2="320" y2="73"/>
+      <line x1="400" y1="179" x2="442" y2="143"/>
+
+      <!-- Sun disc (arc peeking out behind the cloud) -->
+      <path d="M 240 388 A 135 135 0 1 1 418 298"/>
+
+      <!-- Cloud outline -->
+      <path d="
+        M 300 655
+        Q 216 655 208 578
+        Q 132 570 138 492
+        Q 134 412 214 404
+        Q 226 322 316 336
+        Q 350 250 460 256
+        Q 575 250 606 344
+        Q 700 336 714 420
+        Q 792 430 784 508
+        Q 788 582 706 590
+        Q 696 655 612 655
+        Z"/>
     </g>
-    <!-- Sun -->
-    <circle cx="180" cy="172" r="52"/>
-    <!-- Cloud -->
-    <circle cx="256" cy="228" r="70"/>
-    <circle cx="200" cy="250" r="52"/>
-    <circle cx="178" cy="280" r="48"/>
-    <circle cx="336" cy="268" r="58"/>
-    <rect x="150" y="286" width="212" height="46" rx="23"/>
+
     <!-- Rain drops -->
-    <path d="M206,352 c0,0 -18,23 -18,35 a18,18 0 0 0 36,0 c0,-12 -18,-35 -18,-35 Z"/>
-    <path d="M256,362 c0,0 -18,23 -18,35 a18,18 0 0 0 36,0 c0,-12 -18,-35 -18,-35 Z"/>
-    <path d="M306,352 c0,0 -18,23 -18,35 a18,18 0 0 0 36,0 c0,-12 -18,-35 -18,-35 Z"/>
+    <g fill="#000000">
+      <path d="M 345 705 Q 379 762 345 800 Q 311 762 345 705 Z"/>
+      <path d="M 480 715 Q 514 772 480 810 Q 446 772 480 715 Z"/>
+      <path d="M 615 705 Q 649 762 615 800 Q 581 762 615 705 Z"/>
+    </g>
   </g>
 </svg>

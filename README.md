@@ -17,7 +17,7 @@ The source data is parsed, selected and presented for use in Homey. This indepen
 
 ### Release Notes:
 
-#### 1.5.1
+#### 1.5.2
 
 - Rebranded the app and weather device
 - Replaced Yr branding and logos with original weather artwork
