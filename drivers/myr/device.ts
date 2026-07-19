@@ -525,11 +525,13 @@ module.exports = class YrDevice extends Homey.Device {
         const rainingThreshold = getRainingThreshold(this.getSetting('raining_threshold'));
 
         const now = yrlib.getDateAddPeriod(period);
-        const tsAfter = nowcast ? nowcast.properties.timeseries.filter(ts => Date.parse(ts.time) >= now.getTime()) : [];
+        const firstFutureIndex = nowcast
+            ? nowcast.properties.timeseries.findIndex(ts => Date.parse(ts.time) >= now.getTime())
+            : -1;
 
         const settings = this.getSettings();
         const expectedLocationKey = nowcastLocationKey(truncate4(settings.lat), truncate4(settings.lon));
-        if (!isNowcastValid(nowcast, this._nowcastLocationKey, expectedLocationKey) || tsAfter.length === 0) {
+        if (!isNowcastValid(nowcast, this._nowcastLocationKey, expectedLocationKey) || firstFutureIndex < 0) {
             await this.removeNowcastCapabilities();
             return false;
         }
@@ -540,7 +542,7 @@ module.exports = class YrDevice extends Homey.Device {
             await this.addCapability('measure_rain.next_30_minutes');
         }
 
-        const next30Minutes = tsAfter.slice(0, 6);
+        const next30Minutes = nowcast!.properties.timeseries.slice(firstFutureIndex, firstFutureIndex + 6);
         const rainNext30Minutes = round2(
             next30Minutes.reduce((acc, ts) => {
                 const rate = ts.data?.instant?.details?.precipitation_rate || 0;

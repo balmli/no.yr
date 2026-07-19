@@ -67,14 +67,20 @@ const xComparer = (
     tss: YrTimeseries | undefined,
     compareFunc: (ts: YrTimeserie, value: number) => boolean,
 ): boolean => {
-    const selected = requireForecastTimeseries(tss).filter(ts => {
+    let foundForecast = false;
+    for (const ts of requireForecastTimeseries(tss)) {
         const time = Date.parse(ts.time);
-        return time >= startTime.getTime() && time < endTime.getTime();
-    });
-    if (selected.length === 0) {
+        if (time >= startTime.getTime() && time < endTime.getTime()) {
+            foundForecast = true;
+            if (compareFunc(ts, args.value)) {
+                return true;
+            }
+        }
+    }
+    if (!foundForecast) {
         throw new WeatherDataUnavailableError('forecast data for the selected period');
     }
-    return selected.some(ts => compareFunc(ts, args.value));
+    return false;
 };
 
 const xSum = (
@@ -85,14 +91,19 @@ const xSum = (
     sumSelector: (ts: YrTimeserie) => number,
     compareFunc: (sum: number | undefined, value: number) => boolean,
 ): boolean => {
-    const selected = requireForecastTimeseries(tss).filter(ts => {
+    let foundForecast = false;
+    let sum = 0;
+    for (const ts of requireForecastTimeseries(tss)) {
         const time = Date.parse(ts.time);
-        return time >= startTime.getTime() && time < endTime.getTime();
-    });
-    if (selected.length === 0) {
+        if (time >= startTime.getTime() && time < endTime.getTime()) {
+            foundForecast = true;
+            sum += sumSelector(ts);
+        }
+    }
+    if (!foundForecast) {
         throw new WeatherDataUnavailableError('forecast data for the selected period');
     }
-    return compareFunc(math.round2(selected.map(sumSelector).reduce((acc, c) => acc + c, 0)), args.value);
+    return compareFunc(math.round2(sum), args.value);
 };
 
 export const nextHoursComparer = (
