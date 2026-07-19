@@ -22,7 +22,7 @@ Weather data is provided by MET Norway under CC BY 4.0. Preserve the attribution
 
 ## Development Environment and Commands
 
-Homey v12.9.0 and newer run apps on Node.js 22. Use the version pinned in [.nvmrc](.nvmrc).
+Homey runs apps on Node.js 24.16.0. Use the version pinned in [.nvmrc](.nvmrc).
 
 ```bash
 # Compile TypeScript into .homeybuild/
@@ -298,11 +298,10 @@ Production dependencies:
 
 - `@balmli/homey-logger`: structured logging
 - `feels`: feels-like calculations
-- `xml2js`: textual forecast XML parsing
 
-The project uses the native `fetch` supplied by Node.js 22.
+The project uses the native `fetch` supplied by Node.js 24.
 
-Development tooling includes TypeScript, Mocha, Chai, ESLint, Prettier, `ts-node`, Homey SDK types, and Node.js 22 types.
+Development tooling includes TypeScript, Mocha, Chai, ESLint, Prettier, `ts-node`, Homey SDK types, and Node.js 24 types.
 
 ## Important Constraints
 
@@ -314,7 +313,7 @@ Development tooling includes TypeScript, Mocha, Chai, ESLint, Prettier, `ts-node
 - Preserve capability and Flow card IDs.
 - Add migrations for capabilities that existing devices need.
 - Do not edit generated `app.json` directly.
-- Use Node.js 22 and the repository test bootstrap.
+- Use Node.js 24.16.0 and the repository test bootstrap.
 - Some behavior still requires verification on a real Homey device.
 
 ## Additional Resources

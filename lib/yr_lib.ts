@@ -1,13 +1,19 @@
 import Homey from 'homey/lib/Homey';
 
-const xml2js = require('xml2js');
-
 import Logger from '@balmli/homey-logger';
 
-import {Moment} from './moment';
-import moment from './moment-timezone-with-data';
 import {
-    Areas,
+    addHours,
+    DateInput,
+    formatDate,
+    formatIsoWithOffset,
+    formatOffset,
+    getDefaultTimeZone,
+    startOfDayAt,
+    startOfHour,
+    toDate,
+} from './date_time';
+import {
     InstantDetails,
     Point,
     Points,
@@ -21,83 +27,83 @@ import {
     YrTimeseries,
 } from './types';
 import {WeatherLegends} from './legends';
-import {CacheableFetchResult, HttpResourceCache} from './http_cache';
+import type {CacheableFetchResult} from './http_cache';
+import {ParsedResourceCache, ParsedSingleResourceCache} from './parsed_resource_cache';
 import {RateLimitBackoff} from './rate_limit';
 import {requireForecastTimeseries, WeatherDataUnavailableError} from './flow_condition';
 
 const math = require('./math');
 const Feels = require('feels');
-const metResourceCache = new HttpResourceCache();
 const metRateLimitBackoff = new RateLimitBackoff();
-let parsedTextforecastCache:
-    | {
-          data: string;
-          lastModified?: string;
-          forecast: TextforecastGeoJson;
-      }
-    | undefined;
+const sunriseCache = new ParsedResourceCache<Sunrise>();
+const textforecastCache = new ParsedSingleResourceCache<TextforecastGeoJson>();
 
-const getStartTimeNextHours = (forDate: any, args: any): any => {
+const getStartTimeNextHours = (forDate: DateInput | undefined, args: any): Date => {
     const {start} = args;
-    return (!!forDate ? moment(forDate) : moment()).startOf('hour').add(Number(start.id), 'hours');
+    return addHours(startOfHour(forDate ?? new Date()), Number(start.id));
 };
 
-const getEndTimeNextHours = (forDate: any, args: any): any => {
+const getEndTimeNextHours = (forDate: DateInput | undefined, args: any): Date => {
     const {start, hours} = args;
-    return (!!forDate ? moment(forDate) : moment()).startOf('hour').add(Number(start.id), 'hours').add(hours, 'hours');
+    return addHours(startOfHour(forDate ?? new Date()), Number(start.id) + hours);
 };
 
-const getStartTimePeriod = (forDate: any, args: any): any => {
+const getStartTimePeriod = (forDate: DateInput | undefined, args: any): Date => {
     const {start, day} = args;
-    return (!!forDate ? moment(forDate) : moment())
-        .startOf('day')
-        .add(Number(day), 'days')
-        .add(Number(start.split(':')[0]), 'hour')
-        .add(Number(start.split(':')[1]), 'minutes');
+    const [hour, minute] = start.split(':').map(Number);
+    return startOfDayAt(forDate ?? new Date(), Number(day), hour, minute);
 };
 
-const getEndTimePeriod = (forDate: any, args: any): any => {
+const getEndTimePeriod = (forDate: DateInput | undefined, args: any): Date => {
     const {end, day} = args;
-    return (!!forDate ? moment(forDate) : moment())
-        .startOf('day')
-        .add(Number(day), 'days')
-        .add(Number(end.split(':')[0]), 'hour')
-        .add(Number(end.split(':')[1]), 'minutes');
+    const [hour, minute] = end.split(':').map(Number);
+    return startOfDayAt(forDate ?? new Date(), Number(day), hour, minute);
 };
 
 const xComparer = (
     args: any,
-    startTime: any,
-    endTime: any,
+    startTime: Date,
+    endTime: Date,
     tss: YrTimeseries | undefined,
     compareFunc: (ts: YrTimeserie, value: number) => boolean,
 ): boolean => {
-    const selected = requireForecastTimeseries(tss).filter(ts => {
-        const time = moment(ts.time);
-        return time.isSameOrAfter(startTime) && time.isBefore(endTime);
-    });
-    if (selected.length === 0) {
+    let foundForecast = false;
+    for (const ts of requireForecastTimeseries(tss)) {
+        const time = Date.parse(ts.time);
+        if (time >= startTime.getTime() && time < endTime.getTime()) {
+            foundForecast = true;
+            if (compareFunc(ts, args.value)) {
+                return true;
+            }
+        }
+    }
+    if (!foundForecast) {
         throw new WeatherDataUnavailableError('forecast data for the selected period');
     }
-    return selected.some(ts => compareFunc(ts, args.value));
+    return false;
 };
 
 const xSum = (
     args: any,
-    startTime: any,
-    endTime: any,
+    startTime: Date,
+    endTime: Date,
     tss: YrTimeseries | undefined,
     sumSelector: (ts: YrTimeserie) => number,
     compareFunc: (sum: number | undefined, value: number) => boolean,
 ): boolean => {
-    const selected = requireForecastTimeseries(tss).filter(ts => {
-        const time = moment(ts.time);
-        return time.isSameOrAfter(startTime) && time.isBefore(endTime);
-    });
-    if (selected.length === 0) {
+    let foundForecast = false;
+    let sum = 0;
+    for (const ts of requireForecastTimeseries(tss)) {
+        const time = Date.parse(ts.time);
+        if (time >= startTime.getTime() && time < endTime.getTime()) {
+            foundForecast = true;
+            sum += sumSelector(ts);
+        }
+    }
+    if (!foundForecast) {
         throw new WeatherDataUnavailableError('forecast data for the selected period');
     }
-    return compareFunc(math.round2(selected.map(sumSelector).reduce((acc, c) => acc + c, 0)), args.value);
+    return compareFunc(math.round2(sum), args.value);
 };
 
 export const nextHoursComparer = (
@@ -289,14 +295,6 @@ export const doFetch = async (
     return fetchResult;
 };
 
-const doCachedFetch = (
-    uri: string,
-    appVersion: string,
-    logger: Logger,
-    ifModifiedSince?: string,
-): Promise<CacheableFetchResult | null> =>
-    metResourceCache.get(uri, cacheValidator => doFetch(uri, appVersion, logger, cacheValidator ?? ifModifiedSince));
-
 export interface WeatherResult {
     data: YrComplete | null;
     lastModified?: string;
@@ -318,7 +316,7 @@ export const fetchWeather = async (
     const uri =
         `https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=${lat}&lon=${lon}` +
         (!clearAltitude && altitude !== -1 ? `&altitude=${Math.round(altitude)}` : '');
-    const result = await doCachedFetch(uri, appVersion, logger, ifModifiedSince);
+    const result = await doFetch(uri, appVersion, logger, ifModifiedSince);
     if (result === null) {
         return {data: null, notModified: false, throttled: false};
     }
@@ -333,12 +331,7 @@ export const fetchWeather = async (
 
 const parseResult = (json: any, logger: Logger): YrComplete | null => {
     try {
-        const wd = JSON.parse(json) as YrComplete;
-        for (const ts of wd.properties.timeseries) {
-            ts.localTime = moment(ts.time).format('DD.MM.YYYY HH:mm');
-            logger.debug(`Ts: ${ts.time} (${ts.localTime})`);
-        }
-        return wd;
+        return JSON.parse(json) as YrComplete;
     } catch (err) {
         logger.error(`Parse weather file failed.`, json);
     }
@@ -380,28 +373,28 @@ export const toWeatherResult = (
     };
 };
 
-export const getDateFromPeriod = (period: string): Moment => {
+export const getDateFromPeriod = (period: string, now: DateInput = new Date()): Date => {
     const splitted = period.split(':');
     return period.includes(':')
-        ? moment().utc().startOf('day').add(Number(splitted[0]), 'days').hour(Number(splitted[1]))
-        : moment().startOf('hour').add(Number(period), 'hours');
+        ? startOfDayAt(now, Number(splitted[0]), Number(splitted[1]), 0, 'UTC')
+        : addHours(startOfHour(now), Number(period));
 };
 
-export const getDateAddPeriod = (period: string): Moment => {
+export const getDateAddPeriod = (period: string, now: DateInput = new Date()): Date => {
     const splitted = period.split(':');
     return period.includes(':')
-        ? moment().utc().startOf('day').add(Number(splitted[0]), 'days').hour(Number(splitted[1]))
-        : moment().add(Number(period), 'hours');
+        ? startOfDayAt(now, Number(splitted[0]), Number(splitted[1]), 0, 'UTC')
+        : addHours(now, Number(period));
 };
 
 export const getTimeSeries = (wd: YrComplete, period: string, logger: Logger): YrTimeserie | null => {
     const forDate = getDateFromPeriod(period);
     logger.debug('Get time series. Search for: ', forDate);
     for (const ts of wd.properties.timeseries) {
-        const time = moment(ts.time);
-        logger.debug('Check time series:', time);
-        if (time.isSame(forDate)) {
-            logger.info('Got time series:', time);
+        const time = Date.parse(ts.time);
+        logger.debug('Check time series:', new Date(time));
+        if (time === forDate.getTime()) {
+            logger.info('Got time series:', new Date(time));
             return ts;
         }
     }
@@ -412,23 +405,31 @@ export const fetchSunrise = async (
     lat: number,
     lon: number,
     period: string,
-    aDate: Moment | undefined,
+    aDate: Date | undefined,
     appVersion: string,
     logger: Logger,
     homey: Homey,
 ): Promise<Sunrise> => {
-    const forDate = aDate ? aDate : getDateFromPeriod(period);
-    const date = forDate.format('yyyy-MM-DD');
-    const offset = forDate.format('Z');
+    const forDate = aDate ? toDate(aDate) : getDateFromPeriod(period);
+    const timeZone = aDate || !period.includes(':') ? getDefaultTimeZone() : 'UTC';
+    const date = formatDate(forDate, timeZone);
+    const offset = formatOffset(forDate, timeZone);
     logger.debug(`fetchSunrise: ${lat}, ${lon}, ${date}, ${offset}`);
     const uri = `https://api.met.no/weatherapi/sunrise/3.0/sun?lat=${lat}&lon=${lon}&date=${date}&offset=${offset}`;
-    const result = await doCachedFetch(uri, appVersion, logger);
-    if (result === null || !result.data) {
-        throw new Error(homey.__('errors.fetching_sunrise_failed'));
-    }
-
-    const sunrise = await parseSunrise(result.data, logger);
+    let parseFailed = false;
+    const sunrise = await sunriseCache.get(
+        uri,
+        ifModifiedSince => doFetch(uri, appVersion, logger, ifModifiedSince),
+        async data => {
+            const parsed = await parseSunrise(data, logger);
+            parseFailed = !parsed;
+            return parsed;
+        },
+    );
     if (!sunrise) {
+        if (!parseFailed) {
+            throw new Error(homey.__('errors.fetching_sunrise_failed'));
+        }
         logger.error('Unable to parse sunrise file');
         throw new Error(homey.__('errors.parsing_sunrise_failed'));
     }
@@ -443,8 +444,8 @@ export const parseSunrise = async (data1: string, logger?: Logger): Promise<Sunr
         const hasData = data && data.properties && data.properties.sunrise && data.properties.sunset;
         return hasData
             ? {
-                  sunrise: data.properties.sunrise.time ? moment(data.properties.sunrise.time) : undefined,
-                  sunset: data.properties.sunset.time ? moment(data.properties.sunset.time) : undefined,
+                  sunrise: data.properties.sunrise.time ? toDate(data.properties.sunrise.time) : undefined,
+                  sunset: data.properties.sunset.time ? toDate(data.properties.sunset.time) : undefined,
               }
             : undefined;
     } catch (err) {
@@ -465,7 +466,7 @@ export const fetchNowcast = async (
     const uri =
         `https://api.met.no/weatherapi/nowcast/2.0/complete?lat=${lat}&lon=${lon}` +
         (!clearAltitude && altitude !== -1 ? `&altitude=${Math.round(altitude)}` : '');
-    const result = await doCachedFetch(uri, appVersion, logger, ifModifiedSince);
+    const result = await doFetch(uri, appVersion, logger, ifModifiedSince);
     if (result === null) {
         return {data: null, notModified: false, throttled: false};
     }
@@ -493,44 +494,32 @@ export const fetchTextforecast = async (
     logger: Logger,
     homey: Homey,
 ): Promise<Textforecasts> => {
-    const resultTextforecast = await doCachedFetch(
-        `https://api.met.no/weatherapi/textforecast/3.0/landoverview`,
-        appVersion,
-        logger,
+    const uri = `https://api.met.no/weatherapi/textforecast/3.0/landoverview`;
+    let parseFailed = false;
+    const forecast = await textforecastCache.get(
+        ifModifiedSince => doFetch(uri, appVersion, logger, ifModifiedSince),
+        data => {
+            const parsed = parseTextforecastGeoJsonFile(data, logger);
+            parseFailed = !parsed;
+            return parsed;
+        },
     );
-    if (resultTextforecast === null || !resultTextforecast.data) {
-        throw new Error(homey.__('errors.fetching_textforecast_failed'));
-    }
-
-    const cacheMatches =
-        parsedTextforecastCache &&
-        ((resultTextforecast.lastModified &&
-            parsedTextforecastCache.lastModified === resultTextforecast.lastModified) ||
-            (!resultTextforecast.lastModified && parsedTextforecastCache.data === resultTextforecast.data));
-    if (!cacheMatches) {
-        parsedTextforecastCache = undefined;
-        const parsed = parseTextforecastGeoJsonFile(resultTextforecast.data, logger);
-        if (parsed) {
-            parsedTextforecastCache = {
-                data: resultTextforecast.data,
-                lastModified: resultTextforecast.lastModified,
-                forecast: parsed,
-            };
+    if (!forecast) {
+        if (parseFailed) {
+            logger.error('Unable to parse textforecast');
+            throw new Error(homey.__('errors.parsing_textareas_failed'));
         }
-    }
-    if (!parsedTextforecastCache) {
-        logger.error('Unable to parse textforecast');
-        throw new Error(homey.__('errors.parsing_textareas_failed'));
+        throw new Error(homey.__('errors.fetching_textforecast_failed'));
     }
     logger.debug('Got textforecast file');
 
-    const textForecast = findTextforecastForLocation(parsedTextforecastCache.forecast, lat, lon);
+    const textForecast = findTextforecastForLocation(forecast, lat, lon);
     if (textForecast.length === 0) {
         throw new Error(homey.__('errors.textforecast_not_supported'));
     }
 
     logger.info(`Got textforecast data!`, {
-        lastChange: parsedTextforecastCache.forecast.lastChange,
+        lastChange: forecast.lastChange,
         periods: textForecast.length,
         areas: textForecast.map(period => period.locations.map(location => location.name)),
     });
@@ -612,8 +601,8 @@ export const findTextforecastForLocation = (
         let period = periods.get(key);
         if (!period) {
             period = {
-                from: moment(from).tz('Europe/Oslo').format(),
-                to: moment(to).tz('Europe/Oslo').format(),
+                from: formatIsoWithOffset(from, 'Europe/Oslo'),
+                to: formatIsoWithOffset(to, 'Europe/Oslo'),
                 type: 'normal',
                 locations: [],
             };
@@ -633,30 +622,6 @@ export const findTextforecastForLocation = (
  * Transform a polygon string to an array of points.
  * @param polygon
  */
-export const transformToPolygon = (polygon: string): Points => {
-    return polygon.split(' ').map(p => [Number(p.split(',')[0]), Number(p.split(',')[1])] as Point);
-};
-
-const xmlParser = new xml2js.Parser(/* options */);
-
-/**
- * Parse xml areas file to Areas object.
- * @param xmlFile
- * @param logger
- */
-export const parseAreasFile = async (xmlFile: string, logger?: Logger): Promise<Areas | undefined> => {
-    try {
-        const areasObj = await xmlParser.parseStringPromise(xmlFile);
-        return areasObj.areas.area.map((a: any) => ({
-            id: a['$'].id,
-            areaDesc: a.areaDesc[0],
-            polygon: transformToPolygon(a.polygon[0].trim()),
-        }));
-    } catch (err) {
-        logger?.error('parseAreasFile error:', err);
-    }
-};
-
 /**
  * Checks if a location is in a polyogn.
  * @param latitude
@@ -681,51 +646,4 @@ export const isPointInPolygon = (latitude: number, longitude: number, polygon: P
     }
 
     return inside;
-};
-
-/**
- * List area Ids for a location.
- * @param latitude
- * @param longitude
- * @param areas
- */
-export const findAreasIds = (latitude: number, longitude: number, areas: Areas): string[] => {
-    return areas.filter(area => isPointInPolygon(latitude, longitude, area.polygon)).map(area => area.id);
-};
-
-/**
- * Parse textforecast xml file to Textforecasts object.
- * @param xmlFile
- * @param logger
- */
-export const parseTextforecastFile = async (xmlFile: string, logger?: Logger): Promise<Textforecasts | undefined> => {
-    try {
-        const forecastObj = await xmlParser.parseStringPromise(xmlFile);
-        return forecastObj.textforecast.time.map((f: any) => ({
-            from: moment.tz(f['$'].from, 'YYYY-MM-DDThh:mm:ss', 'Europe/Oslo').format(),
-            to: moment.tz(f['$'].to, 'YYYY-MM-DDThh:mm:ss', 'Europe/Oslo').format(),
-            type: f.forecasttype[0]['$'].name,
-            locations: f.forecasttype[0].location.map((l: any) => ({
-                id: l['$'].id,
-                name: l['$'].name,
-                forecast: l['_'],
-            })),
-        }));
-    } catch (err) {
-        logger?.error('parseTextforecastFile error:', err);
-    }
-};
-
-/**
- * Fetch textual forecast for a list of area Ids
- * @param textforecasts
- * @param areaIds
- */
-export const findTextforecastFromAreaIds = (textforecasts: Textforecasts, areaIds: string[]): Textforecasts => {
-    return textforecasts.map(tf => ({
-        from: tf.from,
-        to: tf.to,
-        type: tf.type,
-        locations: tf.locations.filter(tfl => areaIds.includes(tfl.id)),
-    }));
 };

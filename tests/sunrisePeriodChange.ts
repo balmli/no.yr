@@ -1,23 +1,17 @@
-import moment from '../lib/moment-timezone-with-data';
+import {setDefaultTimeZone} from '../lib/date_time';
 import {clearSunEventCapabilities, shouldRefreshSunEvents} from '../lib/sunrise';
 
 describe('sunrise period changes', () => {
-    const originalNow = (moment as any).now;
-
     beforeEach(() => {
-        moment.tz.setDefault('Europe/Oslo');
-        (moment as any).now = () => Date.parse('2026-07-16T08:00:00.000Z');
-    });
-
-    afterEach(() => {
-        (moment as any).now = originalNow;
+        setDefaultTimeZone('Europe/Oslo');
     });
 
     it('refreshes only when the selected sunrise request day or offset changes', () => {
-        expect(shouldRefreshSunEvents('0', '1')).to.equal(false);
-        expect(shouldRefreshSunEvents('0', '18')).to.equal(true);
-        expect(shouldRefreshSunEvents('1:0', '1:6')).to.equal(false);
-        expect(shouldRefreshSunEvents('0', '1:0')).to.equal(true);
+        const now = new Date('2026-07-16T08:00:00.000Z');
+        expect(shouldRefreshSunEvents('0', '1', now)).to.equal(false);
+        expect(shouldRefreshSunEvents('0', '18', now)).to.equal(true);
+        expect(shouldRefreshSunEvents('1:0', '1:6', now)).to.equal(false);
+        expect(shouldRefreshSunEvents('0', '1:0', now)).to.equal(true);
     });
 
     it('invalidates both public sun event values before refreshing', async () => {

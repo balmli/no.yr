@@ -1,5 +1,3 @@
-import {Moment} from './moment';
-
 type Pressure = number | undefined;
 type Humidity = number | undefined;
 type Temperature = number | undefined;
@@ -54,7 +52,6 @@ export interface NextHours {
 
 export interface YrTimeserie {
     time: string;
-    localTime?: string;
     data: {
         instant: {
             details: InstantDetails;
@@ -148,20 +145,12 @@ export interface SunriseData {
 }
 
 export interface Sunrise {
-    sunrise?: Moment;
-    sunset?: Moment;
+    sunrise?: Date;
+    sunset?: Date;
 }
 
 export type Point = [number, number];
 export type Points = Point[];
-
-export interface Area {
-    id: string;
-    areaDesc: string;
-    polygon: Points;
-}
-
-export type Areas = Area[];
 
 export interface LocationForecast {
     id: string;
