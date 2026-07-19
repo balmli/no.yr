@@ -10,7 +10,7 @@ interface DateTimeParts {
 }
 
 const formatterCache = new Map<string, Intl.DateTimeFormat>();
-let defaultTimeZone = 'UTC';
+let defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 function formatter(timeZone: string): Intl.DateTimeFormat {
     let cached = formatterCache.get(timeZone);

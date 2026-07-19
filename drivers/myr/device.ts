@@ -2,7 +2,6 @@ import Homey from 'homey';
 
 import Logger from '@balmli/homey-logger';
 
-import moment from '../../lib/moment-timezone-with-data';
 import {RadarCoverage, Textforecasts, YrComplete, YrTimeserie, YrTimeseries} from '../../lib/types';
 import {WeatherLegends} from '../../lib/legends';
 import * as yrlib from '../../lib/yr_lib';
@@ -536,7 +535,7 @@ module.exports = class YrDevice extends Homey.Device {
         const rainingThreshold = getRainingThreshold(this.getSetting('raining_threshold'));
 
         const now = yrlib.getDateAddPeriod(period);
-        const tsAfter = nowcast ? nowcast.properties.timeseries.filter(ts => moment(ts.time).isSameOrAfter(now)) : [];
+        const tsAfter = nowcast ? nowcast.properties.timeseries.filter(ts => Date.parse(ts.time) >= now.getTime()) : [];
 
         const settings = this.getSettings();
         const expectedLocationKey = nowcastLocationKey(truncate4(settings.lat), truncate4(settings.lon));
@@ -564,11 +563,7 @@ module.exports = class YrDevice extends Homey.Device {
             rainNext30Minutes,
         );
 
-        const minutesUntilStartsRaining = minutesUntilRain(
-            nowcast!.properties.timeseries,
-            now.toDate(),
-            rainingThreshold,
-        );
+        const minutesUntilStartsRaining = minutesUntilRain(nowcast!.properties.timeseries, now, rainingThreshold);
 
         await this.updateCapability('measure_minutes_raining', minutesUntilStartsRaining);
         await this.updateCapability('measure_rain.next_30_minutes', rainNext30Minutes);

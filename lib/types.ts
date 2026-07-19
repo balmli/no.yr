@@ -1,5 +1,3 @@
-import {Moment} from './moment';
-
 type Pressure = number | undefined;
 type Humidity = number | undefined;
 type Temperature = number | undefined;
@@ -148,8 +146,8 @@ export interface SunriseData {
 }
 
 export interface Sunrise {
-    sunrise?: Moment;
-    sunset?: Moment;
+    sunrise?: Date;
+    sunset?: Date;
 }
 
 export type Point = [number, number];

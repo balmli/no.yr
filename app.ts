@@ -1,5 +1,5 @@
 import Homey from 'homey';
-import moment from './lib/moment-timezone-with-data';
+import {setDefaultTimeZone} from './lib/date_time';
 import {YrTimeserie} from './lib/types';
 import {
     capabilityEquals,
@@ -10,7 +10,7 @@ import {
 
 class YrApp extends Homey.App {
     async onInit() {
-        moment.tz.setDefault(this.homey.clock.getTimezone());
+        setDefaultTimeZone(this.homey.clock.getTimezone());
         await this._initFlows();
         this.log('YrApp is running...');
     }

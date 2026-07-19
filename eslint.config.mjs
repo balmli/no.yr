@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint';
 
 // Prettier owns formatting; ESLint is intentionally limited to code-quality rules.
 export default defineConfig(
-    globalIgnores(['.homeybuild/', 'lib/moment.min.js', 'lib/moment.d.ts', 'lib/moment-timezone-with-data.js']),
+    globalIgnores(['.homeybuild/']),
     {
         files: ['**/*.ts'],
         extends: [js.configs.recommended, tseslint.configs.recommended],

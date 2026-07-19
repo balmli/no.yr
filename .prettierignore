@@ -9,11 +9,6 @@ env.json
 # Generated Homey metadata
 app.json
 
-# Vendored/generated libraries
-lib/moment.min.js
-lib/moment.d.ts
-lib/moment-timezone-with-data.js
-
 # Binary and vector assets
 assets/
 drivers/*/assets/

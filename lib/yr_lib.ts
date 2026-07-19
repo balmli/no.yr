@@ -2,8 +2,18 @@ import Homey from 'homey/lib/Homey';
 
 import Logger from '@balmli/homey-logger';
 
-import {Moment} from './moment';
-import moment from './moment-timezone-with-data';
+import {
+    addHours,
+    DateInput,
+    formatDate,
+    formatDateTime,
+    formatIsoWithOffset,
+    formatOffset,
+    getDefaultTimeZone,
+    startOfDayAt,
+    startOfHour,
+    toDate,
+} from './date_time';
 import {
     InstantDetails,
     Point,
@@ -34,44 +44,38 @@ let parsedTextforecastCache:
       }
     | undefined;
 
-const getStartTimeNextHours = (forDate: any, args: any): any => {
+const getStartTimeNextHours = (forDate: DateInput | undefined, args: any): Date => {
     const {start} = args;
-    return (!!forDate ? moment(forDate) : moment()).startOf('hour').add(Number(start.id), 'hours');
+    return addHours(startOfHour(forDate ?? new Date()), Number(start.id));
 };
 
-const getEndTimeNextHours = (forDate: any, args: any): any => {
+const getEndTimeNextHours = (forDate: DateInput | undefined, args: any): Date => {
     const {start, hours} = args;
-    return (!!forDate ? moment(forDate) : moment()).startOf('hour').add(Number(start.id), 'hours').add(hours, 'hours');
+    return addHours(startOfHour(forDate ?? new Date()), Number(start.id) + hours);
 };
 
-const getStartTimePeriod = (forDate: any, args: any): any => {
+const getStartTimePeriod = (forDate: DateInput | undefined, args: any): Date => {
     const {start, day} = args;
-    return (!!forDate ? moment(forDate) : moment())
-        .startOf('day')
-        .add(Number(day), 'days')
-        .add(Number(start.split(':')[0]), 'hour')
-        .add(Number(start.split(':')[1]), 'minutes');
+    const [hour, minute] = start.split(':').map(Number);
+    return startOfDayAt(forDate ?? new Date(), Number(day), hour, minute);
 };
 
-const getEndTimePeriod = (forDate: any, args: any): any => {
+const getEndTimePeriod = (forDate: DateInput | undefined, args: any): Date => {
     const {end, day} = args;
-    return (!!forDate ? moment(forDate) : moment())
-        .startOf('day')
-        .add(Number(day), 'days')
-        .add(Number(end.split(':')[0]), 'hour')
-        .add(Number(end.split(':')[1]), 'minutes');
+    const [hour, minute] = end.split(':').map(Number);
+    return startOfDayAt(forDate ?? new Date(), Number(day), hour, minute);
 };
 
 const xComparer = (
     args: any,
-    startTime: any,
-    endTime: any,
+    startTime: Date,
+    endTime: Date,
     tss: YrTimeseries | undefined,
     compareFunc: (ts: YrTimeserie, value: number) => boolean,
 ): boolean => {
     const selected = requireForecastTimeseries(tss).filter(ts => {
-        const time = moment(ts.time);
-        return time.isSameOrAfter(startTime) && time.isBefore(endTime);
+        const time = Date.parse(ts.time);
+        return time >= startTime.getTime() && time < endTime.getTime();
     });
     if (selected.length === 0) {
         throw new WeatherDataUnavailableError('forecast data for the selected period');
@@ -81,15 +85,15 @@ const xComparer = (
 
 const xSum = (
     args: any,
-    startTime: any,
-    endTime: any,
+    startTime: Date,
+    endTime: Date,
     tss: YrTimeseries | undefined,
     sumSelector: (ts: YrTimeserie) => number,
     compareFunc: (sum: number | undefined, value: number) => boolean,
 ): boolean => {
     const selected = requireForecastTimeseries(tss).filter(ts => {
-        const time = moment(ts.time);
-        return time.isSameOrAfter(startTime) && time.isBefore(endTime);
+        const time = Date.parse(ts.time);
+        return time >= startTime.getTime() && time < endTime.getTime();
     });
     if (selected.length === 0) {
         throw new WeatherDataUnavailableError('forecast data for the selected period');
@@ -332,7 +336,7 @@ const parseResult = (json: any, logger: Logger): YrComplete | null => {
     try {
         const wd = JSON.parse(json) as YrComplete;
         for (const ts of wd.properties.timeseries) {
-            ts.localTime = moment(ts.time).format('DD.MM.YYYY HH:mm');
+            ts.localTime = formatDateTime(ts.time);
             logger.debug(`Ts: ${ts.time} (${ts.localTime})`);
         }
         return wd;
@@ -377,28 +381,28 @@ export const toWeatherResult = (
     };
 };
 
-export const getDateFromPeriod = (period: string): Moment => {
+export const getDateFromPeriod = (period: string, now: DateInput = new Date()): Date => {
     const splitted = period.split(':');
     return period.includes(':')
-        ? moment().utc().startOf('day').add(Number(splitted[0]), 'days').hour(Number(splitted[1]))
-        : moment().startOf('hour').add(Number(period), 'hours');
+        ? startOfDayAt(now, Number(splitted[0]), Number(splitted[1]), 0, 'UTC')
+        : addHours(startOfHour(now), Number(period));
 };
 
-export const getDateAddPeriod = (period: string): Moment => {
+export const getDateAddPeriod = (period: string, now: DateInput = new Date()): Date => {
     const splitted = period.split(':');
     return period.includes(':')
-        ? moment().utc().startOf('day').add(Number(splitted[0]), 'days').hour(Number(splitted[1]))
-        : moment().add(Number(period), 'hours');
+        ? startOfDayAt(now, Number(splitted[0]), Number(splitted[1]), 0, 'UTC')
+        : addHours(now, Number(period));
 };
 
 export const getTimeSeries = (wd: YrComplete, period: string, logger: Logger): YrTimeserie | null => {
     const forDate = getDateFromPeriod(period);
     logger.debug('Get time series. Search for: ', forDate);
     for (const ts of wd.properties.timeseries) {
-        const time = moment(ts.time);
-        logger.debug('Check time series:', time);
-        if (time.isSame(forDate)) {
-            logger.info('Got time series:', time);
+        const time = Date.parse(ts.time);
+        logger.debug('Check time series:', new Date(time));
+        if (time === forDate.getTime()) {
+            logger.info('Got time series:', new Date(time));
             return ts;
         }
     }
@@ -409,14 +413,15 @@ export const fetchSunrise = async (
     lat: number,
     lon: number,
     period: string,
-    aDate: Moment | undefined,
+    aDate: Date | undefined,
     appVersion: string,
     logger: Logger,
     homey: Homey,
 ): Promise<Sunrise> => {
-    const forDate = aDate ? aDate : getDateFromPeriod(period);
-    const date = forDate.format('yyyy-MM-DD');
-    const offset = forDate.format('Z');
+    const forDate = aDate ? toDate(aDate) : getDateFromPeriod(period);
+    const timeZone = aDate || !period.includes(':') ? getDefaultTimeZone() : 'UTC';
+    const date = formatDate(forDate, timeZone);
+    const offset = formatOffset(forDate, timeZone);
     logger.debug(`fetchSunrise: ${lat}, ${lon}, ${date}, ${offset}`);
     const uri = `https://api.met.no/weatherapi/sunrise/3.0/sun?lat=${lat}&lon=${lon}&date=${date}&offset=${offset}`;
     const result = await doCachedFetch(uri, appVersion, logger);
@@ -440,8 +445,8 @@ export const parseSunrise = async (data1: string, logger?: Logger): Promise<Sunr
         const hasData = data && data.properties && data.properties.sunrise && data.properties.sunset;
         return hasData
             ? {
-                  sunrise: data.properties.sunrise.time ? moment(data.properties.sunrise.time) : undefined,
-                  sunset: data.properties.sunset.time ? moment(data.properties.sunset.time) : undefined,
+                  sunrise: data.properties.sunrise.time ? toDate(data.properties.sunrise.time) : undefined,
+                  sunset: data.properties.sunset.time ? toDate(data.properties.sunset.time) : undefined,
               }
             : undefined;
     } catch (err) {
@@ -609,8 +614,8 @@ export const findTextforecastForLocation = (
         let period = periods.get(key);
         if (!period) {
             period = {
-                from: moment(from).tz('Europe/Oslo').format(),
-                to: moment(to).tz('Europe/Oslo').format(),
+                from: formatIsoWithOffset(from, 'Europe/Oslo'),
+                to: formatIsoWithOffset(to, 'Europe/Oslo'),
                 type: 'normal',
                 locations: [],
             };
