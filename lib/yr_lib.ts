@@ -1,13 +1,10 @@
 import Homey from 'homey/lib/Homey';
 
-const xml2js = require('xml2js');
-
 import Logger from '@balmli/homey-logger';
 
 import {Moment} from './moment';
 import moment from './moment-timezone-with-data';
 import {
-    Areas,
     InstantDetails,
     Point,
     Points,
@@ -633,30 +630,6 @@ export const findTextforecastForLocation = (
  * Transform a polygon string to an array of points.
  * @param polygon
  */
-export const transformToPolygon = (polygon: string): Points => {
-    return polygon.split(' ').map(p => [Number(p.split(',')[0]), Number(p.split(',')[1])] as Point);
-};
-
-const xmlParser = new xml2js.Parser(/* options */);
-
-/**
- * Parse xml areas file to Areas object.
- * @param xmlFile
- * @param logger
- */
-export const parseAreasFile = async (xmlFile: string, logger?: Logger): Promise<Areas | undefined> => {
-    try {
-        const areasObj = await xmlParser.parseStringPromise(xmlFile);
-        return areasObj.areas.area.map((a: any) => ({
-            id: a['$'].id,
-            areaDesc: a.areaDesc[0],
-            polygon: transformToPolygon(a.polygon[0].trim()),
-        }));
-    } catch (err) {
-        logger?.error('parseAreasFile error:', err);
-    }
-};
-
 /**
  * Checks if a location is in a polyogn.
  * @param latitude
@@ -681,51 +654,4 @@ export const isPointInPolygon = (latitude: number, longitude: number, polygon: P
     }
 
     return inside;
-};
-
-/**
- * List area Ids for a location.
- * @param latitude
- * @param longitude
- * @param areas
- */
-export const findAreasIds = (latitude: number, longitude: number, areas: Areas): string[] => {
-    return areas.filter(area => isPointInPolygon(latitude, longitude, area.polygon)).map(area => area.id);
-};
-
-/**
- * Parse textforecast xml file to Textforecasts object.
- * @param xmlFile
- * @param logger
- */
-export const parseTextforecastFile = async (xmlFile: string, logger?: Logger): Promise<Textforecasts | undefined> => {
-    try {
-        const forecastObj = await xmlParser.parseStringPromise(xmlFile);
-        return forecastObj.textforecast.time.map((f: any) => ({
-            from: moment.tz(f['$'].from, 'YYYY-MM-DDThh:mm:ss', 'Europe/Oslo').format(),
-            to: moment.tz(f['$'].to, 'YYYY-MM-DDThh:mm:ss', 'Europe/Oslo').format(),
-            type: f.forecasttype[0]['$'].name,
-            locations: f.forecasttype[0].location.map((l: any) => ({
-                id: l['$'].id,
-                name: l['$'].name,
-                forecast: l['_'],
-            })),
-        }));
-    } catch (err) {
-        logger?.error('parseTextforecastFile error:', err);
-    }
-};
-
-/**
- * Fetch textual forecast for a list of area Ids
- * @param textforecasts
- * @param areaIds
- */
-export const findTextforecastFromAreaIds = (textforecasts: Textforecasts, areaIds: string[]): Textforecasts => {
-    return textforecasts.map(tf => ({
-        from: tf.from,
-        to: tf.to,
-        type: tf.type,
-        locations: tf.locations.filter(tfl => areaIds.includes(tfl.id)),
-    }));
 };

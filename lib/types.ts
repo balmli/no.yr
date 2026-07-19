@@ -155,14 +155,6 @@ export interface Sunrise {
 export type Point = [number, number];
 export type Points = Point[];
 
-export interface Area {
-    id: string;
-    areaDesc: string;
-    polygon: Points;
-}
-
-export type Areas = Area[];
-
 export interface LocationForecast {
     id: string;
     name: string;

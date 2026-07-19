@@ -298,7 +298,6 @@ Production dependencies:
 
 - `@balmli/homey-logger`: structured logging
 - `feels`: feels-like calculations
-- `xml2js`: textual forecast XML parsing
 
 The project uses the native `fetch` supplied by Node.js 24.
 
