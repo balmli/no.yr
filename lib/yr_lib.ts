@@ -318,7 +318,7 @@ export const fetchWeather = async (
     const uri =
         `https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=${lat}&lon=${lon}` +
         (!clearAltitude && altitude !== -1 ? `&altitude=${Math.round(altitude)}` : '');
-    const result = await doCachedFetch(uri, appVersion, logger, ifModifiedSince);
+    const result = await doFetch(uri, appVersion, logger, ifModifiedSince);
     if (result === null) {
         return {data: null, notModified: false, throttled: false};
     }
@@ -465,7 +465,7 @@ export const fetchNowcast = async (
     const uri =
         `https://api.met.no/weatherapi/nowcast/2.0/complete?lat=${lat}&lon=${lon}` +
         (!clearAltitude && altitude !== -1 ? `&altitude=${Math.round(altitude)}` : '');
-    const result = await doCachedFetch(uri, appVersion, logger, ifModifiedSince);
+    const result = await doFetch(uri, appVersion, logger, ifModifiedSince);
     if (result === null) {
         return {data: null, notModified: false, throttled: false};
     }
