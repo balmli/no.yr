@@ -1,6 +1,6 @@
 {
   "id": "no.yr",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "brandColor": "#53b7ee",
@@ -44,8 +44,7 @@
     "small": "/assets/images/small.png"
   },
   "permissions": [
-    "homey:manager:geolocation",
-    "homey:manager:api"
+    "homey:manager:geolocation"
   ],
   "api": {
     "getDevices": {
